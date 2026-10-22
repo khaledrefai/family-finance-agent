@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: family-finance-core
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ffa}
+    username: ${DB_USER:ffa}
+    password: ${DB_PASSWORD:ffa}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate      # Flyway owns the schema; Hibernate only checks the entities match it
+  flyway:
+    locations: classpath:db/migration
+
+app:
+  jwt:
+    # DEV ONLY default. Set APP_JWT_SECRET (32+ random bytes) anywhere that is not your laptop.
+    secret: ${APP_JWT_SECRET:dev-only-secret-change-me-0123456789abcdef}
+    issuer: family-finance-core
+    ttl: 8h
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+---
+# "demo" profile: also loads the demo family (db/seed). Used by docker-compose and the tests.
+spring:
+  config:
+    activate:
+      on-profile: demo
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed

@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Family Finance - Ask to Buy (demo)",
+  "version": "0.0.1",
+  "description": "DEMO ONLY. Pauses checkout on supported stores and sends an ask-to-buy request to a parent.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://www.noon.com/*", "https://www.amazon.ae/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.noon.com/*", "https://www.amazon.ae/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
