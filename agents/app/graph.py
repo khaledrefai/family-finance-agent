@@ -3,14 +3,21 @@
 Week 1 is a skeleton:
   * routing uses simple keywords so it works without an LLM key and is easy to test;
   * each agent node only says what it will do and in which week it arrives.
+Spend-logging spike: the Bookkeeper really works for two things, a child saying what they bought
+("12 dirhams shawarma") and a parent asking where a child's money went (see bookkeeper.py).
 Later weeks replace route_message() with an LLM classifier and fill in each agent with tools
 that call the core API (core_client.py). Agents never calculate money themselves.
 """
 
+import re
 from enum import Enum
 from typing import TypedDict
 
+from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
+
+from . import bookkeeper
+from .spend_parser import looks_like_spend
 
 
 class Agent(str, Enum):
@@ -47,8 +54,19 @@ _PLACEHOLDER = {
 }
 
 
+# A child asking for something ("can I buy...") goes to the Gatekeeper even if it has a price in it
+_ASKING = re.compile(r"\b(can i|could i|may i|i want|i wanna|please|buy me)\b", re.I)
+
+
+def is_spend_log(state: ChatState) -> bool:
+    text = state.get("message", "")
+    return state.get("role") == "CHILD" and looks_like_spend(text) and not _ASKING.search(text)
+
+
 def route_message(state: ChatState) -> ChatState:
     text = state.get("message", "").lower()
+    if bookkeeper.is_spend_question(text) or is_spend_log(state):
+        return {"agent": Agent.BOOKKEEPER}
     for agent, words in _KEYWORDS:
         if any(w in text for w in words):
             return {"agent": agent}
@@ -61,11 +79,20 @@ def _agent_node(agent: Agent):
     return run
 
 
+def bookkeeper_node(state: ChatState, config: RunnableConfig) -> ChatState:
+    ctx = config.get("configurable", {})
+    core, me = ctx.get("core"), ctx.get("me")
+    message = state.get("message", "")
+    if core is not None and me is not None and (bookkeeper.is_spend_question(message) or is_spend_log(state)):
+        return {"reply": bookkeeper.handle(core, me, message)}
+    return {"reply": _PLACEHOLDER[Agent.BOOKKEEPER]}
+
+
 def build_graph():
     graph = StateGraph(ChatState)
     graph.add_node("router", route_message)
     for agent in Agent:
-        graph.add_node(agent.value, _agent_node(agent))
+        graph.add_node(agent.value, bookkeeper_node if agent is Agent.BOOKKEEPER else _agent_node(agent))
         graph.add_edge(agent.value, END)
     graph.add_edge(START, "router")
     graph.add_conditional_edges("router", lambda s: s["agent"].value, {a.value: a.value for a in Agent})

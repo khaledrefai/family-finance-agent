@@ -49,12 +49,12 @@ INSERT INTO commitment (family_id, name, kind, amount_minor, frequency, next_due
  ('00000000-0000-0000-0000-00000000f001', 'DEWA electricity and water', 'UTILITY',        95000, 'MONTHLY',   current_date + 12, NULL),
  ('00000000-0000-0000-0000-00000000f001', 'Streaming bundle',           'SUBSCRIPTION',    5900, 'MONTHLY',   current_date + 3,  NULL);
 
--- Budgets: family food budget + weekly pocket money per child
+-- Budgets: family food budget + weekly pocket money per child (Layla's AED 100 includes school canteen money)
 INSERT INTO budget (family_id, member_id, category, period, limit_minor) VALUES
  ('00000000-0000-0000-0000-00000000f001', NULL, 'GROCERIES', 'WEEKLY', 70000),
  ('00000000-0000-0000-0000-00000000f001', NULL, 'DINING_OUT', 'MONTHLY', 80000),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1', 'POCKET_MONEY', 'WEEKLY', 5000),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'POCKET_MONEY', 'WEEKLY', 3000);
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1', 'POCKET_MONEY', 'WEEKLY', 10000),
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'POCKET_MONEY', 'WEEKLY', 6000);
 
 -- Family rules
 INSERT INTO family_rule (family_id, applies_to_member_id, kind, category, allergen, limit_minor, note, created_by) VALUES
@@ -68,15 +68,15 @@ INSERT INTO demo_wallet (id, family_id, member_id) VALUES
  ('00000000-0000-0000-0000-0000000000d1', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1'),
  ('00000000-0000-0000-0000-0000000000d2', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2');
 
--- Weekly pocket money every Sunday for the last 11 weeks: Layla AED 50, Adam AED 30 (matches the budgets above).
+-- Weekly pocket money every Sunday for the last 11 weeks: Layla AED 100, Adam AED 60 (matches the budgets above).
 -- "Today" is UAE time so it lines up with the core's clock.
 INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description, created_at)
 SELECT w.wallet_id, 'POCKET_MONEY', w.amount, 'Weekly pocket money (demo money)',
        (t.d - (extract(isodow FROM t.d)::int % 7) - 7 * k) + time '09:00'
 FROM (SELECT (now() AT TIME ZONE 'Asia/Dubai')::date AS d) t
 CROSS JOIN generate_series(0, 10) AS k
-CROSS JOIN (VALUES ('00000000-0000-0000-0000-0000000000d1'::uuid, 5000),
-                   ('00000000-0000-0000-0000-0000000000d2'::uuid, 3000)) AS w(wallet_id, amount);
+CROSS JOIN (VALUES ('00000000-0000-0000-0000-0000000000d1'::uuid, 10000),
+                   ('00000000-0000-0000-0000-0000000000d2'::uuid, 6000)) AS w(wallet_id, amount);
 
 INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description) VALUES
  ('00000000-0000-0000-0000-0000000000d1', 'PAYMENT', -1200, 'Bookshop (demo money)');
@@ -101,23 +101,23 @@ INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, 
 -- has something to answer from on any day you reseed. Amounts in fils. Some school days are missing on purpose:
 -- real kids forget to log, and the parent's answer should say so.
 --
--- Layla (13): canteen Mon/Tue/Thu, crisps on Friday, bubble tea every other Saturday, plus one-offs
--- Adam (9):   canteen Tue/Thu, ice cream on Saturday, lots of Pokemon cards, one Robux card and one cola
---             (both against family rules)
+-- Layla (13): canteen Monday to Thursday, crisps on Friday, bubble tea every other Saturday, plus one-offs
+-- Adam (9):   canteen Tue/Thu, ice cream on Saturday, cards or stickers every Sunday, one Robux card and
+--             one cola (both against family rules)
 WITH today AS (SELECT (now() AT TIME ZONE 'Asia/Dubai')::date AS d),
 days AS (
     SELECT g AS ago, t.d - g AS d, extract(isodow FROM t.d - g)::int AS dow, (extract(week FROM t.d - g)::int % 2) AS odd_week
-    FROM today t, generate_series(0, 74) AS g
+    FROM today t, generate_series(1, 74) AS g   -- nothing today, so the agent's nudge shows in the demo
 ),
 habits AS (
     -- Layla
     SELECT '00000000-0000-0000-0000-0000000000c1'::uuid AS member, ago, d,
            (ARRAY['Chicken wrap', 'Pasta', 'Sandwich and juice'])[ago % 3 + 1] AS descr,
-           'School canteen' AS merchant, 'SCHOOL_CANTEEN' AS cat, (ARRAY[800, 700, 600])[ago % 3 + 1] AS amt
-    FROM days WHERE dow IN (1, 2, 4) AND ago % 5 <> 3
+           'School canteen' AS merchant, 'SCHOOL_CANTEEN' AS cat, (ARRAY[800, 700, 900])[ago % 3 + 1] AS amt
+    FROM days WHERE dow IN (1, 2, 3, 4) AND ago % 7 <> 3
     UNION ALL
     SELECT '00000000-0000-0000-0000-0000000000c1', ago, d, 'Crisps and water', 'School canteen', 'SNACKS', 400
-    FROM days WHERE dow = 5 AND ago % 5 <> 3
+    FROM days WHERE dow = 5 AND ago % 3 <> 0
     UNION ALL
     SELECT '00000000-0000-0000-0000-0000000000c1', ago, d, 'Bubble tea', 'Mall', 'EATING_OUT', 1600
     FROM days WHERE dow = 6 AND odd_week = 1
@@ -128,18 +128,23 @@ habits AS (
     UNION ALL
     SELECT '00000000-0000-0000-0000-0000000000c2', ago, d, 'Ice cream', 'Ice cream shop', 'SNACKS', 700
     FROM days WHERE dow = 6
+    UNION ALL
+    SELECT '00000000-0000-0000-0000-0000000000c2', ago, d,
+           CASE WHEN odd_week = 1 THEN 'Pokemon cards' ELSE 'Football stickers' END, 'Toy shop', 'TOYS_AND_HOBBIES',
+           CASE WHEN odd_week = 1 THEN 1500 ELSE 800 END
+    FROM days WHERE dow = 7
 ),
 one_offs AS (
     SELECT v.member, v.ago, t.d - v.ago AS d, v.descr, v.merchant, v.cat, v.amt
     FROM today t, (VALUES
      -- Layla
      ('00000000-0000-0000-0000-0000000000c1'::uuid,  2, 'Shawarma with friends',   'Shawarma place', 'EATING_OUT',              1200),
-     ('00000000-0000-0000-0000-0000000000c1'::uuid,  5, 'Phone case',              'Mall kiosk',     'CLOTHES_AND_ACCESSORIES', 3500),
-     ('00000000-0000-0000-0000-0000000000c1'::uuid, 12, 'Birthday gift for Mariam', NULL,            'GIFTS_AND_CHARITY',       3000),
+     ('00000000-0000-0000-0000-0000000000c1'::uuid,  5, 'Phone case',              'Mall kiosk',     'CLOTHES_AND_ACCESSORIES', 2500),
+     ('00000000-0000-0000-0000-0000000000c1'::uuid, 12, 'Birthday gift for Mariam', NULL,            'GIFTS_AND_CHARITY',       2500),
      ('00000000-0000-0000-0000-0000000000c1'::uuid, 19, 'Notebook and gel pens',   'Bookshop',       'BOOKS_AND_STATIONERY',    1500),
      ('00000000-0000-0000-0000-0000000000c1'::uuid, 26, 'Popcorn at the cinema',   'Cinema',         'SNACKS',                  1800),
      ('00000000-0000-0000-0000-0000000000c1'::uuid, 33, 'Metro card top-up',       'Metro',          'TRANSPORT',               2000),
-     ('00000000-0000-0000-0000-0000000000c1'::uuid, 40, 'Lip balm and hair clips', 'Pharmacy',       'CLOTHES_AND_ACCESSORIES', 2500),
+     ('00000000-0000-0000-0000-0000000000c1'::uuid, 40, 'Lip balm and hair clips', 'Pharmacy',       'CLOTHES_AND_ACCESSORIES', 2000),
      ('00000000-0000-0000-0000-0000000000c1'::uuid, 47, 'Shawarma with friends',   'Shawarma place', 'EATING_OUT',              1200),
      ('00000000-0000-0000-0000-0000000000c1'::uuid, 54, 'Gift for Teachers'' Day', NULL,             'GIFTS_AND_CHARITY',       2000),
      ('00000000-0000-0000-0000-0000000000c1'::uuid, 61, 'Sketchbook',              'Bookshop',       'BOOKS_AND_STATIONERY',    2200),
@@ -147,14 +152,10 @@ one_offs AS (
      -- Adam
      ('00000000-0000-0000-0000-0000000000c2'::uuid,  3, 'Cola',                    'Supermarket',    'SUGARY_DRINKS',            300),
      ('00000000-0000-0000-0000-0000000000c2'::uuid,  6, 'Robux gift card',         'Supermarket',    'IN_GAME_PURCHASES',       2000),
-     ('00000000-0000-0000-0000-0000000000c2'::uuid, 13, 'Pokemon cards',           'Toy shop',       'TOYS_AND_HOBBIES',        1500),
      ('00000000-0000-0000-0000-0000000000c2'::uuid, 20, 'Slime kit',               'Toy shop',       'TOYS_AND_HOBBIES',        1200),
-     ('00000000-0000-0000-0000-0000000000c2'::uuid, 27, 'Pokemon cards',           'Toy shop',       'TOYS_AND_HOBBIES',        1500),
-     ('00000000-0000-0000-0000-0000000000c2'::uuid, 34, 'Football stickers',       'Supermarket',    'TOYS_AND_HOBBIES',         800),
-     ('00000000-0000-0000-0000-0000000000c2'::uuid, 41, 'Pokemon cards',           'Toy shop',       'TOYS_AND_HOBBIES',        1500),
+     ('00000000-0000-0000-0000-0000000000c2'::uuid, 34, 'Lego minifigure',         'Toy shop',       'TOYS_AND_HOBBIES',        1800),
      ('00000000-0000-0000-0000-0000000000c2'::uuid, 48, 'Charity box at school',   NULL,             'GIFTS_AND_CHARITY',        500),
-     ('00000000-0000-0000-0000-0000000000c2'::uuid, 55, 'Slime kit',               'Toy shop',       'TOYS_AND_HOBBIES',        1200),
-     ('00000000-0000-0000-0000-0000000000c2'::uuid, 62, 'Pokemon cards',           'Toy shop',       'TOYS_AND_HOBBIES',        1500)
+     ('00000000-0000-0000-0000-0000000000c2'::uuid, 55, 'Slime kit',               'Toy shop',       'TOYS_AND_HOBBIES',        1200)
     ) AS v(member, ago, descr, merchant, cat, amt)
 )
 INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, merchant, category, direction,

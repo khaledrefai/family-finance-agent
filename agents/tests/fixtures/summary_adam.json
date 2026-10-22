@@ -1,0 +1,292 @@
+{
+    "memberId": "00000000-0000-0000-0000-0000000000c2",
+    "displayName": "Adam",
+    "periodLabel": "October 2026",
+    "from": "2026-10-01",
+    "to": "2026-10-23",
+    "monthToDate": true,
+    "daysInPeriod": 23,
+    "total": {
+        "minor": 11200,
+        "currency": "AED",
+        "text": "AED 112"
+    },
+    "purchaseCount": 14,
+    "daysLogged": 11,
+    "lastLoggedOn": "2026-10-20",
+    "pocketMoney": {
+        "minor": 18000,
+        "currency": "AED",
+        "text": "AED 180"
+    },
+    "spentPercentOfPocketMoney": 62,
+    "categories": [
+        {
+            "category": "TOYS_AND_HOBBIES",
+            "label": "toys and hobbies",
+            "total": {
+                "minor": 4300,
+                "currency": "AED",
+                "text": "AED 43"
+            },
+            "count": 4,
+            "percent": 38,
+            "averagePerPurchase": {
+                "minor": 1075,
+                "currency": "AED",
+                "text": "AED 10.75"
+            }
+        },
+        {
+            "category": "SCHOOL_CANTEEN",
+            "label": "the school canteen",
+            "total": {
+                "minor": 2500,
+                "currency": "AED",
+                "text": "AED 25"
+            },
+            "count": 5,
+            "percent": 22,
+            "averagePerPurchase": {
+                "minor": 500,
+                "currency": "AED",
+                "text": "AED 5"
+            }
+        },
+        {
+            "category": "SNACKS",
+            "label": "snacks and treats",
+            "total": {
+                "minor": 2100,
+                "currency": "AED",
+                "text": "AED 21"
+            },
+            "count": 3,
+            "percent": 19,
+            "averagePerPurchase": {
+                "minor": 700,
+                "currency": "AED",
+                "text": "AED 7"
+            }
+        },
+        {
+            "category": "IN_GAME_PURCHASES",
+            "label": "in-game purchases",
+            "total": {
+                "minor": 2000,
+                "currency": "AED",
+                "text": "AED 20"
+            },
+            "count": 1,
+            "percent": 18,
+            "averagePerPurchase": {
+                "minor": 2000,
+                "currency": "AED",
+                "text": "AED 20"
+            }
+        },
+        {
+            "category": "SUGARY_DRINKS",
+            "label": "fizzy and sugary drinks",
+            "total": {
+                "minor": 300,
+                "currency": "AED",
+                "text": "AED 3"
+            },
+            "count": 1,
+            "percent": 3,
+            "averagePerPurchase": {
+                "minor": 300,
+                "currency": "AED",
+                "text": "AED 3"
+            }
+        }
+    ],
+    "topItems": [
+        {
+            "description": "Juice and croissant",
+            "category": "SCHOOL_CANTEEN",
+            "count": 5,
+            "total": {
+                "minor": 2500,
+                "currency": "AED",
+                "text": "AED 25"
+            }
+        },
+        {
+            "description": "Ice cream",
+            "category": "SNACKS",
+            "count": 3,
+            "total": {
+                "minor": 2100,
+                "currency": "AED",
+                "text": "AED 21"
+            }
+        },
+        {
+            "description": "Robux gift card",
+            "category": "IN_GAME_PURCHASES",
+            "count": 1,
+            "total": {
+                "minor": 2000,
+                "currency": "AED",
+                "text": "AED 20"
+            }
+        },
+        {
+            "description": "Football stickers",
+            "category": "TOYS_AND_HOBBIES",
+            "count": 2,
+            "total": {
+                "minor": 1600,
+                "currency": "AED",
+                "text": "AED 16"
+            }
+        },
+        {
+            "description": "Pokemon cards",
+            "category": "TOYS_AND_HOBBIES",
+            "count": 1,
+            "total": {
+                "minor": 1500,
+                "currency": "AED",
+                "text": "AED 15"
+            }
+        },
+        {
+            "description": "Slime kit",
+            "category": "TOYS_AND_HOBBIES",
+            "count": 1,
+            "total": {
+                "minor": 1200,
+                "currency": "AED",
+                "text": "AED 12"
+            }
+        },
+        {
+            "description": "Cola",
+            "category": "SUGARY_DRINKS",
+            "count": 1,
+            "total": {
+                "minor": 300,
+                "currency": "AED",
+                "text": "AED 3"
+            }
+        }
+    ],
+    "biggestPurchase": {
+        "id": "ab9b473c-2ef3-4670-85e3-7418a8b7baa4",
+        "occurredOn": "2026-10-17",
+        "description": "Robux gift card",
+        "merchant": "Supermarket",
+        "category": "IN_GAME_PURCHASES",
+        "categoryLabel": "in-game purchases",
+        "amount": {
+            "minor": 2000,
+            "currency": "AED",
+            "text": "AED 20"
+        },
+        "loggedText": "20 dirhams robux gift card",
+        "possibleDuplicate": false,
+        "familyRuleNote": "No in-game purchases"
+    },
+    "weeks": [
+        {
+            "weekStart": "2026-10-01",
+            "weekEnd": "2026-10-04",
+            "total": {
+                "minor": 3200,
+                "currency": "AED",
+                "text": "AED 32"
+            },
+            "topCategory": "TOYS_AND_HOBBIES",
+            "topCategoryLabel": "toys and hobbies"
+        },
+        {
+            "weekStart": "2026-10-05",
+            "weekEnd": "2026-10-11",
+            "total": {
+                "minor": 2700,
+                "currency": "AED",
+                "text": "AED 27"
+            },
+            "topCategory": "TOYS_AND_HOBBIES",
+            "topCategoryLabel": "toys and hobbies"
+        },
+        {
+            "weekStart": "2026-10-12",
+            "weekEnd": "2026-10-18",
+            "total": {
+                "minor": 4500,
+                "currency": "AED",
+                "text": "AED 45"
+            },
+            "topCategory": "IN_GAME_PURCHASES",
+            "topCategoryLabel": "in-game purchases"
+        },
+        {
+            "weekStart": "2026-10-19",
+            "weekEnd": "2026-10-23",
+            "total": {
+                "minor": 800,
+                "currency": "AED",
+                "text": "AED 8"
+            },
+            "topCategory": "SCHOOL_CANTEEN",
+            "topCategoryLabel": "the school canteen"
+        }
+    ],
+    "topCategoryWeeksRunning": 0,
+    "previous": {
+        "periodLabel": "September 2026",
+        "from": "2026-09-01",
+        "to": "2026-09-23",
+        "total": {
+            "minor": 10500,
+            "currency": "AED",
+            "text": "AED 105"
+        },
+        "daysLogged": 12,
+        "difference": {
+            "minor": 700,
+            "currency": "AED",
+            "text": "AED 7"
+        },
+        "direction": "MORE"
+    },
+    "goals": [],
+    "againstFamilyRules": [
+        {
+            "id": "ab9b473c-2ef3-4670-85e3-7418a8b7baa4",
+            "occurredOn": "2026-10-17",
+            "description": "Robux gift card",
+            "merchant": "Supermarket",
+            "category": "IN_GAME_PURCHASES",
+            "categoryLabel": "in-game purchases",
+            "amount": {
+                "minor": 2000,
+                "currency": "AED",
+                "text": "AED 20"
+            },
+            "loggedText": "20 dirhams robux gift card",
+            "possibleDuplicate": false,
+            "familyRuleNote": "No in-game purchases"
+        },
+        {
+            "id": "f7a3088c-5162-4b3b-bd87-322306e69f68",
+            "occurredOn": "2026-10-20",
+            "description": "Cola",
+            "merchant": "Supermarket",
+            "category": "SUGARY_DRINKS",
+            "categoryLabel": "fizzy and sugary drinks",
+            "amount": {
+                "minor": 300,
+                "currency": "AED",
+                "text": "AED 3"
+            },
+            "loggedText": "3 dirhams cola",
+            "possibleDuplicate": false,
+            "familyRuleNote": "No fizzy drinks for Adam"
+        }
+    ]
+}

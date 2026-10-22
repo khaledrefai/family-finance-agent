@@ -1,0 +1,305 @@
+{
+    "memberId": "00000000-0000-0000-0000-0000000000c1",
+    "displayName": "Layla",
+    "periodLabel": "October 2026",
+    "from": "2026-10-01",
+    "to": "2026-10-23",
+    "monthToDate": true,
+    "daysInPeriod": 23,
+    "total": {
+        "minor": 18000,
+        "currency": "AED",
+        "text": "AED 180"
+    },
+    "purchaseCount": 17,
+    "daysLogged": 16,
+    "lastLoggedOn": "2026-10-22",
+    "pocketMoney": {
+        "minor": 30000,
+        "currency": "AED",
+        "text": "AED 300"
+    },
+    "spentPercentOfPocketMoney": 60,
+    "categories": [
+        {
+            "category": "SCHOOL_CANTEEN",
+            "label": "the school canteen",
+            "total": {
+                "minor": 7900,
+                "currency": "AED",
+                "text": "AED 79"
+            },
+            "count": 10,
+            "percent": 44,
+            "averagePerPurchase": {
+                "minor": 790,
+                "currency": "AED",
+                "text": "AED 7.90"
+            }
+        },
+        {
+            "category": "EATING_OUT",
+            "label": "eating out",
+            "total": {
+                "minor": 2800,
+                "currency": "AED",
+                "text": "AED 28"
+            },
+            "count": 2,
+            "percent": 16,
+            "averagePerPurchase": {
+                "minor": 1400,
+                "currency": "AED",
+                "text": "AED 14"
+            }
+        },
+        {
+            "category": "CLOTHES_AND_ACCESSORIES",
+            "label": "clothes and accessories",
+            "total": {
+                "minor": 2500,
+                "currency": "AED",
+                "text": "AED 25"
+            },
+            "count": 1,
+            "percent": 14,
+            "averagePerPurchase": {
+                "minor": 2500,
+                "currency": "AED",
+                "text": "AED 25"
+            }
+        },
+        {
+            "category": "GIFTS_AND_CHARITY",
+            "label": "gifts and giving",
+            "total": {
+                "minor": 2500,
+                "currency": "AED",
+                "text": "AED 25"
+            },
+            "count": 1,
+            "percent": 14,
+            "averagePerPurchase": {
+                "minor": 2500,
+                "currency": "AED",
+                "text": "AED 25"
+            }
+        },
+        {
+            "category": "BOOKS_AND_STATIONERY",
+            "label": "books and stationery",
+            "total": {
+                "minor": 1500,
+                "currency": "AED",
+                "text": "AED 15"
+            },
+            "count": 1,
+            "percent": 8,
+            "averagePerPurchase": {
+                "minor": 1500,
+                "currency": "AED",
+                "text": "AED 15"
+            }
+        },
+        {
+            "category": "SNACKS",
+            "label": "snacks and treats",
+            "total": {
+                "minor": 800,
+                "currency": "AED",
+                "text": "AED 8"
+            },
+            "count": 2,
+            "percent": 4,
+            "averagePerPurchase": {
+                "minor": 400,
+                "currency": "AED",
+                "text": "AED 4"
+            }
+        }
+    ],
+    "topItems": [
+        {
+            "description": "Pasta",
+            "category": "SCHOOL_CANTEEN",
+            "count": 4,
+            "total": {
+                "minor": 2800,
+                "currency": "AED",
+                "text": "AED 28"
+            }
+        },
+        {
+            "description": "Sandwich and juice",
+            "category": "SCHOOL_CANTEEN",
+            "count": 3,
+            "total": {
+                "minor": 2700,
+                "currency": "AED",
+                "text": "AED 27"
+            }
+        },
+        {
+            "description": "Phone case",
+            "category": "CLOTHES_AND_ACCESSORIES",
+            "count": 1,
+            "total": {
+                "minor": 2500,
+                "currency": "AED",
+                "text": "AED 25"
+            }
+        },
+        {
+            "description": "Birthday gift for Mariam",
+            "category": "GIFTS_AND_CHARITY",
+            "count": 1,
+            "total": {
+                "minor": 2500,
+                "currency": "AED",
+                "text": "AED 25"
+            }
+        },
+        {
+            "description": "Chicken wrap",
+            "category": "SCHOOL_CANTEEN",
+            "count": 3,
+            "total": {
+                "minor": 2400,
+                "currency": "AED",
+                "text": "AED 24"
+            }
+        },
+        {
+            "description": "Bubble tea",
+            "category": "EATING_OUT",
+            "count": 1,
+            "total": {
+                "minor": 1600,
+                "currency": "AED",
+                "text": "AED 16"
+            }
+        },
+        {
+            "description": "Notebook and gel pens",
+            "category": "BOOKS_AND_STATIONERY",
+            "count": 1,
+            "total": {
+                "minor": 1500,
+                "currency": "AED",
+                "text": "AED 15"
+            }
+        },
+        {
+            "description": "Shawarma with friends",
+            "category": "EATING_OUT",
+            "count": 1,
+            "total": {
+                "minor": 1200,
+                "currency": "AED",
+                "text": "AED 12"
+            }
+        }
+    ],
+    "biggestPurchase": {
+        "id": "1381c7ad-8db4-412d-aa83-6a28e5786e2b",
+        "occurredOn": "2026-10-18",
+        "description": "Phone case",
+        "merchant": "Mall kiosk",
+        "category": "CLOTHES_AND_ACCESSORIES",
+        "categoryLabel": "clothes and accessories",
+        "amount": {
+            "minor": 2500,
+            "currency": "AED",
+            "text": "AED 25"
+        },
+        "loggedText": "25 dirhams phone case",
+        "possibleDuplicate": false,
+        "familyRuleNote": null
+    },
+    "weeks": [
+        {
+            "weekStart": "2026-10-01",
+            "weekEnd": "2026-10-04",
+            "total": {
+                "minor": 2200,
+                "currency": "AED",
+                "text": "AED 22"
+            },
+            "topCategory": "BOOKS_AND_STATIONERY",
+            "topCategoryLabel": "books and stationery"
+        },
+        {
+            "weekStart": "2026-10-05",
+            "weekEnd": "2026-10-11",
+            "total": {
+                "minor": 6800,
+                "currency": "AED",
+                "text": "AED 68"
+            },
+            "topCategory": "GIFTS_AND_CHARITY",
+            "topCategoryLabel": "gifts and giving"
+        },
+        {
+            "weekStart": "2026-10-12",
+            "weekEnd": "2026-10-18",
+            "total": {
+                "minor": 5500,
+                "currency": "AED",
+                "text": "AED 55"
+            },
+            "topCategory": "SCHOOL_CANTEEN",
+            "topCategoryLabel": "the school canteen"
+        },
+        {
+            "weekStart": "2026-10-19",
+            "weekEnd": "2026-10-23",
+            "total": {
+                "minor": 3500,
+                "currency": "AED",
+                "text": "AED 35"
+            },
+            "topCategory": "SCHOOL_CANTEEN",
+            "topCategoryLabel": "the school canteen"
+        }
+    ],
+    "topCategoryWeeksRunning": 2,
+    "previous": {
+        "periodLabel": "September 2026",
+        "from": "2026-09-01",
+        "to": "2026-09-23",
+        "total": {
+            "minor": 15600,
+            "currency": "AED",
+            "text": "AED 156"
+        },
+        "daysLogged": 16,
+        "difference": {
+            "minor": 2400,
+            "currency": "AED",
+            "text": "AED 24"
+        },
+        "direction": "MORE"
+    },
+    "goals": [
+        {
+            "name": "Headphones",
+            "target": {
+                "minor": 30000,
+                "currency": "AED",
+                "text": "AED 300"
+            },
+            "saved": {
+                "minor": 6000,
+                "currency": "AED",
+                "text": "AED 60"
+            },
+            "remaining": {
+                "minor": 24000,
+                "currency": "AED",
+                "text": "AED 240"
+            },
+            "percent": 20
+        }
+    ],
+    "againstFamilyRules": []
+}

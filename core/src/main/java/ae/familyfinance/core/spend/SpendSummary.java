@@ -24,7 +24,7 @@ public record SpendSummary(UUID memberId,
                            MoneyView pocketMoney,       // pocket money paid into the demo wallet in the period
                            int spentPercentOfPocketMoney,
                            List<CategoryLine> categories,  // biggest first
-                           List<ItemLine> topItems,         // biggest first, at most 5
+                           List<ItemLine> topItems,         // biggest first, at most 8
                            EntryView biggestPurchase,       // null if nothing was logged
                            List<WeekLine> weeks,            // oldest first
                            int topCategoryWeeksRunning,     // latest weeks in a row where categories[0] was the top
@@ -36,7 +36,7 @@ public record SpendSummary(UUID memberId,
                                MoneyView averagePerPurchase) {
     }
 
-    public record ItemLine(String description, int count, MoneyView total) {
+    public record ItemLine(String description, SpendCategory category, int count, MoneyView total) {
     }
 
     public record WeekLine(LocalDate weekStart, LocalDate weekEnd, MoneyView total, SpendCategory topCategory,

@@ -74,10 +74,10 @@ public final class SpendSummaryCalculator {
         Map<String, List<Line>> byItem = new LinkedHashMap<>();
         f.lines().forEach(l -> byItem.computeIfAbsent(normalise(l.description()), k -> new ArrayList<>()).add(l));
         List<ItemLine> topItems = byItem.values().stream()
-                .map(ls -> new ItemLine(ls.get(0).description(), ls.size(), view(sum(ls, cur))))
+                .map(ls -> new ItemLine(ls.get(0).description(), ls.get(0).category(), ls.size(), view(sum(ls, cur))))
                 .sorted(Comparator.comparingLong((ItemLine i) -> i.total().minor()).reversed()
                         .thenComparing(Comparator.comparingInt(ItemLine::count).reversed()))
-                .limit(5)
+                .limit(8)
                 .toList();
 
         EntryView biggest = f.lines().stream()
@@ -86,7 +86,7 @@ public final class SpendSummaryCalculator {
                 .orElse(null);
 
         List<WeekLine> weeks = weeks(f.period(), f.lines(), cur);
-        int weeksRunning = categories.isEmpty() ? 0 : weeksRunning(weeks, categories.get(0).category());
+        int weeksRunning = categories.isEmpty() ? 0 : weeksRunning(weeks, categories.get(0).category(), f.period());
 
         Money previousTotal = sum(f.previousLines(), cur);
         Money difference = total.minus(previousTotal);
@@ -148,15 +148,19 @@ public final class SpendSummaryCalculator {
                 .orElse(null);
     }
 
-    /** Counts back from the latest week; a week with nothing logged yet (e.g. today is Monday) is skipped. */
-    private static int weeksRunning(List<WeekLine> weeks, SpendCategory category) {
+    /**
+     * Counts back from the latest week. A week that is still running (today is Wednesday) only counts if it
+     * already agrees; otherwise it's skipped, so two days of data can't break a streak.
+     */
+    private static int weeksRunning(List<WeekLine> weeks, SpendCategory category, Period p) {
         int run = 0;
         for (int i = weeks.size() - 1; i >= 0; i--) {
             WeekLine w = weeks.get(i);
-            if (w.topCategory() == null && i == weeks.size() - 1) {
-                continue;
-            }
+            boolean stillRunning = i == weeks.size() - 1 && p.monthToDate() && w.weekEnd().getDayOfWeek() != DayOfWeek.SUNDAY;
             if (w.topCategory() != category) {
+                if (stillRunning) {
+                    continue;
+                }
                 break;
             }
             run++;

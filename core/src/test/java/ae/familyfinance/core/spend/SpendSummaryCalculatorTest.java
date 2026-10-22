@@ -81,6 +81,16 @@ class SpendSummaryCalculatorTest {
     }
 
     @Test
+    void a_week_still_running_does_not_break_the_streak() {
+        List<Line> lines = List.of(
+                line("2025-10-06", "Wrap", SCHOOL_CANTEEN, 3000),
+                line("2025-10-14", "Wrap", SCHOOL_CANTEEN, 3000),
+                line("2025-10-21", "Bubble tea", EATING_OUT, 1600));   // this week so far (Mon 20 - Wed 22)
+        SpendSummary s = SpendSummaryCalculator.summarise(facts(lines, List.of()));
+        assertThat(s.topCategoryWeeksRunning()).isEqualTo(2);
+    }
+
+    @Test
     void compares_with_the_same_days_last_month() {
         SpendSummary more = SpendSummaryCalculator.summarise(facts(
                 List.of(line("2025-10-06", "Wrap", SCHOOL_CANTEEN, 2500)),
