@@ -38,3 +38,9 @@ button.danger { background: var(--danger); }
 .badge { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); }
 .demo { font-size: 12px; text-align: center; color: var(--muted); }
 form { display: grid; gap: 8px; }
+.chat form { grid-template-columns: 1fr auto; }
+.bubble { margin: 8px 0; padding: 10px 12px; border-radius: 12px; white-space: pre-wrap; line-height: 1.45; }
+.bubble.me { background: var(--accent); color: #fff; margin-left: 15%; }
+.bubble.agent { background: var(--bg); border: 1px solid var(--border); margin-right: 5%; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+button.chip { font-size: 14px; padding: 6px 10px; }

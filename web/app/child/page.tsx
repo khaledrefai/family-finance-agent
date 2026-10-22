@@ -1,12 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { api, formatMoney } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { agent, api, formatMoney } from "@/lib/api";
+import { AgentChat } from "../agent-chat";
 import { useSession } from "../use-session";
 
-// Child view: ask for money or share a product link, and see the status of my own requests.
+// Child view: tell the agent what I bought, ask for money or share a product link,
+// and see the status of my own requests.
 export default function ChildPage() {
   const { me, requests, error, setError, reload, logout } = useSession("CHILD");
+  const [nudge, setNudge] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (me) agent.nudge().then((n) => setNudge(n.nudge)).catch(() => {});
+  }, [me]);
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [link, setLink] = useState("");
@@ -40,6 +47,12 @@ export default function ChildPage() {
         <h1>Hi {me.displayName}</h1>
         <button className="secondary" onClick={logout}>Log out</button>
       </div>
+
+      <AgentChat
+        title="What did you buy?"
+        placeholder="e.g. 12 dirhams shawarma"
+        intro={nudge}
+      />
 
       <form className="card" onSubmit={submit}>
         <strong>Ask for something</strong>
