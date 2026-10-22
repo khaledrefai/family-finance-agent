@@ -1,0 +1,50 @@
+# One command runs the whole stack:  ./deploy.sh
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ffa
+      POSTGRES_USER: ffa
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ffa -d ffa"]
+      interval: 5s
+      retries: 20
+
+  core:
+    build: ./core
+    environment:
+      SPRING_PROFILES_ACTIVE: demo          # loads the demo family
+      DB_URL: jdbc:postgresql://db:5432/ffa
+      DB_USER: ffa
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      APP_JWT_SECRET: ${APP_JWT_SECRET:?set APP_JWT_SECRET in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 || exit 1"]
+      interval: 5s
+      retries: 30
+
+  agents:
+    build: ./agents
+    environment:
+      AGENTS_CORE_URL: http://core:8080
+    depends_on:
+      - core
+
+  web:
+    build:
+      context: ./web
+      args:
+        CORE_URL: http://core:8080
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    depends_on:
+      - core
+
+volumes:
+  dbdata:

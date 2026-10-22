@@ -1,0 +1,10 @@
+{
+  "name": "Family Finance Agent",
+  "short_name": "FamilyFinance",
+  "description": "Family accountant and money coach (prototype, demo money only)",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f766e",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
