@@ -1,0 +1,30 @@
+{
+    "logged": [
+        {
+            "id": "c259f79b-a8c9-4f42-834a-4fb475c2f4b2",
+            "occurredOn": "2026-10-23",
+            "description": "Shawarma",
+            "merchant": null,
+            "category": "EATING_OUT",
+            "categoryLabel": "eating out",
+            "amount": {
+                "minor": 1200,
+                "currency": "AED",
+                "text": "AED 12"
+            },
+            "loggedText": "12 dirhams shawarma",
+            "possibleDuplicate": false,
+            "familyRuleNote": null
+        }
+    ],
+    "today": {
+        "minor": 1200,
+        "currency": "AED",
+        "text": "AED 12"
+    },
+    "thisMonth": {
+        "minor": 19200,
+        "currency": "AED",
+        "text": "AED 192"
+    }
+}

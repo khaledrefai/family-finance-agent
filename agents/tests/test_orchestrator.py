@@ -25,6 +25,10 @@ def test_unknown_message_goes_to_gatekeeper():
 def test_chat_requires_a_token():
     client = TestClient(app)
     assert client.post("/chat", json={"message": "hi"}).status_code == 401
+
+
+def test_chat_routes_with_a_token(fake_core):
+    client = TestClient(app)
     ok = client.post("/chat", json={"message": "can I buy a toy?"}, headers={"Authorization": "Bearer x"})
     assert ok.status_code == 200
     assert ok.json()["agent"] == "gatekeeper"

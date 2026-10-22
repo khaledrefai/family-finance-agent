@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { api, formatMoney, MemberView } from "@/lib/api";
+import { AgentChat } from "../agent-chat";
 import { useSession } from "../use-session";
 
-// Parent view: see every request in the family and approve or reject the pending ones.
+// Parent view: ask where the kids' money went, see every request in the family,
+// and approve or reject the pending ones.
 export default function ParentPage() {
   const { me, requests, error, setError, reload, logout } = useSession("PARENT");
   const [members, setMembers] = useState<MemberView[]>([]);
@@ -34,6 +36,15 @@ export default function ParentPage() {
       </div>
       <p className="muted">{me.familyName} · parent view</p>
       {error && <p className="error">{error}</p>}
+
+      <AgentChat
+        title="Ask about the kids' money"
+        placeholder="e.g. Where did Layla's money go this month?"
+        suggestions={members
+          .filter((m) => m.role === "CHILD")
+          .map((m) => `Where did ${m.displayName}'s money go this month?`)}
+      />
+      <p className="demo">Every number in these answers comes from the money engine, not the AI.</p>
 
       <h2>Requests</h2>
       {requests.length === 0 && <p className="muted">No requests yet.</p>}

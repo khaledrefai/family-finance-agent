@@ -77,6 +77,19 @@ npm install && npm run dev       # forwards /api/* to http://localhost:8080
 | GET | `/api/requests` | parents see all; children see their own |
 | POST | `/api/requests/{id}/approve` | a parent, not the requester |
 | POST | `/api/requests/{id}/reject` | a parent, not the requester |
+| POST | `/api/spend` | any member, logs their own spending (amount as typed text, the core converts to fils) |
+| GET | `/api/spend?memberId=&month=` | parents: anyone in the family; children: themselves |
+| GET | `/api/spend/summary?memberId=&month=` | same; every number the agent may use ("where did the money go?") |
+| GET | `/api/spend/status` | my logging today, for the agent's nudge |
+
+Agent service (the web app reaches it at `/agent/...`): `POST /chat` and `GET /nudge`.
+
+## Spend logging (spike)
+
+Kids tell the agent what they bought ("12 dirhams shawarma"). The Bookkeeper parses it into typed items
+(`agents/app/spend_parser.py`, plain rules, no LLM yet), the core records it, and a parent can ask
+"Where did Layla's money go this month?". The answer (`agents/app/spend_story.py`) only copies numbers from
+`/api/spend/summary`; a test checks every number in it came from the core.
 
 ## Ground rules (from the project brief)
 
