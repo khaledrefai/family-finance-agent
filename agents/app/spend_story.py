@@ -104,7 +104,7 @@ def child_confirmation(result: LogResult) -> str:
     rules = [e for e in result.logged if e.familyRuleNote]
     if rules:
         reply.append(f"Thanks for being honest. Your family rule says “{rules[0].familyRuleNote}”, "
-                     "so a parent will see this one.")
+                     "so your parents will see this one flagged.")
     return " ".join(reply)
 
 

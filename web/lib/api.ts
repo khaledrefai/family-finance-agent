@@ -62,17 +62,25 @@ export class ApiError extends Error {
 
 async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = getToken();
-  const res = await fetch(path, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...init.headers,
-    },
-  });
+  let res: Response;
+  try {
+    res = await fetch(path, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...init.headers,
+      },
+    });
+  } catch {
+    // The browser says "Failed to fetch" here, which means nothing to a family member.
+    throw new ApiError(0, "Can't connect right now. Check your internet and try again.");
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, body.detail ?? `Request failed (${res.status})`);
+    // Only plain-sentence details are shown; validation lists and server errors get a fixed line.
+    const detail = typeof body.detail === "string" && res.status < 500 ? body.detail : null;
+    throw new ApiError(res.status, detail ?? "Something went wrong on our side. Try again in a moment.");
   }
   return res.status === 204 ? (undefined as T) : res.json();
 }

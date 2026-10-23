@@ -45,12 +45,13 @@ _KEYWORDS: list[tuple[Agent, tuple[str, ...]]] = [
     (Agent.GATEKEEPER, ("buy", "can i", "want", "noon", "amazon", "allerg", "peanut", "money for")),
 ]
 
+# Shown until each agent is built. No week numbers: these lines can appear in the demo video.
 _PLACEHOLDER = {
-    Agent.BOOKKEEPER: "Bookkeeper: I'll sort receipts and statements and catch duplicates (arrives week 3).",
-    Agent.GATEKEEPER: "Gatekeeper: I'll check this against funds, upcoming bills and family rules, then ask a parent (arrives week 4).",
-    Agent.SHOPPER: "Shopper: I'll compare options and plan meals within budget (arrives weeks 6-7).",
-    Agent.COACH: "Coach: I'll set up savings challenges, lessons and points (arrives week 5).",
-    Agent.PLANNER: "Planner: I'll run neutral 1, 5 and 10 year scenarios. Information only, not advice (arrives week 8).",
+    Agent.BOOKKEEPER: "I can't sort receipts and statements yet. That's coming soon, along with spotting duplicate charges.",
+    Agent.GATEKEEPER: "I can't check requests yet. Soon I'll look at the family's money, upcoming bills and rules, then ask a parent.",
+    Agent.SHOPPER: "I can't compare prices or plan meals yet. That's coming soon.",
+    Agent.COACH: "Savings challenges and lessons aren't ready yet. They're coming soon.",
+    Agent.PLANNER: "Planning isn't ready yet. When it is, it will show 1, 5 and 10 year what-ifs. Information only, not financial advice.",
 }
 
 

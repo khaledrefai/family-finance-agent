@@ -39,7 +39,7 @@ export function AgentChat({
       setTurns((t) => [...t, { from: "agent", text: res.reply }]);
       onReply?.();
     } catch (err) {
-      setTurns((t) => [...t, { from: "agent", text: `That didn't go through: ${(err as Error).message}. Try sending it again.` }]);
+      setTurns((t) => [...t, { from: "agent", text: `That didn't send. ${(err as Error).message}` }]);
     } finally {
       setBusy(false);
     }
