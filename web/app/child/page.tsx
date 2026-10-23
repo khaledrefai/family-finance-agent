@@ -18,13 +18,15 @@ export default function ChildPage() {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [link, setLink] = useState("");
+  const [sent, setSent] = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    setSent(null);
     // Convert "300" or "12.50" to fils without floating-point maths.
     const match = amount.trim().match(/^(\d+)(?:\.(\d{1,2}))?$/);
     if (!match) {
-      setError("Enter an amount like 300 or 12.50");
+      setError("Enter the price as a number, like 300 or 12.50.");
       return;
     }
     const fils = Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"));
@@ -34,6 +36,7 @@ export default function ChildPage() {
       setAmount("");
       setLink("");
       setError(null);
+      setSent(`Sent. Your parents can see "${title}" now, and their answer will show under My requests.`);
       await reload();
     } catch (err) {
       setError((err as Error).message);
@@ -74,6 +77,7 @@ export default function ChildPage() {
         </label>
         <button type="submit">Send to a parent</button>
         {error && <p className="error" role="alert">{error}</p>}
+        {sent && <p className="muted" role="status">{sent}</p>}
       </form>
 
       <h2>My requests</h2>

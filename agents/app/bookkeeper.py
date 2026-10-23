@@ -59,7 +59,7 @@ def handle(core: CoreClient, me: Me, message: str) -> str:
             return _answer_question(core, me, message, today)
         return _log(core, message, today)
     except CoreError as e:
-        return f"I couldn't do that: {e.detail}."
+        return f"I couldn't do that. {e.detail}."
 
 
 def _log(core: CoreClient, message: str, today: date) -> str:

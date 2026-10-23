@@ -52,7 +52,8 @@ export default function ParentPage() {
           <Chit request={fresh} from={`${nameOf(fresh.requesterId)} asked`} landed />
         </>
       )}
-      {pending.length > 0 && <h2 className={fresh ? undefined : "first"}>Waiting for a decision</h2>}
+      <h2 className={fresh ? undefined : "first"}>Waiting for a decision</h2>
+      {pending.length === 0 && <p className="empty">Nothing waiting. When one of the kids asks for something, it lands here.</p>}
       {pending.map((r) => (
         <Chit key={r.id} request={r} from={`${nameOf(r.requesterId)} asks`} stamp={false}>
           {r.requesterId !== me.memberId ? (
@@ -69,7 +70,7 @@ export default function ParentPage() {
       <AgentChat
         title="Ask about the kids' money"
         placeholder="Where did Layla's money go this month?"
-        source="Numbers from the money engine, not the AI."
+        source="Totals are worked out exactly by the app, not guessed by the AI."
         suggestions={members
           .filter((m) => m.role === "CHILD")
           .map((m) => `Where did ${m.displayName}'s money go this month?`)}
