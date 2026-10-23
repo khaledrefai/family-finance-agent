@@ -41,10 +41,12 @@ services:
       context: ./web
       args:
         CORE_URL: http://core:8080
+        AGENTS_URL: http://agents:8000
     ports:
       - "${WEB_PORT:-3000}:3000"
     depends_on:
       - core
+      - agents
 
 volumes:
   dbdata:

@@ -50,6 +50,33 @@ public record Money(long minor, String currency) implements Comparable<Money> {
         return new Money(Math.multiplyExact(minor, factor), currency);
     }
 
+    /**
+     * Whole-number share of {@code total}, rounded half up: 30 of 120 is 25. Returns 0 when total is zero.
+     * Percentages live here so the agents never divide anything themselves.
+     */
+    public int percentOf(Money total) {
+        requireSameCurrency(total);
+        if (total.minor == 0) {
+            return 0;
+        }
+        return (int) ((Math.multiplyExact(minor, 100L) * 2 + total.minor) / (total.minor * 2));
+    }
+
+    /** Rounded-half-up average of {@code count} items, still in minor units. */
+    public Money averageOver(long count) {
+        if (count <= 0) {
+            throw new IllegalArgumentException("count must be positive: " + count);
+        }
+        return new Money((minor * 2 + count) / (count * 2), currency);
+    }
+
+    /** For people: "AED 12" for whole amounts, "AED 12.50" otherwise. */
+    public String toDisplay() {
+        return minor % 100 == 0
+                ? currency + " " + (minor / 100)
+                : currency + " " + toMajor().toPlainString();
+    }
+
     public boolean isNegative() {
         return minor < 0;
     }

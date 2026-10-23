@@ -1,12 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { api, formatMoney } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { agent, api } from "@/lib/api";
+import { AgentChat } from "../agent-chat";
+import { Chit } from "../chit";
 import { useSession } from "../use-session";
 
-// Child view: ask for money or share a product link, and see the status of my own requests.
+// Child view: tell the agent what I bought, ask for money or share a product link,
+// and see the status of my own requests.
 export default function ChildPage() {
   const { me, requests, error, setError, reload, logout } = useSession("CHILD");
+  const [nudge, setNudge] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (me) agent.nudge().then((n) => setNudge(n.nudge)).catch(() => {});
+  }, [me]);
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [link, setLink] = useState("");
@@ -36,30 +44,42 @@ export default function ChildPage() {
 
   return (
     <>
-      <div className="row">
-        <h1>Hi {me.displayName}</h1>
-        <button className="secondary" onClick={logout}>Log out</button>
-      </div>
+      <header className="masthead">
+        <div>
+          <h1>Hi {me.displayName}</h1>
+          <p className="muted">{me.familyName}</p>
+        </div>
+        <button className="text" onClick={logout}>Log out</button>
+      </header>
 
-      <form className="card" onSubmit={submit}>
+      <AgentChat
+        title="What did you buy?"
+        placeholder="12 dirhams shawarma"
+        intro={nudge}
+      />
+
+      <form className="panel" onSubmit={submit}>
         <strong>Ask for something</strong>
-        <input placeholder="What is it?" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        <input placeholder="Price in AED" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} required />
-        <input placeholder="Product link (optional)" value={link} onChange={(e) => setLink(e.target.value)} />
+        <label>
+          What is it?
+          <input value={title} onChange={(e) => setTitle(e.target.value)} required />
+        </label>
+        <label>
+          Price in AED
+          <input inputMode="decimal" placeholder="300 or 12.50" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+        </label>
+        <label>
+          Link to it, if it's online
+          <input inputMode="url" value={link} onChange={(e) => setLink(e.target.value)} />
+        </label>
         <button type="submit">Send to a parent</button>
-        {error && <p className="error">{error}</p>}
+        {error && <p className="error" role="alert">{error}</p>}
       </form>
 
       <h2>My requests</h2>
-      {requests.length === 0 && <p className="muted">Nothing yet.</p>}
+      {requests.length === 0 && <p className="empty">When you ask for something, it shows up here with your parent's answer.</p>}
       {requests.map((r) => (
-        <div className="card row" key={r.id}>
-          <div>
-            <strong>{r.title}</strong>
-            <p className="muted">{formatMoney(r.amountMinor, r.currency)}</p>
-          </div>
-          <span className="badge">{r.status}</span>
-        </div>
+        <Chit key={r.id} request={r} small />
       ))}
     </>
   );

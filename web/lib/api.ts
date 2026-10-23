@@ -95,6 +95,13 @@ export const api = {
     call<SpendingRequest>(`/api/requests/${id}/${decision}`, { method: "POST" }),
 };
 
+// The agent service (Python). It calls the core with the same token, so it can't do more than the member can.
+export const agent = {
+  chat: (message: string) =>
+    call<{ agent: string; reply: string }>("/agent/chat", { method: "POST", body: JSON.stringify({ message }) }),
+  nudge: () => call<{ nudge: string | null }>("/agent/nudge"),
+};
+
 export function formatMoney(minor: number, currency = "AED") {
   return `${currency} ${(minor / 100).toFixed(2)}`;
 }

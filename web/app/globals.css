@@ -1,40 +1,206 @@
+/*
+ * Design tokens. The idea: every request is a paper chit that a parent stamps.
+ * Navy "ink" carries the interface; the only strong colours are the stamp inks for each status.
+ * All text/background pairs below are at least 4.5:1 (AA), borders on inputs at least 3:1.
+ */
 :root {
-  --bg: #f7faf9;
-  --card: #ffffff;
-  --text: #13201d;
-  --muted: #5b6b67;
-  --accent: #0f766e;
-  --danger: #b42318;
-  --border: #dfe7e5;
+  --paper: #edf0f3;        /* page */
+  --chit: #ffffff;         /* cards and chits */
+  --ink: #1a2340;          /* text, primary buttons */
+  --ink-soft: #4f5873;     /* secondary text, 6.3:1 on paper */
+  --rule: #c9cfdb;         /* dividers and perforations */
+  --field: #7d869c;        /* input borders, 3.4:1 on chit */
+  --on-ink: #ffffff;
+  --focus: #3155d6;
+
+  --approved: #1d6b3f;   --approved-wash: #e4f2e9;
+  --declined: #a8251c;   --declined-wash: #fbe7e4;
+  --waiting: #7a4d00;    --waiting-wash: #fdf0d2;
+  --blocked: #5a3a9a;    --blocked-wash: #eee8fa;
+  --cancelled: #5c6170;  --cancelled-wash: #eceef2;
+
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 40px;
+  --radius-field: 10px;
+  --radius-chit: 6px;
+
+  --step--1: 0.8125rem;   /* 13px: fine print */
+  --step-0: 1rem;         /* 16px: body */
+  --step-1: 1.25rem;      /* 20px: section heads */
+  --step-2: 1.75rem;      /* 28px: page title */
+  --step-3: 2.5rem;       /* 40px: amounts on chits */
+
+  color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0e1513;
-    --card: #17211e;
-    --text: #e8efed;
-    --muted: #9fb0ab;
-    --accent: #2dd4bf;
-    --danger: #f97066;
-    --border: #2a3733;
+    --paper: #0f1320;
+    --chit: #181e2f;
+    --ink: #e4e8f3;
+    --ink-soft: #a3abc2;
+    --rule: #2e3650;
+    --field: #6b7493;
+    --on-ink: #121829;
+    --focus: #8ea6ff;
+
+    --approved: #7fd6a0;   --approved-wash: #15291f;
+    --declined: #ff9a8f;   --declined-wash: #321816;
+    --waiting: #f2c46b;    --waiting-wash: #2c2310;
+    --blocked: #c6b0ff;    --blocked-wash: #231c3a;
+    --cancelled: #a6abba;  --cancelled-wash: #22273a;
+
+    color-scheme: dark;
   }
 }
+
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  font-family: var(--font-readex), system-ui, sans-serif;
+  font-size: var(--step-0);
+  line-height: 1.5;
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
 }
-main { max-width: 560px; margin: 0 auto; padding: 16px; }
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 12px 0; }
-.muted { color: var(--muted); font-size: 14px; }
-.row { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
-input, button { font: inherit; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); }
-input { width: 100%; background: var(--bg); color: var(--text); }
-button { background: var(--accent); color: #fff; border: none; cursor: pointer; }
-button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-button.danger { background: var(--danger); }
-.error { color: var(--danger); }
-.badge { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); }
-.demo { font-size: 12px; text-align: center; color: var(--muted); }
-form { display: grid; gap: 8px; }
+main { max-width: 560px; margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-6); }
+
+h1, h2 { margin: 0; line-height: 1.2; }
+h1 { font-size: var(--step-2); font-weight: 500; letter-spacing: -0.01em; }
+h2 { font-size: var(--step-1); font-weight: 500; margin: var(--space-6) 0 var(--space-3); }
+h2.first { margin-top: 0; }
+p { margin: 0; }
+strong { font-weight: 600; }
+
+.muted { color: var(--ink-soft); font-size: var(--step--1); }
+.error { color: var(--declined); font-size: var(--step--1); }
+.fine { color: var(--ink-soft); font-size: var(--step--1); text-align: center; margin-top: var(--space-6); }
+
+/* Page header: who is signed in, and the way out. */
+.masthead { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-5); }
+.masthead .muted { margin-top: var(--space-1); }
+
+/* Controls */
+label { display: grid; gap: var(--space-1); font-size: var(--step--1); color: var(--ink-soft); }
+input {
+  font: inherit; font-size: var(--step-0); width: 100%;
+  padding: 11px var(--space-3);
+  border-radius: var(--radius-field);
+  border: 1px solid var(--field);
+  background: var(--chit); color: var(--ink);
+}
+input::placeholder { color: var(--ink-soft); opacity: 0.8; }
+form { display: grid; gap: var(--space-3); }
+
+button {
+  font: inherit; font-weight: 500;
+  padding: 11px var(--space-4);
+  border-radius: var(--radius-field);
+  border: 1px solid var(--ink);
+  background: var(--ink); color: var(--on-ink);
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms, transform 80ms;
+}
+button:hover { background: color-mix(in srgb, var(--ink) 86%, var(--paper)); }
+button:active { transform: translateY(1px); }
+button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+button.quiet { background: transparent; color: var(--ink); border-color: var(--rule); }
+button.quiet:hover { background: var(--chit); border-color: var(--field); }
+button.text { background: transparent; border-color: transparent; color: var(--ink-soft); padding: 6px var(--space-2); }
+button.text:hover { color: var(--ink); background: transparent; text-decoration: underline; }
+button.decline { background: transparent; color: var(--declined); border-color: var(--declined); }
+button.decline:hover { background: var(--declined-wash); }
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+input:focus-visible { outline-offset: 0; border-color: var(--focus); }
+
+/* A plain panel, for forms and the agent conversation. */
+.panel { background: var(--chit); border: 1px solid var(--rule); border-radius: var(--radius-field); padding: var(--space-4); margin: var(--space-3) 0; }
+.panel > strong { display: block; margin-bottom: var(--space-3); }
+
+/* The chit: a tear-off request slip with a perforated top edge. */
+.chit {
+  position: relative;
+  background: var(--chit);
+  border-radius: 0 0 var(--radius-chit) var(--radius-chit);
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  margin: 0 0 var(--space-4);
+  box-shadow: 0 1px 0 var(--rule), 0 6px 18px -12px rgb(26 35 64 / 0.35);
+}
+.chit::before {
+  /* perforation: small half-circles of page colour bitten out of the top edge */
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px;
+  background: radial-gradient(circle at 50% 0, var(--paper) 4px, transparent 4.5px) 0 0 / 12px 6px repeat-x;
+}
+.chit-from { color: var(--ink-soft); font-size: var(--step--1); }
+.chit-title { font-size: var(--step-0); font-weight: 600; margin-top: 2px; padding-right: 112px; }
+.chit:not(:has(.stamp)) .chit-title { padding-right: 0; }
+.chit-amount {
+  font-size: var(--step-3); font-weight: 300; line-height: 1.1; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums; margin: var(--space-2) 0 var(--space-1);
+}
+.chit-amount .cur { font-size: var(--step-0); font-weight: 500; letter-spacing: 0.02em; margin-right: 6px; vertical-align: 0.9em; }
+.chit-summary { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px dashed var(--rule); font-size: var(--step--1); color: var(--ink-soft); }
+.chit-actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-top: var(--space-4); }
+.chit-note { margin-top: var(--space-3); font-size: var(--step--1); color: var(--ink-soft); }
+.chit.small { padding-top: var(--space-4); }
+.chit.small .chit-amount { font-size: var(--step-1); font-weight: 400; margin: 2px 0 0; }
+.chit.small .chit-amount .cur { font-size: var(--step--1); vertical-align: 0.15em; }
+
+/* The stamp: the decision, inked onto the chit's corner. */
+.stamp {
+  --c: var(--cancelled);
+  position: absolute; top: var(--space-4); right: var(--space-4);
+  display: inline-grid; place-items: center;
+  min-width: 96px; padding: 6px 12px;
+  border: 2.5px solid var(--c); border-radius: 8px;
+  box-shadow: inset 0 0 0 2px var(--chit), inset 0 0 0 3.5px var(--c);
+  color: var(--c);
+  font-size: var(--step--1); font-weight: 700; letter-spacing: 0.04em; line-height: 1.15; text-align: center;
+  transform: rotate(-7deg);
+  mix-blend-mode: multiply;
+}
+@media (prefers-color-scheme: dark) { .stamp { mix-blend-mode: normal; } }
+.stamp small { display: block; font-size: 10px; font-weight: 500; letter-spacing: 0.02em; opacity: 0.9; }
+.stamp.approved { --c: var(--approved); }
+.stamp.declined { --c: var(--declined); }
+.stamp.blocked { --c: var(--blocked); }
+.stamp.cancelled { --c: var(--cancelled); }
+.stamp.waiting {
+  --c: var(--waiting);
+  border-style: dashed; box-shadow: none; background: var(--waiting-wash); transform: none;
+  font-weight: 600; letter-spacing: 0.01em; mix-blend-mode: normal;
+}
+.stamp.landed { animation: stamp-down 360ms cubic-bezier(0.2, 0.9, 0.3, 1.3); }
+@keyframes stamp-down {
+  0% { opacity: 0; transform: rotate(-12deg) scale(1.7); }
+  60% { opacity: 1; transform: rotate(-6deg) scale(0.94); }
+  100% { transform: rotate(-7deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp.landed { animation: none; }
+  button { transition: none; }
+}
+
+/* Agent conversation */
+.turn-me {
+  justify-self: end; max-width: 85%;
+  background: var(--ink); color: var(--on-ink);
+  padding: var(--space-2) var(--space-3); border-radius: 14px 14px 4px 14px;
+}
+.turn-agent { white-space: pre-wrap; line-height: 1.6; padding-left: var(--space-3); border-left: 2px solid var(--rule); }
+.turn-source { font-size: var(--step--1); color: var(--ink-soft); padding-left: calc(var(--space-3) + 2px); margin-top: calc(-1 * var(--space-2)); }
+.turns { display: grid; gap: var(--space-3); margin-bottom: var(--space-3); }
+.thinking { color: var(--ink-soft); font-size: var(--step--1); padding-left: calc(var(--space-3) + 2px); }
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-3); }
+button.chip { font-size: var(--step--1); font-weight: 400; padding: 6px var(--space-3); border-radius: 999px; background: transparent; color: var(--ink); border-color: var(--field); text-align: left; }
+button.chip:hover { background: var(--paper); }
+.chat form { grid-template-columns: 1fr auto; }
+
+/* Login */
+.wordmark { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-6) 0 var(--space-2); }
+.wordmark svg { flex: none; }
+.lede { color: var(--ink-soft); margin-bottom: var(--space-5); max-width: 40ch; }
+.people { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); margin-top: var(--space-2); }
+.people button { display: grid; text-align: left; gap: 0; padding: var(--space-2) var(--space-3); }
+.people button span { font-size: var(--step--1); color: var(--ink-soft); font-weight: 400; }
+.empty { color: var(--ink-soft); padding: var(--space-4); border: 1px dashed var(--rule); border-radius: var(--radius-chit); text-align: center; font-size: var(--step--1); }
