@@ -9,17 +9,20 @@ interface Turn {
 }
 
 // A small chat box that talks to the agent service. Used by both the child and parent pages.
+// `source` is a line shown under each agent answer, e.g. where its numbers came from.
 export function AgentChat({
   title,
   placeholder,
   suggestions = [],
   intro,
+  source,
   onReply,
 }: {
   title: string;
   placeholder: string;
   suggestions?: string[];
   intro?: string | null;
+  source?: string;
   onReply?: () => void;
 }) {
   const [text, setText] = useState("");
@@ -36,24 +39,33 @@ export function AgentChat({
       setTurns((t) => [...t, { from: "agent", text: res.reply }]);
       onReply?.();
     } catch (err) {
-      setTurns((t) => [...t, { from: "agent", text: `Sorry, something went wrong: ${(err as Error).message}` }]);
+      setTurns((t) => [...t, { from: "agent", text: `That didn't go through: ${(err as Error).message}. Try sending it again.` }]);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="card chat">
+    <section className="panel chat" aria-label={title}>
       <strong>{title}</strong>
-      {intro && turns.length === 0 && <p className="bubble agent">{intro}</p>}
-      {turns.map((t, i) => (
-        <p key={i} className={`bubble ${t.from}`}>{t.text}</p>
-      ))}
-      {busy && <p className="muted">Thinking…</p>}
+      <div className="turns" aria-live="polite">
+        {intro && turns.length === 0 && <p className="turn-agent">{intro}</p>}
+        {turns.map((t, i) =>
+          t.from === "me" ? (
+            <p key={i} className="turn-me">{t.text}</p>
+          ) : (
+            <div key={i} style={{ display: "contents" }}>
+              <p className="turn-agent">{t.text}</p>
+              {source && <p className="turn-source">{source}</p>}
+            </div>
+          ),
+        )}
+        {busy && <p className="thinking">Working it out…</p>}
+      </div>
       {suggestions.length > 0 && (
         <div className="chips">
           {suggestions.map((s) => (
-            <button key={s} type="button" className="secondary chip" onClick={() => send(s)} disabled={busy}>
+            <button key={s} type="button" className="chip" onClick={() => send(s)} disabled={busy}>
               {s}
             </button>
           ))}
@@ -65,9 +77,9 @@ export function AgentChat({
           send(text);
         }}
       >
-        <input placeholder={placeholder} value={text} onChange={(e) => setText(e.target.value)} />
+        <input aria-label={title} placeholder={placeholder} value={text} onChange={(e) => setText(e.target.value)} />
         <button type="submit" disabled={busy}>Send</button>
       </form>
-    </div>
+    </section>
   );
 }
