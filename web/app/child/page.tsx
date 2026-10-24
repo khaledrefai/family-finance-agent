@@ -7,7 +7,7 @@ import { kids } from "@/lib/sample";
 import { Chit } from "../chit";
 import { SampleNote, StackBar } from "../ui";
 import { useSession } from "../use-session";
-import { artFor, Avatar, BuddySays, GoalArt, GoalJar, Piggy, SmallStar } from "./kid-ui";
+import { artFor, Avatar, BuddySays, Camel, GoalArt, GoalJar, SmallStar } from "./kid-ui";
 
 // Kid Home: my goal jar, my demo wallet, where my pocket money went, the coin buddy's nudge, and my requests.
 // Kids only ever see their own money. Requests and the nudge are live; goal, wallet and the chart are
@@ -67,7 +67,7 @@ export default function ChildHome() {
 
       {kid && (
         <section className="card wallet">
-          <Piggy size={young ? 68 : 56} />
+          <Camel size={young ? 84 : 72} />
           <div style={{ flex: 1 }}>
             <p className="muted">My wallet</p>
             <p className="wallet-amount">{aed(kid.savedMinor, { cents: true })}</p>

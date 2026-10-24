@@ -333,7 +333,7 @@ button.chip.on, button.chip.on:hover { background: var(--ink); color: var(--on-i
 body:has(.kid-app) {
   --kid-bg: #fff4dc; --kid-card: #fffdf8; --kid-line: #1a2340; --kid-glass: #eef6ff;
   --kid-a: #6a3fc8; --kid-a-wash: #ece4ff; --kid-on-a: #ffffff;
-  --kid-sun: #ffc83d; --kid-sun-deep: #b07a00; --kid-mint: #2bbf8a; --kid-pink: #ff9fb2;
+  --kid-sun: #ffc83d; --kid-sun-deep: #b07a00; --kid-mint: #2bbf8a; --kid-pink: #ff9fb2; --kid-sand: #eabd7f;
   background: var(--kid-bg);
 }
 body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }

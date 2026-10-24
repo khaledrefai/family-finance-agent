@@ -205,8 +205,8 @@ export const saverOfTheMonth = [
   { name: "Layla", percent: 40 },
 ];
 
-export const badges: { art: "piggy" | "quarter" | "half" | "threequarter" | "trophy" | "heart"; name: string; earned: boolean; hint?: string }[] = [
-  { art: "piggy", name: "Big Saver", earned: true },
+export const badges: { art: "camel" | "quarter" | "half" | "threequarter" | "trophy" | "heart"; name: string; earned: boolean; hint?: string }[] = [
+  { art: "camel", name: "Big Saver", earned: true },
   { art: "quarter", name: "A quarter there", earned: true },
   { art: "half", name: "Halfway", earned: false, hint: "AED 30 to go" },
   { art: "threequarter", name: "Nearly there", earned: false },

@@ -1,6 +1,6 @@
 "use client";
 
-// Drawings and pieces for the kids' screens only: the goal jar, the coin buddy, the piggy wallet,
+// Drawings and pieces for the kids' screens only: the goal jar, the coin buddy, the camel wallet,
 // sticker badges, the big star and the Saver of the Month race.
 // They only draw what they are given. Every percent and amount comes from the app, never from here.
 
@@ -124,19 +124,32 @@ export function BuddySays({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function Piggy({ size = 60 }: { size?: number }) {
+// A friendly camel carrying a coin bag: the saving character on the wallet and the Big Saver sticker.
+function CamelShape({ fill, line, bag }: { fill: string; line: string; bag: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
-      <path d="M20 20l-2-9 9 5" fill="var(--kid-pink)" stroke="var(--kid-line)" strokeWidth="2.5" strokeLinejoin="round" />
-      <ellipse cx="32" cy="36" rx="22" ry="17" fill="var(--kid-pink)" stroke="var(--kid-line)" strokeWidth="3" />
-      <rect x="18" y="48" width="7" height="9" rx="2" fill="var(--kid-pink)" stroke="var(--kid-line)" strokeWidth="2.5" />
-      <rect x="38" y="48" width="7" height="9" rx="2" fill="var(--kid-pink)" stroke="var(--kid-line)" strokeWidth="2.5" />
-      <ellipse cx="53" cy="36" rx="5" ry="6" fill="#ffc3cf" stroke="var(--kid-line)" strokeWidth="2.5" />
-      <circle cx="52" cy="34.5" r="1" fill="var(--kid-line)" />
-      <circle cx="52" cy="38" r="1" fill="var(--kid-line)" />
-      <circle cx="42" cy="30" r="2.2" fill="#1a2340" />
-      <rect x="26" y="19" width="12" height="3.5" rx="1.75" fill="var(--kid-line)" />
-      <circle cx="32" cy="10" r="6" fill="var(--kid-sun)" stroke="var(--kid-sun-deep)" strokeWidth="2" />
+    <g strokeLinejoin="round" strokeLinecap="round">
+      <path d="M13 38q-5 2-4 8" fill="none" stroke={line} strokeWidth="2.5" />
+      {[16, 23, 36, 43].map((x) => (
+        <rect key={x} x={x} y="43" width="5" height="15" rx="2.5" fill={fill} stroke={line} strokeWidth="2.5" />
+      ))}
+      <path d="M43 38L48 21h7l-3 19z" fill={fill} stroke={line} strokeWidth="2.5" />
+      <ellipse cx="30" cy="40" rx="18" ry="9.5" fill={fill} stroke={line} strokeWidth="2.5" />
+      <path d="M17 36q7-17 17-1" fill={fill} stroke={line} strokeWidth="2.5" />
+      <path d="M33 35q5-11 11-1" fill={fill} stroke={line} strokeWidth="2.5" />
+      <ellipse cx="55" cy="21" rx="8" ry="5.5" fill={fill} stroke={line} strokeWidth="2.5" />
+      <path d="M50 16.5l-1-4 4 2.5" fill={fill} stroke={line} strokeWidth="2" />
+      <circle cx="55.5" cy="19.5" r="1.6" fill={line} />
+      <path d="M58 23.5q2 1.2 3.5-.5" fill="none" stroke={line} strokeWidth="1.8" />
+      <rect x="22" y="37" width="13" height="11" rx="3.5" fill={bag} stroke={line} strokeWidth="2.5" />
+      <circle cx="28.5" cy="42.5" r="2.6" fill="var(--kid-sun)" stroke={line} strokeWidth="1.5" />
+    </g>
+  );
+}
+
+export function Camel({ size = 60 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 66 62" aria-hidden="true">
+      <CamelShape fill="var(--kid-sand)" line="var(--kid-line)" bag="var(--kid-a)" />
     </svg>
   );
 }
@@ -164,10 +177,10 @@ export function SmallStar({ size = 18 }: { size?: number }) {
   );
 }
 
-type Sticker = "piggy" | "quarter" | "half" | "threequarter" | "trophy" | "heart";
+type Sticker = "camel" | "quarter" | "half" | "threequarter" | "trophy" | "heart";
 
 const STICKER_FILL: Record<Sticker, string> = {
-  piggy: "var(--kid-pink)",
+  camel: "var(--kid-sand)",
   quarter: "var(--kid-mint)",
   half: "var(--kid-a)",
   threequarter: "var(--kid-sun)",
@@ -182,15 +195,10 @@ export function StickerArt({ kind, earned }: { kind: Sticker; earned: boolean })
   return (
     <svg width="64" height="64" viewBox="0 0 52 52" aria-hidden="true" className="sticker">
       <circle cx="26" cy="26" r="24" fill={earned ? "var(--kid-card)" : "transparent"} stroke={line} strokeWidth="2.5" strokeDasharray={earned ? undefined : "4 3"} />
-      {kind === "piggy" && (
-        <>
-          <path d="M18 21l-1-6 6 4" fill={fill} stroke={line} strokeWidth="1.8" strokeLinejoin="round" />
-          <ellipse cx="25" cy="28" rx="12" ry="9" fill={fill} stroke={line} strokeWidth="2" />
-          <ellipse cx="37.5" cy="28" rx="3.5" ry="4" fill={fill} stroke={line} strokeWidth="1.8" />
-          <circle cx="31" cy="25" r="1.5" fill={line} />
-          <path d="M18 36v3M30 36v3" stroke={line} strokeWidth="2.5" strokeLinecap="round" />
-          <rect x="20" y="19.5" width="8" height="2.5" rx="1.25" fill={line} />
-        </>
+      {kind === "camel" && (
+        <g transform="translate(9.5 10) scale(0.5)">
+          <CamelShape fill={fill} line={line} bag={earned ? "var(--kid-a)" : "var(--track)"} />
+        </g>
       )}
       {(kind === "quarter" || kind === "half" || kind === "threequarter") && (
         <>
