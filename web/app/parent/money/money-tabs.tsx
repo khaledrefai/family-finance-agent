@@ -4,12 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon, Masthead } from "../../ui";
 
-// Header and the four sections of the Money tab. Bills and Uploads live on the overview for now.
+// Header and the five sections of the Money tab. Bills and Uploads live on the overview for now.
 const SECTIONS = [
   { href: "/parent/money", label: "Overview" },
   { href: "/parent/money#bills", label: "Bills" },
   { href: "/parent/money/budgets", label: "Budgets" },
   { href: "/parent/money#uploads", label: "Uploads" },
+  { href: "/parent/money/accounts", label: "Accounts" },
 ];
 
 export function MoneyHeader({ sub }: { sub: string }) {

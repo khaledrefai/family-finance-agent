@@ -294,6 +294,7 @@ export const receipt = {
   shop: "Carrefour, Mirdif",
   date: "Sun 26 Oct",
   paidBy: "Omar, credit card",
+  accountId: "visa",
   budget: "Groceries",
   totalMinor: 64_150,
   vsPlan: "27 of the 31 planned items bought, plus 4 extras. AED 29.50 over the plan, still AED 48.50 inside the food budget.",
@@ -389,3 +390,41 @@ export const buckets = {
     { name: "Dream" as Tier, text: "Big things, like a home" },
   ],
 };
+
+// Accounts and cards the parents typed in (GET /api/accounts once it exists). Nothing links to a bank:
+// balances are what the family entered, so they are shown as estimated with their as-of date.
+// Card bills are the engine's forecast: spend since the last statement plus any carried balance,
+// and the free cash the cash-flow calendar expects on the due date.
+export type AccountKind = "BANK" | "CREDIT_CARD" | "CASH";
+export const accounts: {
+  id: string; kind: AccountKind; label: string; last4?: string; owner: string;
+  balanceMinor: number; asOf: string;
+  limitMinor?: number; usedShare?: number; statementDay?: number; dueDay?: number;
+  bill?: { soFarMinor: number; due: string; freeByDueMinor: number; ok: boolean };
+}[] = [
+  { id: "enbd", kind: "BANK", label: "Emirates NBD current", last4: "4821", owner: "Omar", balanceMinor: 1_845_000, asOf: "24 Oct" },
+  { id: "adcb", kind: "BANK", label: "ADCB savings", last4: "1093", owner: "Sara", balanceMinor: 3_260_000, asOf: "20 Oct" },
+  {
+    id: "visa", kind: "CREDIT_CARD", label: "Omar's Visa", last4: "7710", owner: "Omar", balanceMinor: -590_000, asOf: "24 Oct",
+    limitMinor: 2_000_000, usedShare: 29.5, statementDay: 27, dueDay: 5,
+    bill: { soFarMinor: 590_000, due: "5 November", freeByDueMinor: 480_000, ok: false },
+  },
+  {
+    id: "mc", kind: "CREDIT_CARD", label: "Sara's Mastercard", last4: "3356", owner: "Sara", balanceMinor: -135_000, asOf: "24 Oct",
+    limitMinor: 1_200_000, usedShare: 11.3, statementDay: 1, dueDay: 25,
+    bill: { soFarMinor: 135_000, due: "25 November", freeByDueMinor: 920_000, ok: true },
+  },
+  { id: "cash", kind: "CASH", label: "Cash at home", owner: "Family", balanceMinor: 65_000, asOf: "22 Oct" },
+];
+
+// The card check the engine adds to a request paid by card (part of the assess API once it exists).
+export const cardCheck: Record<string, { withMinor: number; freeByDueMinor: number; shortMinor: number; due: string } | null> = {
+  visa: { withMinor: 620_000, freeByDueMinor: 480_000, shortMinor: 140_000, due: "5 November" },
+  mc: null,
+  enbd: null,
+  adcb: null,
+  cash: null,
+};
+
+// A card statement upload, matched to an account by its last 4 digits.
+export const statementUpload = { name: "Visa statement, September", lines: 48, accountId: "visa", matchedBy: "last 4 digits 7710" };
