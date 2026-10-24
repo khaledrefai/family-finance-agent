@@ -205,13 +205,13 @@ export const saverOfTheMonth = [
   { name: "Layla", percent: 40 },
 ];
 
-export const badges = [
-  { short: "BS", name: "Big Saver", earned: true },
-  { short: "25%", name: "A quarter there", earned: true },
-  { short: "50%", name: "Halfway", earned: false, hint: "AED 30 to go" },
-  { short: "75%", name: "Nearly there", earned: false },
-  { short: "100%", name: "Goal reached", earned: false },
-  { short: "FAM", name: "Family badge", earned: false, hint: "Trip at 30% of 50%" },
+export const badges: { art: "piggy" | "quarter" | "half" | "threequarter" | "trophy" | "heart"; name: string; earned: boolean; hint?: string }[] = [
+  { art: "piggy", name: "Big Saver", earned: true },
+  { art: "quarter", name: "A quarter there", earned: true },
+  { art: "half", name: "Halfway", earned: false, hint: "AED 30 to go" },
+  { art: "threequarter", name: "Nearly there", earned: false },
+  { art: "trophy", name: "Goal reached", earned: false },
+  { art: "heart", name: "Family badge", earned: false, hint: "Trip at 30% of 50%" },
 ];
 
 // What the agent offers Layla for the AED 300 headphones (from the assess API once it exists).

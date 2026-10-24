@@ -4,8 +4,9 @@ import { useState } from "react";
 import { aed, api } from "@/lib/api";
 import { headphones } from "@/lib/sample";
 import { AgentChat } from "../../agent-chat";
-import { Icon, Masthead, SampleNote } from "../../ui";
+import { SampleNote } from "../../ui";
 import { useSession } from "../../use-session";
+import { BuddySays, GoalArt } from "../kid-ui";
 
 // Kid Ask: tell the agent what I bought, see the agent's options for something I want,
 // or ask for something directly. The options card shows the seeded headphones example until the
@@ -49,16 +50,25 @@ export default function ChildAsk() {
 
   return (
     <div className={`stack${young ? " young" : ""}`}>
-      <Masthead title="Ask" sub="Tell me what you bought, or ask for something" />
+      <header className="kid-head">
+        <h1>Ask</h1>
+      </header>
+      <BuddySays>
+        <p>Tell me what you bought and I'll keep your picture right. Or tell me about something you want.</p>
+      </BuddySays>
 
-      <AgentChat title="What did you buy?" placeholder="12 dirhams shawarma, or paste a link" />
+      <AgentChat
+        title="What did you buy?"
+        placeholder="12 dirhams shawarma, or paste a link"
+        suggestions={["12 dirhams shawarma", "8 dirhams chicken wrap", "5 dirhams juice"]}
+      />
 
       {!young && (
         <section className="stack" style={{ gap: 10 }}>
           <h2 className="first">Something you want</h2>
           <article className="card" style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span aria-hidden="true" style={{ flex: "none", width: 64, height: 64, borderRadius: 8, background: "var(--rule-soft)", display: "grid", placeItems: "center", color: "var(--ink-soft)" }}>
-              <Icon name="headphones" size={30} />
+            <span className="art-blob" aria-hidden="true">
+              <GoalArt art="headphones" size={56} />
             </span>
             <span style={{ flex: 1 }}>
               <b>{headphones.title}</b>
@@ -70,7 +80,8 @@ export default function ChildAsk() {
           </article>
           <p className="turn-agent">{headphones.intro}</p>
           {headphones.options.map((o, i) => (
-            <div className="card" key={o.id} style={{ display: "grid", gap: 8 }}>
+            <div className="card option-card" key={o.id}>
+              <span className="option-num" aria-hidden="true">{i + 1}</span>
               <p><b>{o.title}</b> {o.text}</p>
               <button className={i === 0 ? undefined : "quiet"} onClick={() => send(o.requestTitle, o.amountMinor)}>
                 {o.button}
@@ -83,7 +94,7 @@ export default function ChildAsk() {
       )}
 
       <form className="panel" onSubmit={submit}>
-        <strong>Ask for something</strong>
+        <strong>Ask for something else</strong>
         <label>
           What is it?
           <input value={title} onChange={(e) => setTitle(e.target.value)} required />

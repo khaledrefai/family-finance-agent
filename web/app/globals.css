@@ -324,10 +324,108 @@ button.close:hover { background: transparent; color: var(--ink); }
 
 /* Badges */
 .badges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.badge { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-size: 12px; padding: 12px 6px; border-radius: var(--radius-field); background: var(--chit); border: 1px solid var(--rule); }
-.medal { width: 52px; height: 52px; border-radius: 99px; display: grid; place-items: center; border: 2.5px solid var(--ink); box-shadow: inset 0 0 0 2px var(--chit), inset 0 0 0 3.5px var(--ink); font-weight: 700; font-size: 13px; }
-.badge.locked { color: var(--cancelled); border-style: dashed; }
-.badge.locked .medal { border: 2px dashed var(--cancelled); box-shadow: none; color: var(--cancelled); }
 .demo-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--cancelled); border: 1px dashed var(--cancelled); border-radius: 6px; padding: 3px 8px; }
 button.chip { min-height: 44px; }
 button.chip.on, button.chip.on:hover { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+
+/* Kids' look: sunny page, sticker-style cards with a thick outline, a rounder font and big drawings.
+   Layla's accent is purple and Adam's (the .young screens) is orange. Text stays in ink for contrast. */
+body:has(.kid-app) {
+  --kid-bg: #fff4dc; --kid-card: #fffdf8; --kid-line: #1a2340; --kid-glass: #eef6ff;
+  --kid-a: #6a3fc8; --kid-a-wash: #ece4ff; --kid-on-a: #ffffff;
+  --kid-sun: #ffc83d; --kid-sun-deep: #b07a00; --kid-mint: #2bbf8a; --kid-pink: #ff9fb2;
+  background: var(--kid-bg);
+}
+body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
+@media (prefers-color-scheme: dark) {
+  body:has(.kid-app) {
+    --kid-bg: #191430; --kid-card: #241e40; --kid-line: #50467d; --kid-glass: #2c2652;
+    --kid-a: #b69cff; --kid-a-wash: #352a5e; --kid-on-a: #191430; --kid-mint: #25a679;
+  }
+  body:has(.kid-app .young) { --kid-a: #ff9a52; --kid-a-wash: #4a2a12; }
+}
+.kid-app h1, .kid-app h2, .kid-app .card-title, .kid-app strong, .kid-app .goal-pct, .kid-app .wallet-amount, .kid-app button, .kid-app .tab {
+  font-family: var(--font-kid), var(--font-readex), system-ui, sans-serif;
+}
+.kid-app h1 { font-size: 2rem; font-weight: 700; }
+.kid-app h2 { font-weight: 700; font-size: 1.375rem; }
+.kid-app .card-title { font-weight: 700; font-size: 1.125rem; }
+.kid-app .card, .kid-app .panel {
+  background: var(--kid-card); border: 2px solid var(--kid-line); border-radius: 22px; box-shadow: 0 4px 0 var(--kid-line);
+}
+.kid-app button { border-radius: 16px; border: 2px solid var(--kid-line); background: var(--kid-a); color: var(--kid-on-a); font-weight: 700; box-shadow: 0 3px 0 var(--kid-line); }
+.kid-app button:hover { background: color-mix(in srgb, var(--kid-a) 88%, var(--kid-line)); }
+.kid-app button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--kid-line); }
+.kid-app button.quiet, .kid-app button.chip { background: var(--kid-card); color: var(--ink); }
+.kid-app button.chip { border-radius: 999px; font-weight: 600; }
+.kid-app button.chip:hover, .kid-app button.quiet:hover { background: var(--kid-a-wash); }
+.kid-app button.text { background: transparent; border-color: transparent; box-shadow: none; color: var(--ink-soft); font-weight: 500; }
+.kid-app input { border-radius: 14px; border-width: 2px; }
+.kid-app .chit { border-radius: 14px; }
+
+.kid-head { display: flex; align-items: center; gap: 12px; }
+.avatar {
+  flex: none; width: 52px; height: 52px; border-radius: 99px; display: grid; place-items: center;
+  background: var(--kid-a); color: var(--kid-on-a); border: 2.5px solid var(--kid-line);
+  font: 700 1.5rem/1 var(--font-kid), sans-serif;
+}
+.star-chip {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; padding: 3px 12px 3px 8px; border-radius: 99px;
+  background: var(--kid-card); border: 2px solid var(--kid-line); color: var(--ink); text-decoration: none; font-weight: 600; font-size: 14px;
+}
+.goal-card { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; align-items: center; }
+.goal-info { display: grid; gap: 4px; }
+.goal-name { display: flex; align-items: center; gap: 8px; font: 700 1.25rem/1.15 var(--font-kid), sans-serif; text-transform: capitalize; }
+.goal-pct { font-size: 2.75rem; font-weight: 700; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+.goal-plan { grid-column: 1 / -1; padding: 10px 14px; border-radius: 14px; background: var(--kid-a-wash); font-size: 15px; }
+.wallet { display: flex; align-items: center; gap: 14px; }
+.wallet-amount { white-space: nowrap; font-size: 1.5rem; font-weight: 700; line-height: 1.1; }
+.buddy-says { display: flex; gap: 10px; align-items: flex-end; }
+.buddy { flex: none; }
+.bubble {
+  position: relative; flex: 1; display: grid; gap: 6px; padding: 12px 14px; border-radius: 20px 20px 20px 6px;
+  background: var(--kid-card); border: 2px solid var(--kid-line); line-height: 1.5;
+}
+.kid-app .stackbar { height: 28px; gap: 3px; }
+.kid-app .stackbar > span { border: 2px solid var(--kid-line); }
+.kid-app .stackbar > span:first-child { border-radius: 14px 4px 4px 14px; }
+.kid-app .stackbar > span:last-child { border-radius: 4px 14px 14px 4px; }
+.kid-app .swatch { width: 14px; height: 14px; border-radius: 99px; border: 1.5px solid var(--kid-line); }
+.art-blob { flex: none; width: 76px; height: 76px; border-radius: 24px; display: grid; place-items: center; background: var(--kid-a-wash); border: 2px solid var(--kid-line); }
+.option-card { display: grid; grid-template-columns: auto 1fr; gap: 10px 12px; align-items: start; }
+.option-card > button { grid-column: 1 / -1; }
+.option-num {
+  width: 34px; height: 34px; border-radius: 99px; display: grid; place-items: center;
+  background: var(--kid-sun); border: 2px solid var(--kid-line); color: #1a2340; font: 700 1.125rem/1 var(--font-kid), sans-serif;
+}
+
+.star-hero { display: flex; align-items: center; gap: 16px; background: var(--kid-a-wash) !important; }
+.badges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.badge {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; font-size: 12px; color: var(--ink-soft);
+  padding: 12px 6px; border-radius: 18px; background: var(--kid-card, var(--chit)); border: 2px solid var(--kid-line, var(--rule)); box-shadow: 0 3px 0 var(--kid-line, var(--rule));
+}
+.badge-name { font: 700 14px/1.2 var(--font-kid), sans-serif; color: var(--ink); }
+.badge.locked { border-style: dashed; box-shadow: none; background: transparent; }
+.badge.locked .badge-name { color: var(--ink-soft); }
+.earn { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+.race { display: grid; gap: 12px; margin-top: 4px; }
+.lane { display: grid; grid-template-columns: 52px 1fr 44px; align-items: center; gap: 8px; }
+.lane-name { font-weight: 600; font-size: 14px; }
+.lane-pct { text-align: right; font-variant-numeric: tabular-nums; }
+.lane-track { position: relative; height: 40px; margin-right: 14px; border-bottom: 3px dashed var(--kid-line); }
+.runner {
+  position: absolute; bottom: -2px; transform: translateX(-50%); width: 36px; height: 36px; border-radius: 99px;
+  display: grid; place-items: center; background: var(--kid-card); border: 2.5px solid var(--kid-line);
+  font: 700 1rem/1 var(--font-kid), sans-serif; color: var(--ink);
+}
+.runner.lead { background: var(--kid-sun); color: #1a2340; }
+.flag { position: absolute; right: -16px; bottom: 0; }
+
+.kid-app .tabbar { background: var(--kid-card); border-top: 2px solid var(--kid-line); }
+.kid-app .tab { font-size: 13px; font-weight: 600; border-radius: 16px; min-width: 84px; padding: 4px 10px; }
+.kid-app .tab svg { width: 28px; height: 28px; }
+.kid-app .tab[aria-current="page"] { background: var(--kid-a-wash); color: var(--ink); }
+
+.young .goal-pct { font-size: 3.25rem; }
+.young .goal-plan { font-size: 1.0625rem; }

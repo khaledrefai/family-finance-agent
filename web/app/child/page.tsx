@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import { agent, aed } from "@/lib/api";
 import { kids } from "@/lib/sample";
 import { Chit } from "../chit";
-import { Masthead, Progress, SampleNote, StackBar } from "../ui";
+import { SampleNote, StackBar } from "../ui";
 import { useSession } from "../use-session";
+import { artFor, Avatar, BuddySays, GoalArt, GoalJar, Piggy, SmallStar } from "./kid-ui";
 
-// Kid Home: my goal, my demo wallet, where my pocket money went, a nudge to log spending, and my requests.
+// Kid Home: my goal jar, my demo wallet, where my pocket money went, the coin buddy's nudge, and my requests.
 // Kids only ever see their own money. Requests and the nudge are live; goal, wallet and the chart are
-// sample figures until the goals endpoint exists. Adam (6 to 9) gets bigger type.
+// sample figures until the goals endpoint exists. Adam (6 to 9) gets bigger type and fewer words.
 export default function ChildHome() {
   const { me, requests, error, logout } = useSession("CHILD");
   const [nudge, setNudge] = useState<string | null>(null);
@@ -25,32 +26,51 @@ export default function ChildHome() {
 
   return (
     <div className={`stack${young ? " young" : ""}`}>
-      <Masthead
-        title={`Hi ${me.displayName}`}
-        sub={kid ? `${kid.stars} stars so far` : me.familyName}
-        action={<button className="text" onClick={logout}>Log out</button>}
-      />
+      <header className="kid-head">
+        <Avatar name={me.displayName} />
+        <div style={{ flex: 1 }}>
+          <h1>Hi {me.displayName}</h1>
+          {kid && (
+            <Link href="/child/stars" className="star-chip">
+              <SmallStar /> {kid.stars} stars
+            </Link>
+          )}
+        </div>
+        <button className="text" onClick={logout}>Log out</button>
+      </header>
       {error && <p className="error" role="alert">{error}</p>}
 
       {kid && (
-        <section className="card" style={{ display: "grid", gap: 10 }}>
-          <div className="row" style={{ padding: 0 }}>
-            <span className="card-title">My goal: {kid.goal}</span>
-            <span className="muted">{aed(kid.goalMinor)}</span>
+        <section className="card goal-card">
+          <GoalJar percent={kid.percent} size={young ? 150 : 128} />
+          <div className="goal-info">
+            <p className="label">My goal</p>
+            <div className="goal-name">
+              <GoalArt art={artFor(kid.goal)} size={44} />
+              <span>{kid.goal}</span>
+            </div>
+            <p className="goal-pct">{kid.percent}%</p>
+            <p className="muted">
+              {aed(kid.savedMinor)} of {aed(kid.goalMinor)}
+            </p>
           </div>
-          <p className="big">{kid.percent}%</p>
-          <Progress percent={kid.percent} label={`${kid.percent} percent of the way`} />
-          <p style={{ fontSize: young ? undefined : 14 }}>
-            {aed(kid.savedMinor)} saved. {kid.plan}
-          </p>
+          <p className="goal-plan">{kid.plan}</p>
         </section>
       )}
 
+      {nudge && (
+        <BuddySays>
+          <p>{nudge}</p>
+          <Link href="/child/ask" className="link">Tell me in Ask</Link>
+        </BuddySays>
+      )}
+
       {kid && (
-        <section className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div>
+        <section className="card wallet">
+          <Piggy size={young ? 68 : 56} />
+          <div style={{ flex: 1 }}>
             <p className="muted">My wallet</p>
-            <p style={{ fontSize: 24 }}>{aed(kid.savedMinor, { cents: true })}</p>
+            <p className="wallet-amount">{aed(kid.savedMinor, { cents: true })}</p>
           </div>
           <span className="demo-tag">DEMO MONEY</span>
         </section>
@@ -67,13 +87,6 @@ export default function ChildHome() {
             label={kid.pocket.parts.map((p) => `${p.label} ${aed(p.amountMinor)}`).join(", ")}
           />
           <p style={{ fontSize: 14 }}>{kid.pocket.note}</p>
-        </section>
-      )}
-
-      {nudge && (
-        <section className="turn-agent" style={{ display: "grid", gap: 8 }}>
-          <p>{nudge}</p>
-          <Link href="/child/ask" className="link" style={{ fontSize: 14 }}>Tell me in Ask</Link>
         </section>
       )}
 
