@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { aed } from "@/lib/api";
-import { bills, cashflow, findings, monthly } from "@/lib/sample";
+import { bills, cashflow, findings, monthly, wealth } from "@/lib/sample";
 import { MonthColumns, SampleNote, TRUST, Waterfall } from "../../ui";
 import { useSession } from "../../use-session";
 import { MoneyHeader } from "./money-tabs";
@@ -18,6 +18,15 @@ export default function MoneyPage() {
   return (
     <div className="stack">
       <MoneyHeader sub={`${monthly.month} · from your confirmed income and commitments`} />
+
+      <Link href="/parent/money/wealth" className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, color: "inherit", textDecoration: "none" }}>
+        <span>
+          <span className="muted" style={{ display: "block" }}>Family wealth · estimated, {wealth.asOf}</span>
+          <span style={{ fontSize: 24, fontWeight: 300, fontVariantNumeric: "tabular-nums" }}>{aed(wealth.totalMinor)}</span>
+          <span className="est" style={{ display: "block" }}>Bank, cash and gold, minus cards and loans</span>
+        </span>
+        <span aria-hidden="true">›</span>
+      </Link>
 
       <section className="card" style={{ display: "grid", gap: 10 }}>
         <div>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { aed } from "@/lib/api";
-import { buckets } from "@/lib/sample";
+import { buckets, gold } from "@/lib/sample";
 import { Back, BucketFlow, Masthead, SampleNote, TRUST } from "../../../ui";
 import { useSession } from "../../../use-session";
 
@@ -93,6 +93,16 @@ export default function BucketsPage() {
             <button className="quiet" style={{ justifySelf: "start" }} onClick={() => setGivingOn((v) => !v)}>
               {givingOn ? "Turn off giving" : "Turn on giving"}
             </button>
+          )}
+          {b.id === "goals" && (
+            <Link href="/parent/money/gold" className="gold-held">
+              <span>
+                <b>Kept as gold:</b> {gold.totalGrams.map((g) => `${g.grams} g ${g.purity}`).join(" + ")}, worth {aed(gold.valueMinor)} today
+                <br />
+                <span className="est">Gold price 24K {aed(gold.price["24K"], { cents: true })}/g, as of {gold.priceAsOf}</span>
+              </span>
+              <span aria-hidden="true">›</span>
+            </Link>
           )}
           {b.id === "invest" && <p className="muted">Learning only for now. Real investing would come later through a licensed partner.</p>}
         </section>

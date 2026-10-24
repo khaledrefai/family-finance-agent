@@ -428,3 +428,37 @@ export const cardCheck: Record<string, { withMinor: number; freeByDueMinor: numb
 
 // A card statement upload, matched to an account by its last 4 digits.
 export const statementUpload = { name: "Visa statement, September", lines: 48, accountId: "visa", matchedBy: "last 4 digits 7710" };
+
+// Saving in gold (GET /api/gold once it exists). Parents log each purchase; the engine values the grams
+// at today's price for their purity. Prices here are sample figures, not a real rate (verify a source).
+export type Purity = "24K" | "22K" | "21K";
+export const gold = {
+  price: { "24K": 32_000, "22K": 29_650, "21K": 28_300 } as Record<Purity, number>, // fils per gram
+  priceSource: "Daily retail rate, Dubai (sample)",
+  priceAsOf: "24 Oct, 10:00",
+  totalGrams: [{ purity: "24K" as Purity, grams: 40 }, { purity: "22K" as Purity, grams: 10 }],
+  valueMinor: 1_576_500,
+  paidMinor: 1_540_000,
+  purchases: [
+    { id: "g1", what: "Gold bar", grams: 20, purity: "24K" as Purity, paidMinor: 580_000, date: "10 Mar", shop: "Gold Souk, Deira", goal: "Home deposit", valueMinor: 640_000, belowPaid: false },
+    { id: "g2", what: "Gold coins, 4 × 5 g", grams: 20, purity: "24K" as Purity, paidMinor: 620_000, date: "2 Jul", shop: "Mall of the Emirates", goal: "Home deposit", valueMinor: 640_000, belowPaid: false },
+    { id: "g3", what: "Bangle", grams: 10, purity: "22K" as Purity, paidMinor: 340_000, date: "15 Sep", shop: "Gold Souk, Deira", goal: "Emergency buffer", valueMinor: 296_500, belowPaid: true },
+  ],
+  makingNote: "Jewellery prices include making charges, so it is worth less than you paid if you sell it by weight.",
+};
+
+// Family wealth (GET /api/wealth once it exists): what the family owns minus what it owes, from typed data.
+// `from`/`to` place each line on one bar, as shares of everything owned. Sent by the engine.
+export const wealth = {
+  totalMinor: 2_181_500,
+  asOf: "24 Oct",
+  steps: [
+    { label: "Bank accounts", amountMinor: 5_105_000, from: 0, to: 75.67, kind: "s1", asOf: "20 to 24 Oct" },
+    { label: "Cash", amountMinor: 65_000, from: 75.67, to: 76.63, kind: "s1", asOf: "22 Oct" },
+    { label: "Gold, at today's price", amountMinor: 1_576_500, from: 76.63, to: 100, kind: "s4", asOf: "24 Oct" },
+    { label: "Everything you own", amountMinor: 6_746_500, from: 0, to: 100, kind: "total", asOf: "" },
+    { label: "Credit cards", amountMinor: -725_000, from: 89.25, to: 100, kind: "s2", asOf: "24 Oct" },
+    { label: "Car loan left", amountMinor: -3_840_000, from: 32.34, to: 89.25, kind: "s2", asOf: "1 Oct" },
+    { label: "Family wealth", amountMinor: 2_181_500, from: 0, to: 32.34, kind: "total", asOf: "" },
+  ],
+};
