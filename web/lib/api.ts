@@ -113,3 +113,19 @@ export const agent = {
 export function formatMoney(minor: number, currency = "AED") {
   return `${currency} ${(minor / 100).toFixed(2)}`;
 }
+
+// "AED 34,500" or "AED 12.50". Formatting only; the figure itself comes from the core or the sample data.
+export function aed(minor: number, { cents = false }: { cents?: boolean } = {}) {
+  const value = Math.abs(minor) / 100;
+  const text = value.toLocaleString("en-US", {
+    minimumFractionDigits: cents ? 2 : 0,
+    maximumFractionDigits: cents ? 2 : 0,
+  });
+  return `${minor < 0 ? "−" : ""}AED ${text}`;
+}
+
+// The same, without the currency, for chart labels where AED is said once above.
+export function plain(minor: number) {
+  const text = (Math.abs(minor) / 100).toLocaleString("en-US", { maximumFractionDigits: 0 });
+  return `${minor < 0 ? "−" : ""}${text}`;
+}
