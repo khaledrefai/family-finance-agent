@@ -1,17 +1,22 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api, MemberView } from "@/lib/api";
-import { AgentChat } from "../agent-chat";
+import { advice, bills, familyGoal, kids, monthly } from "@/lib/sample";
 import { Chit } from "../chit";
+import { BigAmount, Icon, Masthead, Progress, SampleNote, TRUST, WhySheet } from "../ui";
 import { useSession } from "../use-session";
 
-// Parent view: decide waiting requests first, ask where the kids' money went,
-// then see everything already decided.
-export default function ParentPage() {
+// Today: only what needs a parent, in this order: bills due, ask, waiting requests,
+// what is free this month, the family goal, one piece of advice, then what was decided.
+// Requests are live from the core; the money cards use sample figures until the plan endpoints exist.
+export default function TodayPage() {
   const { me, requests, error, setError, reload, logout } = useSession("PARENT");
   const [members, setMembers] = useState<MemberView[]>([]);
   const [justDecided, setJustDecided] = useState<string | null>(null);
+  const [adviceState, setAdviceState] = useState<"open" | "accepted" | "later">("open");
+  const [why, setWhy] = useState(false);
 
   useEffect(() => {
     if (me) api.members().then(setMembers).catch(() => {});
@@ -34,53 +39,114 @@ export default function ParentPage() {
   const pending = requests.filter((r) => r.status === "PENDING");
   const decided = requests.filter((r) => r.status !== "PENDING" && r.id !== justDecided);
   const fresh = requests.find((r) => r.id === justDecided);
+  const nextBill = bills[0];
 
   return (
-    <>
-      <header className="masthead">
-        <div>
-          <h1>Hi {me.displayName}</h1>
-          <p className="muted">{me.familyName}</p>
-        </div>
-        <button className="text" onClick={logout}>Log out</button>
-      </header>
+    <div className="stack">
+      <Masthead
+        title={`Hi ${me.displayName}`}
+        sub={me.familyName}
+        action={<button className="text" onClick={logout}>Log out</button>}
+      />
       {error && <p className="error" role="alert">{error}</p>}
 
+      <Link href="/parent/money" className="alert">
+        <Icon name="bell" size={20} />
+        <span style={{ flex: 1 }}>
+          <b>{nextBill.name} due in {nextBill.daysLeft} days.</b> AED 850 reserved, enough to cover it.
+        </span>
+        <span aria-hidden="true">›</span>
+      </Link>
+
+      <Link href="/parent/ask" className="askbar">
+        <Icon name="ask" size={20} />
+        Ask the accountant anything
+      </Link>
+
       {fresh && (
-        <>
+        <section>
           <h2 className="first">Just decided</h2>
           <Chit request={fresh} from={`${nameOf(fresh.requesterId)} asked`} landed />
-        </>
+        </section>
       )}
-      <h2 className={fresh ? undefined : "first"}>Waiting for a decision</h2>
-      {pending.length === 0 && <p className="empty">Nothing waiting. When one of the kids asks for something, it lands here.</p>}
-      {pending.map((r) => (
-        <Chit key={r.id} request={r} from={`${nameOf(r.requesterId)} asks`} stamp={false}>
-          {r.requesterId !== me.memberId ? (
-            <div className="chit-actions">
-              <button onClick={() => decide(r.id, "approve")}>Approve</button>
-              <button className="decline" onClick={() => decide(r.id, "reject")}>Decline</button>
-            </div>
+
+      <section>
+        <h2 className="first">Waiting for you</h2>
+        {pending.length === 0 && <p className="empty">Nothing waiting. When one of the kids asks for something, it lands here.</p>}
+        {pending.map((r) => (
+          <Chit key={r.id} request={r} from={`${nameOf(r.requesterId)} asks`} stamp={false}>
+            {r.requesterId !== me.memberId ? (
+              <div className="chit-actions">
+                <button onClick={() => decide(r.id, "approve")}>Approve</button>
+                <button className="decline" onClick={() => decide(r.id, "reject")}>Decline</button>
+              </div>
+            ) : (
+              <p className="chit-note">You asked for this, so the other parent decides.</p>
+            )}
+            <Link href={`/parent/why?id=${r.id}`} className="link">Why this?</Link>
+          </Chit>
+        ))}
+      </section>
+
+      <section className="card">
+        <p className="muted">Free this month, after commitments</p>
+        <BigAmount minor={monthly.freeMinor} />
+        <p style={{ fontSize: 14 }}>AED 2,140 free until pay day on {monthly.payday}.</p>
+        <p className="trust" style={{ marginTop: 4 }}>{TRUST}</p>
+      </section>
+
+      <section className="card" style={{ display: "grid", gap: 8 }}>
+        <div className="row" style={{ padding: 0 }}>
+          <span className="card-title">{familyGoal.name}</span>
+          <span className="muted">Family goal</span>
+        </div>
+        <Progress percent={familyGoal.percent} label={`${familyGoal.percent} percent saved`} />
+        <p style={{ fontSize: 14 }}>
+          AED 3,600 of 12,000 saved · {familyGoal.percent}% · on track for {familyGoal.onTrackFor}
+        </p>
+        <p className="muted">
+          Own goals: Layla {kids.Layla.percent}% · Adam {kids.Adam.percent}%
+        </p>
+      </section>
+
+      {adviceState !== "later" && (
+        <section className="card strong" style={{ display: "grid", gap: 10 }}>
+          <p className="muted">{advice.title}</p>
+          {adviceState === "accepted" ? (
+            <p role="status">Done. Entertainment is AED 600 a month for November and December. You can change it in Money, Budgets.</p>
           ) : (
-            <p className="chit-note">You asked for this, so the other parent decides.</p>
+            <>
+              <p>{advice.text}</p>
+              <div className="actions" style={{ marginTop: 0 }}>
+                <button onClick={() => setAdviceState("accepted")}>Accept</button>
+                <button className="quiet" onClick={() => setAdviceState("later")}>Not now</button>
+              </div>
+            </>
           )}
-        </Chit>
-      ))}
+          <button type="button" className="text" style={{ justifySelf: "start", minHeight: 44 }} onClick={() => setWhy(true)}>
+            Why this?
+          </button>
+        </section>
+      )}
 
-      <AgentChat
-        title="Ask about the kids' money"
-        placeholder="Where did Layla's money go this month?"
-        source="Totals are worked out exactly by the app, not guessed by the AI."
-        suggestions={members
-          .filter((m) => m.role === "CHILD")
-          .map((m) => `Where did ${m.displayName}'s money go this month?`)}
-      />
+      <Link href="/parent/summary" className="link">See October's family summary</Link>
+      <SampleNote />
 
-      <h2>Decided</h2>
-      {decided.length === 0 && <p className="empty">Approved and declined requests will collect here.</p>}
-      {decided.map((r) => (
-        <Chit key={r.id} request={r} from={nameOf(r.requesterId)} small />
-      ))}
-    </>
+      <section>
+        <h2 className="first">Decided</h2>
+        {decided.length === 0 && <p className="empty">Approved and declined requests will collect here.</p>}
+        {decided.map((r) => (
+          <Chit key={r.id} request={r} from={nameOf(r.requesterId)} small />
+        ))}
+      </section>
+
+      {why && (
+        <WhySheet
+          title="Why I suggested this"
+          groups={[{ heading: "The numbers behind it", rows: advice.why }]}
+          onClose={() => setWhy(false)}
+        />
+      )}
+    </div>
   );
 }

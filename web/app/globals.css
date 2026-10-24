@@ -204,3 +204,130 @@ button.chip:hover { background: var(--paper); }
 .people button { display: grid; text-align: left; gap: 0; padding: var(--space-2) var(--space-3); }
 .people button span { font-size: var(--step--1); color: var(--ink-soft); font-weight: 400; }
 .empty { color: var(--ink-soft); padding: var(--space-4); border: 1px dashed var(--rule); border-radius: var(--radius-chit); text-align: center; font-size: var(--step--1); }
+
+/* ---------- App shell: tab bar, cards and the pieces every screen shares ---------- */
+
+/* Chart series colours: the default data-viz palette (first four slots, checked for colour-blind readers).
+   Dark mode uses the same hues stepped for the dark surface. Text never wears these colours. */
+:root { --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --track: #e3e7ee; --rule-soft: #e3e7ee; }
+@media (prefers-color-scheme: dark) { :root { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --track: #262d44; --rule-soft: #262d44; } }
+
+main.with-tabs { padding-bottom: 104px; }
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  background: var(--chit); border-top: 1px solid var(--rule);
+  display: flex; justify-content: center;
+  padding: 6px max(8px, env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom));
+}
+.tabbar-inner { display: flex; justify-content: space-around; width: 100%; max-width: 560px; }
+.tab {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-width: 60px; min-height: 48px; font-size: 11px; color: var(--ink-soft); text-decoration: none;
+}
+.tab[aria-current="page"] { color: var(--ink); font-weight: 600; }
+
+.stack { display: grid; gap: var(--space-4); }
+.card { background: var(--chit); border: 1px solid var(--rule); border-radius: var(--radius-field); padding: var(--space-4); }
+.card.strong { border-color: var(--ink); }
+.card > .label, .label { margin: 0 0 6px; font-size: 12px; letter-spacing: 0.04em; color: var(--ink-soft); text-transform: uppercase; }
+.card-title { font-weight: 600; }
+.big { font-size: 2rem; font-weight: 300; letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.big .cur { font-size: var(--step--1); font-weight: 500; vertical-align: 0.8em; margin-right: 6px; }
+.row { display: flex; justify-content: space-between; gap: var(--space-3); padding: 6px 0; font-size: 14px; }
+.row b, .num { font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.row.sub { padding-left: var(--space-3); color: var(--ink-soft); font-size: var(--step--1); }
+.row.total { border-top: 1.5px solid var(--ink); margin-top: 6px; padding-top: 10px; font-size: var(--step-0); font-weight: 600; }
+.rows > .row + .row { border-top: 1px solid var(--rule-soft); }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-top: var(--space-3); }
+.back { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink-soft); text-decoration: none; font-size: 14px; }
+.link { display: inline-flex; align-items: center; min-height: 44px; font-size: var(--step--1); color: var(--ink-soft); }
+a { color: var(--focus); }
+.sample { font-size: 12px; color: var(--ink-soft); border: 1px dashed var(--rule); border-radius: var(--radius-chit); padding: 6px 10px; }
+.trust { font-size: 12px; color: var(--ink-soft); }
+.over { color: var(--declined); }
+.good { color: var(--approved); }
+
+.alert {
+  display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: var(--radius-field);
+  background: var(--waiting-wash); color: var(--waiting); text-decoration: none; font-size: 14px;
+}
+.alert.short { background: var(--declined-wash); color: var(--declined); }
+.askbar {
+  display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px;
+  background: var(--chit); border: 1px solid var(--field); border-radius: var(--radius-field);
+  color: var(--ink-soft); text-decoration: none;
+}
+
+/* Draft card: anything the AI filled in. Dashed until a parent confirms it. */
+.draft { background: var(--chit); border: 1.5px dashed var(--field); border-radius: var(--radius-field); padding: 12px 14px; display: grid; gap: 4px; }
+.draft.done { border-style: solid; border-color: var(--rule); }
+.draft .row { padding: 3px 0; }
+.typed { display: flex; flex-wrap: wrap; gap: 6px; }
+.typed span { font-size: 12px; padding: 2px 8px; border-radius: 6px; background: var(--cancelled-wash); }
+.confirmed { font-size: 12px; font-weight: 600; color: var(--approved); }
+
+/* Progress line */
+.bar { height: 8px; border-radius: 99px; background: var(--track); overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--ink); border-radius: 99px; }
+.bar.thin { height: 6px; }
+
+/* Segmented control inside Money */
+.seg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; background: var(--rule-soft); border-radius: var(--radius-field); padding: 3px; }
+.seg a { display: grid; place-items: center; min-height: 44px; border-radius: 8px; font-size: 13px; color: var(--ink-soft); text-decoration: none; }
+.seg a[aria-current="page"] { background: var(--chit); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgb(26 35 64 / 0.15); }
+
+/* Options you pick one of (plan pace, kid's choices) */
+.option { display: flex; gap: 12px; align-items: flex-start; background: var(--chit); border: 1px solid var(--rule); border-radius: var(--radius-field); padding: 14px; cursor: pointer; font-size: var(--step-0); color: var(--ink); }
+.option:has(input:checked) { border: 2px solid var(--ink); padding: 13px; }
+.option input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--ink); }
+.pill { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 600; border: 1px solid var(--ink); border-radius: 99px; padding: 1px 8px; }
+
+/* Bottom sheet for "Why this?" */
+.sheet-backdrop { position: fixed; inset: 0; background: rgb(15 19 32 / 0.35); z-index: 20; display: flex; align-items: flex-end; justify-content: center; }
+.sheet { width: 100%; max-width: 560px; max-height: 88vh; overflow: auto; background: var(--chit); border-radius: 18px 18px 0 0; padding: 12px 20px calc(20px + env(safe-area-inset-bottom)); display: grid; gap: 12px; }
+.sheet .grip { width: 40px; height: 4px; border-radius: 99px; background: var(--rule); justify-self: center; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; }
+.sheet-head h2 { margin: 0; }
+button.close { background: transparent; border: 0; color: var(--ink-soft); min-width: 44px; min-height: 44px; font-size: 22px; padding: 0; }
+button.close:hover { background: transparent; color: var(--ink); }
+
+/* Charts. Numbers are always written beside the marks, so nothing is read off a shape. */
+.wf { display: grid; gap: 9px; }
+.wf-row .row { padding: 0 0 2px; font-size: 13px; }
+.wf-track { position: relative; height: 14px; }
+.wf-track > span { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+.bud { display: grid; gap: 4px; padding: 8px 0; }
+.bud-track { position: relative; height: 12px; border-radius: 4px; background: var(--track); }
+.bud-track .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); border-radius: 4px; }
+.bud-track .fill.capped { border-radius: 4px 0 0 4px; }
+.bud-track .past { position: absolute; top: 0; bottom: 0; background: var(--declined); border-radius: 0 4px 4px 0; }
+.bud-track .limit { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
+.cols { position: relative; display: grid; align-items: end; }
+.col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; font-size: 11px; color: var(--ink-soft); height: 100%; }
+.col > span { display: block; width: 60%; max-width: 26px; border-radius: 4px 4px 0 0; background: var(--ink); }
+.col > span.tight { background: var(--waiting); }
+.col > span.soft { background: var(--field); }
+.refline { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--ink-soft); pointer-events: none; }
+.stackbar { display: flex; gap: 2px; height: 18px; }
+.stackbar > span:first-child { border-radius: 4px 0 0 4px; }
+.stackbar > span:last-child { border-radius: 0 4px 4px 0; }
+.legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 14px; }
+.legend > span { display: flex; align-items: center; gap: 8px; }
+.swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+/* Chat turns used by the setup chat and the kids' Ask */
+.convo { display: grid; gap: var(--space-3); }
+
+/* Kid screens: Adam (9) gets bigger type */
+.young { font-size: 1.0625rem; }
+.young h1 { font-size: 1.875rem; }
+
+/* Badges */
+.badges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.badge { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-size: 12px; padding: 12px 6px; border-radius: var(--radius-field); background: var(--chit); border: 1px solid var(--rule); }
+.medal { width: 52px; height: 52px; border-radius: 99px; display: grid; place-items: center; border: 2.5px solid var(--ink); box-shadow: inset 0 0 0 2px var(--chit), inset 0 0 0 3.5px var(--ink); font-weight: 700; font-size: 13px; }
+.badge.locked { color: var(--cancelled); border-style: dashed; }
+.badge.locked .medal { border: 2px dashed var(--cancelled); box-shadow: none; color: var(--cancelled); }
+.demo-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--cancelled); border: 1px dashed var(--cancelled); border-radius: 6px; padding: 3px 8px; }
+button.chip { min-height: 44px; }
+button.chip.on, button.chip.on:hover { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
