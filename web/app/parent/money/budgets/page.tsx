@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { budgets } from "@/lib/sample";
+import { aed } from "@/lib/api";
+import { budgets, food } from "@/lib/sample";
 import { BudgetBar, MonthColumns, SampleNote } from "../../../ui";
 import { useSession } from "../../../use-session";
 import { MoneyHeader } from "../money-tabs";
@@ -23,6 +24,20 @@ export default function BudgetsPage() {
           <BudgetBar key={b.name} {...b} />
         ))}
         <p className="trust" style={{ marginTop: 6 }}>All amounts in AED, from receipts, statements and payments you added.</p>
+      </section>
+
+      <section className="card" style={{ display: "grid", gap: 6 }}>
+        <div className="row" style={{ padding: 0 }}>
+          <span className="card-title">This week's food</span>
+          <span className="muted">{aed(food.budgetMinor)}</span>
+        </div>
+        <p className="muted">{food.week}</p>
+        <div className="rows">
+          {food.lines.map((l) => (
+            <div className="row" key={l.label}><span>{l.label}</span><b>{aed(l.amountMinor)}</b></div>
+          ))}
+        </div>
+        <p style={{ fontSize: 14 }}>{food.note}</p>
       </section>
 
       <section className="card">

@@ -462,3 +462,51 @@ export const wealth = {
     { label: "Family wealth", amountMinor: 2_181_500, from: 0, to: 32.34, kind: "total", asOf: "" },
   ],
 };
+
+// This week's food budget. The weekly meal plan arrives later, so delivery nights stay a line here.
+export const food = {
+  week: "Sun 26 Oct to Fri 31 Oct",
+  budgetMinor: 69_000,
+  lines: [
+    { label: "Groceries", amountMinor: 48_000 },
+    { label: "Delivery nights, 2 planned", amountMinor: 21_000 },
+  ],
+  note: "Six delivery nights cost about AED 1,050 last month. Two a week keeps food inside budget.",
+};
+
+// Ways to save: once a month, at most three suggestions built from recurring costs. The engine works out
+// every amount and share; the agent only words them. Never a product pitch, never a link to buy.
+export const waysToSave = {
+  month: "November",
+  tips: [
+    {
+      id: "streaming",
+      title: "Streaming",
+      text: "You pay AED 180 a month for three streaming services. Dropping one saves about AED 720 a year.",
+      why: [
+        { label: "Streaming services", value: "3" },
+        { label: "Paid each month", value: "AED 180" },
+        { label: "Cheapest one, a year", value: "AED 720" },
+      ],
+    },
+    {
+      id: "rent",
+      title: "Rent",
+      text: "Rent is 29% of take-home pay and the lease renews on 1 Mar. That is a good time to compare other flats.",
+      why: [
+        { label: "Rent, a year", value: "AED 120,000" },
+        { label: "Take-home pay, a month", value: "AED 34,500" },
+        { label: "Share of take-home pay", value: "29%" },
+      ],
+    },
+    {
+      id: "fun",
+      title: "Outings",
+      text: "Entertainment averaged AED 1,520 a month. Ask the accountant to plan cheaper outings for the family.",
+      why: [
+        { label: "Entertainment, 3-month average", value: "AED 1,520" },
+        { label: "Entertainment budget", value: "AED 1,200" },
+      ],
+    },
+  ],
+};

@@ -459,3 +459,9 @@ body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
 
 /* Gold */
 .gold-held { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-field); background: color-mix(in srgb, var(--s4) 14%, var(--chit)); border: 1px solid color-mix(in srgb, var(--s4) 50%, var(--rule)); color: inherit; text-decoration: none; font-size: 14px; }
+
+/* Ways to save tips on Today */
+.tip { display: grid; gap: 4px; padding-top: 10px; border-top: 1px solid var(--rule-soft); }
+.tip:first-of-type { border-top: 0; padding-top: 0; }
+.tip-actions { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.tip-actions .text { min-height: 44px; font-size: 14px; padding: 0; }

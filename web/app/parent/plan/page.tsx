@@ -87,8 +87,7 @@ export default function PlanPage() {
 
       <section className="card" style={{ display: "grid", gap: 6 }}>
         <p className="card-title">Also in Plan</p>
-        <Link href="/parent/plan/meals" className="link" style={{ fontSize: 15 }}>This week's dinners and shopping list (optional)</Link>
-        <p className="muted">Big purchases and the long-term calculator arrive here next.</p>
+        <p className="muted">Weekly dinners and a shopping list, big purchases and the long-term calculator are coming soon.</p>
       </section>
       <SampleNote />
 

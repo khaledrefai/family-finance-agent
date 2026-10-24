@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { aed, api, MemberView } from "@/lib/api";
-import { accounts, advice, bills, familyGoal, kids, monthly } from "@/lib/sample";
+import { accounts, advice, bills, familyGoal, kids, monthly, waysToSave } from "@/lib/sample";
 import { Chit } from "../chit";
 import { AccountPicker, BigAmount, CardWarning, Icon, Masthead, Progress, SampleNote, TRUST, WhySheet } from "../ui";
 import { useSession } from "../use-session";
 
 // Today: only what needs a parent, in this order: bills due, ask, waiting requests,
-// what is free this month, the family goal, one piece of advice, then what was decided.
+// what is free this month, the family goal, one piece of advice, ways to save, then what was decided.
 // Requests are live from the core; the money cards use sample figures until the plan endpoints exist.
 export default function TodayPage() {
   const { me, requests, error, setError, reload, logout } = useSession("PARENT");
@@ -17,6 +17,9 @@ export default function TodayPage() {
   const [justDecided, setJustDecided] = useState<string | null>(null);
   const [adviceState, setAdviceState] = useState<"open" | "accepted" | "later">("open");
   const [why, setWhy] = useState(false);
+  // Ways to save: each tip can be dismissed or snoozed to next month. Saved per parent once the endpoint exists.
+  const [tipState, setTipState] = useState<Record<string, "dismissed" | "snoozed">>({});
+  const [tipWhy, setTipWhy] = useState<string | null>(null);
   // Which account a parent would pay a request from. Sample default until requests carry it.
   const [payFrom, setPayFrom] = useState<Record<string, string>>({});
 
@@ -148,6 +151,30 @@ export default function TodayPage() {
         </section>
       )}
 
+      {waysToSave.tips.some((t) => !tipState[t.id]) && (
+        <section className="card" style={{ display: "grid", gap: 10 }}>
+          <div className="row" style={{ padding: 0 }}>
+            <span className="card-title">Ways to save</span>
+            <span className="muted">{waysToSave.month}</span>
+          </div>
+          {waysToSave.tips.filter((t) => !tipState[t.id]).map((t) => (
+            <div key={t.id} className="tip">
+              <p className="label">{t.title}</p>
+              <p style={{ fontSize: 15 }}>{t.text}</p>
+              <div className="tip-actions">
+                <button type="button" className="text" onClick={() => setTipWhy(t.id)}>Why this?</button>
+                <button type="button" className="text" onClick={() => setTipState((s) => ({ ...s, [t.id]: "snoozed" }))}>Snooze a month</button>
+                <button type="button" className="text" onClick={() => setTipState((s) => ({ ...s, [t.id]: "dismissed" }))}>Dismiss</button>
+              </div>
+            </div>
+          ))}
+          <p className="trust">{TRUST}</p>
+        </section>
+      )}
+      {Object.values(tipState).includes("snoozed") && (
+        <p className="muted" role="status">Snoozed tips come back next month.</p>
+      )}
+
       <Link href="/parent/summary" className="link">See October's family summary</Link>
       <SampleNote />
 
@@ -164,6 +191,13 @@ export default function TodayPage() {
           title="Why I suggested this"
           groups={[{ heading: "The numbers behind it", rows: advice.why }]}
           onClose={() => setWhy(false)}
+        />
+      )}
+      {tipWhy && (
+        <WhySheet
+          title="Why this tip"
+          groups={[{ heading: "The numbers behind it", rows: waysToSave.tips.find((t) => t.id === tipWhy)!.why }]}
+          onClose={() => setTipWhy(null)}
         />
       )}
     </div>

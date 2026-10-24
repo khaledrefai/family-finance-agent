@@ -94,7 +94,7 @@ export default function FamilyPage() {
         <p style={{ fontSize: 14 }}>Adam: peanut allergy</p>
         <p style={{ fontSize: 14 }}>Weekly meal plan: on (optional)</p>
         <p className="muted" style={{ marginTop: 4 }}>
-          Used for the weekly meals and for ask-to-buy. The app flags products but never certifies them: always check the halal mark and the pack label.
+          Used for ask-to-buy. The app flags products but never certifies them: always check the halal mark and the pack label.
         </p>
       </section>
 
