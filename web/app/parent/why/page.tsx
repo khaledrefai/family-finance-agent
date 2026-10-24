@@ -2,10 +2,10 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { api, MemberView } from "@/lib/api";
-import { headphones } from "@/lib/sample";
+import { aed, api, MemberView } from "@/lib/api";
+import { accounts, cardCheck, headphones } from "@/lib/sample";
 import { Chit } from "../../chit";
-import { Back, SampleNote, WhySheet } from "../../ui";
+import { AccountPicker, Back, CardWarning, SampleNote, WhySheet } from "../../ui";
 import { useSession } from "../../use-session";
 
 // One request with the "Why this?" sheet open: the figures the agent used, the kid's side and the family's side.
@@ -16,6 +16,7 @@ function Why() {
   const { me, requests, error, setError, reload } = useSession("PARENT");
   const [members, setMembers] = useState<MemberView[]>([]);
   const [open, setOpen] = useState(true);
+  const [payFrom, setPayFrom] = useState("visa");
 
   useEffect(() => {
     if (me) api.members().then(setMembers).catch(() => {});
@@ -43,6 +44,14 @@ function Why() {
     }
   }
 
+  const check = cardCheck[payFrom];
+  const acct = accounts.find((a) => a.id === payFrom);
+  const paying = r.status === "PENDING" && r.requesterId !== me.memberId && (
+    <div style={{ display: "grid", gap: 8 }}>
+      <AccountPicker label="Pay from" value={payFrom} onChange={setPayFrom} />
+      <CardWarning accountId={payFrom} />
+    </div>
+  );
   const buttons = r.status === "PENDING" && r.requesterId !== me.memberId && (
     <div className="actions">
       <button onClick={() => decide("approve")}>Approve</button>
@@ -55,6 +64,7 @@ function Why() {
       <Back href="/parent" label="Today" />
       {error && <p className="error" role="alert">{error}</p>}
       <Chit request={r} from={`${name} asks`} stamp={r.status !== "PENDING"}>
+        {paying}
         {buttons}
       </Chit>
       {!open && (
@@ -70,10 +80,22 @@ function Why() {
             { heading: `${name}'s side`, rows: headphones.kidSide },
             { heading: "The family's side", rows: headphones.familySide },
             { heading: "Family rules checked", rows: headphones.rules.map((x) => ({ ...x, good: x.value === "Not relevant" })) },
+            ...(check && acct
+              ? [{
+                  heading: "Card bill check",
+                  rows: [
+                    { label: "Paid from", value: `${acct.label} ···${acct.last4}` },
+                    { label: `Bill on ${check.due}, with this`, value: aed(check.withMinor) },
+                    { label: "Free by then", value: aed(check.freeByDueMinor) },
+                    { label: "Short by", value: aed(check.shortMinor), over: true },
+                  ],
+                }]
+              : []),
           ]}
           footer={`${name} saw only the first list, never the family figures. Worked out exactly by the app, not guessed by the AI.`}
           onClose={() => setOpen(false)}
         >
+          {paying}
           {buttons}
         </WhySheet>
       )}

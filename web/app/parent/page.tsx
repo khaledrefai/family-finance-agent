@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { api, MemberView } from "@/lib/api";
-import { advice, bills, familyGoal, kids, monthly } from "@/lib/sample";
+import { aed, api, MemberView } from "@/lib/api";
+import { accounts, advice, bills, familyGoal, kids, monthly } from "@/lib/sample";
 import { Chit } from "../chit";
-import { BigAmount, Icon, Masthead, Progress, SampleNote, TRUST, WhySheet } from "../ui";
+import { AccountPicker, BigAmount, CardWarning, Icon, Masthead, Progress, SampleNote, TRUST, WhySheet } from "../ui";
 import { useSession } from "../use-session";
 
 // Today: only what needs a parent, in this order: bills due, ask, waiting requests,
@@ -17,6 +17,8 @@ export default function TodayPage() {
   const [justDecided, setJustDecided] = useState<string | null>(null);
   const [adviceState, setAdviceState] = useState<"open" | "accepted" | "later">("open");
   const [why, setWhy] = useState(false);
+  // Which account a parent would pay a request from. Sample default until requests carry it.
+  const [payFrom, setPayFrom] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (me) api.members().then(setMembers).catch(() => {});
@@ -40,6 +42,7 @@ export default function TodayPage() {
   const decided = requests.filter((r) => r.status !== "PENDING" && r.id !== justDecided);
   const fresh = requests.find((r) => r.id === justDecided);
   const nextBill = bills[0];
+  const tightCard = accounts.find((a) => a.bill && !a.bill.ok);
 
   return (
     <div className="stack">
@@ -58,6 +61,16 @@ export default function TodayPage() {
         <span aria-hidden="true">›</span>
       </Link>
 
+      {tightCard?.bill && (
+        <Link href="/parent/money/accounts" className="alert short">
+          <Icon name="warn" size={20} />
+          <span style={{ flex: 1 }}>
+            <b>{tightCard.label} bill due {tightCard.bill.due}.</b> {aed(tightCard.bill.soFarMinor)} so far, {aed(tightCard.bill.freeByDueMinor)} free by then.
+          </span>
+          <span aria-hidden="true">›</span>
+        </Link>
+      )}
+
       <Link href="/parent/ask" className="askbar">
         <Icon name="ask" size={20} />
         Ask the accountant anything
@@ -75,6 +88,12 @@ export default function TodayPage() {
         {pending.length === 0 && <p className="empty">Nothing waiting. When one of the kids asks for something, it lands here.</p>}
         {pending.map((r) => (
           <Chit key={r.id} request={r} from={`${nameOf(r.requesterId)} asks`} stamp={false}>
+            {r.requesterId !== me.memberId && (
+              <div style={{ display: "grid", gap: 8, padding: "10px 0 8px" }}>
+                <AccountPicker label="Pay from" value={payFrom[r.id] ?? "visa"} onChange={(id) => setPayFrom((p) => ({ ...p, [r.id]: id }))} />
+                <CardWarning accountId={payFrom[r.id] ?? "visa"} />
+              </div>
+            )}
             {r.requesterId !== me.memberId ? (
               <div className="chit-actions">
                 <button onClick={() => decide(r.id, "approve")}>Approve</button>
