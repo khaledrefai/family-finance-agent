@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { aed } from "@/lib/api";
-import { planOptions, planSplit, planSteps } from "@/lib/sample";
-import { Masthead, SampleNote, TRUST, WhySheet } from "../../ui";
+import { buckets, planOptions, planSplit, planSteps } from "@/lib/sample";
+import { Masthead, SampleNote, StackBar, TRUST, WhySheet } from "../../ui";
 import { useSession } from "../../use-session";
 
 // The family plan: protect commitments, clear the card, build a buffer, then pick the goal's pace.
@@ -38,6 +38,17 @@ export default function PlanPage() {
           </div>
         ))}
       </section>
+
+      <Link href="/parent/plan/buckets" className="card bucket-link" style={{ display: "grid", gap: 10, color: "inherit", textDecoration: "none" }}>
+        <div className="row" style={{ padding: 0 }}>
+          <span className="card-title">Money buckets</span>
+          <span className="link">See what is in each ›</span>
+        </div>
+        <StackBar
+          parts={buckets.list.map((b) => ({ label: b.name, amountMinor: b.amountMinor, color: b.color }))}
+          label={buckets.list.map((b) => `${b.name} ${aed(b.amountMinor)}`).join(", ")}
+        />
+      </Link>
 
       <section className="stack" style={{ gap: 10 }}>
         <div>

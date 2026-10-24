@@ -360,3 +360,69 @@ export function StackBar({ parts, label }: { parts: { label: string; amountMinor
     </>
   );
 }
+
+// Money flowing from income into each bucket. `from`/`to` are each bucket's place on the income bar
+// (shares of income, from the engine). The chart only lays them out; labels sit beside every bucket.
+export function BucketFlow({
+  incomeMinor,
+  buckets,
+}: {
+  incomeMinor: number;
+  buckets: { id: string; name: string; color: string; amountMinor: number; percent: number; from: number; to: number }[];
+}) {
+  const top = 30;
+  const tall = 300; // height of the income bar
+  const gap = 6; // space between buckets on the right
+  const unit = tall / 100;
+  const nodes = buckets.map((b, i) => ({ ...b, y0: top + b.from * unit + i * gap, y1: top + b.to * unit + i * gap }));
+  // Labels follow their bucket but never sit closer than 36px to the one above.
+  const labels: number[] = [];
+  nodes.forEach((n, i) => {
+    const mid = (n.y0 + n.y1) / 2;
+    labels.push(i === 0 ? Math.max(mid, top + 14) : Math.max(mid, labels[i - 1] + 36));
+  });
+  const height = Math.max(nodes[nodes.length - 1].y1, labels[labels.length - 1] + 18) + 6;
+  const lx = 16;
+  const rx = 146;
+  return (
+    <svg
+      width="100%"
+      viewBox={`0 0 358 ${height}`}
+      role="img"
+      aria-label={`Income ${aed(incomeMinor)} split into ${buckets.map((b) => `${b.name} ${aed(b.amountMinor)}`).join(", ")}`}
+      className="flow"
+    >
+      <text x="0" y="16" fontSize="13" fontWeight="600" fill="var(--ink)">Income {aed(incomeMinor)}</text>
+      <rect x="0" y={top} width={lx} height={tall} rx="3" fill="var(--ink)" />
+      {nodes.map((n) => {
+        const a = top + n.from * unit;
+        const b = top + n.to * unit;
+        const c = (lx + rx) / 2;
+        return (
+          <a key={n.id} href={`#${n.id}`}>
+            <title>{`${n.name}: ${aed(n.amountMinor)}, ${n.percent}% of income`}</title>
+            <path
+              d={`M${lx} ${a}C${c} ${a} ${c} ${n.y0} ${rx} ${n.y0}V${n.y1}C${c} ${n.y1} ${c} ${b} ${lx} ${b}Z`}
+              fill={n.color}
+              opacity="0.35"
+            />
+            <rect x={rx} y={n.y0} width="14" height={Math.max(2, n.y1 - n.y0)} rx="2" fill={n.color} />
+          </a>
+        );
+      })}
+      {nodes.map((n, i) => {
+        const mid = (n.y0 + n.y1) / 2;
+        const ly = labels[i];
+        return (
+          <g key={n.id}>
+            {Math.abs(ly - mid) > 2 && <path d={`M${rx + 16} ${mid}L${rx + 24} ${ly - 4}`} stroke="var(--ink-soft)" strokeWidth="1" />}
+            <text x={rx + 28} y={ly - 2} fontSize="13" fontWeight="600" fill="var(--ink)">{n.name}</text>
+            <text x={rx + 28} y={ly + 13} fontSize="12" fill="var(--ink-soft)">
+              {aed(n.amountMinor)} · {n.percent}%
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}

@@ -209,8 +209,8 @@ button.chip:hover { background: var(--paper); }
 
 /* Chart series colours: the default data-viz palette (first four slots, checked for colour-blind readers).
    Dark mode uses the same hues stepped for the dark surface. Text never wears these colours. */
-:root { --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --track: #e3e7ee; --rule-soft: #e3e7ee; }
-@media (prefers-color-scheme: dark) { :root { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --track: #262d44; --rule-soft: #262d44; } }
+:root { --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --track: #e3e7ee; --rule-soft: #e3e7ee; }
+@media (prefers-color-scheme: dark) { :root { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --track: #262d44; --rule-soft: #262d44; } }
 
 main.with-tabs { padding-bottom: 104px; }
 .tabbar {
@@ -429,3 +429,15 @@ body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
 
 .young .goal-pct { font-size: 3.25rem; }
 .young .goal-plan { font-size: 1.0625rem; }
+
+/* Money buckets */
+.bucket { display: grid; gap: 8px; border-top-width: 4px; scroll-margin-top: 16px; }
+.bucket-items { display: grid; gap: 12px; }
+.bucket-item { display: grid; gap: 4px; font-size: 14px; }
+.bucket-item .bud-track { height: 8px; }
+.tier { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; border-radius: 99px; padding: 1px 8px; border: 1px solid var(--ink); white-space: nowrap; }
+.tier-survival { background: var(--ink); color: var(--on-ink); }
+.tier-goodlife { background: transparent; color: var(--ink); }
+.tier-dream { background: transparent; color: var(--ink); border-style: dashed; }
+.flow a { cursor: pointer; }
+.flow a:hover path { opacity: 0.55; }

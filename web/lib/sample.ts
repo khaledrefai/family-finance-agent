@@ -322,3 +322,70 @@ export const summary = {
 };
 
 export const spendCategories = ["Restaurant", "Hotel", "Transport", "Groceries", "Shopping", "Other"];
+
+// Money buckets (GET /api/plan/buckets once it exists). The accountant suggests each bucket's share,
+// a parent confirms, and the engine works out the amounts. `from`/`to` place each bucket on the
+// income bar and `share` sizes each line inside its bucket, both sent by the engine.
+export type Tier = "Survival" | "Good Life" | "Dream";
+export const buckets = {
+  month: "October",
+  incomeMinor: 3_450_000,
+  confirmed: false,
+  list: [
+    {
+      id: "commitments", name: "Commitments", color: "var(--s1)", amountMinor: 1_720_000, percent: 49.9, from: 0, to: 49.86,
+      about: "Survival first: rent, school and bills are covered before anything else.",
+      items: [
+        { label: "Rent reserve (4 cheques a year)", amountMinor: 1_000_000, share: 58.1 },
+        { label: "School fees reserve (3 terms)", amountMinor: 375_000, share: 21.8 },
+        { label: "Car loan", amountMinor: 210_000, share: 12.2 },
+        { label: "DEWA, average", amountMinor: 90_000, share: 5.2 },
+        { label: "du mobile and internet", amountMinor: 45_000, share: 2.6 },
+      ],
+    },
+    {
+      id: "everyday", name: "Everyday", color: "var(--s2)", amountMinor: 739_000, percent: 21.4, from: 49.86, to: 71.28,
+      about: "What the family spends week to week. The budgets live here.",
+      items: [
+        { label: "Groceries", amountMinor: 300_000, share: 40.6 },
+        { label: "Eating out", amountMinor: 150_000, share: 20.3 },
+        { label: "Entertainment", amountMinor: 120_000, share: 16.2 },
+        { label: "Transport", amountMinor: 100_000, share: 13.5 },
+        { label: "Kids' pocket money", amountMinor: 69_000, share: 9.3 },
+      ],
+    },
+    {
+      id: "goals", name: "Goals", color: "var(--s3)", amountMinor: 650_000, percent: 18.8, from: 71.28, to: 90.12,
+      about: "Saving for what the family wants, the safety net first.",
+      items: [
+        { label: "Emergency buffer", amountMinor: 500_000, share: 76.9, tier: "Survival" as Tier, note: "Full in March, then this money moves to the next goal" },
+        { label: "Summer trip", amountMinor: 150_000, share: 23.1, tier: "Good Life" as Tier, note: "AED 3,600 of 12,000 saved" },
+        { label: "Home deposit", amountMinor: 0, share: 0, tier: "Dream" as Tier, note: "Starts when the buffer is full" },
+      ],
+    },
+    {
+      id: "invest", name: "Set aside for investing", color: "var(--s4)", amountMinor: 100_000, percent: 2.9, from: 90.12, to: 93.02,
+      about: "An amount kept apart for the long term. The app never names a fund or product.",
+      items: [{ label: "Set aside this month", amountMinor: 100_000, share: 100 }],
+    },
+    {
+      id: "fun", name: "Fun", color: "var(--s5)", amountMinor: 191_000, percent: 5.5, from: 93.02, to: 98.55,
+      about: "Money each parent spends as they like, no questions asked.",
+      items: [
+        { label: "Omar's own money", amountMinor: 70_000, share: 36.6 },
+        { label: "Sara's own money", amountMinor: 70_000, share: 36.6 },
+        { label: "Family day out", amountMinor: 51_000, share: 26.7 },
+      ],
+    },
+    {
+      id: "giving", name: "Giving", color: "var(--s6)", amountMinor: 50_000, percent: 1.4, from: 98.55, to: 100, optional: true,
+      about: "Optional. Charity and sadaqah. Turn it off any time.",
+      items: [{ label: "Charity and sadaqah", amountMinor: 50_000, share: 100 }],
+    },
+  ],
+  tiers: [
+    { name: "Survival" as Tier, text: "Bills plus a 3-month buffer" },
+    { name: "Good Life" as Tier, text: "Trips, Eid, the extras" },
+    { name: "Dream" as Tier, text: "Big things, like a home" },
+  ],
+};

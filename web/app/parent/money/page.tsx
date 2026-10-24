@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { aed } from "@/lib/api";
 import { bills, cashflow, findings, monthly } from "@/lib/sample";
@@ -28,6 +29,7 @@ export default function MoneyPage() {
           label="Income AED 34,500, minus commitments 17,200 and everyday spending 7,390, leaves free cash 9,910. Saving takes 6,500, leaving 3,410 spare."
         />
         <p className="trust">All amounts in AED. The full list is below.</p>
+        <Link href="/parent/plan/buckets" className="link">See the same money as buckets</Link>
       </section>
 
       <section className="card">
