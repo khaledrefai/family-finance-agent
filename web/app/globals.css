@@ -272,8 +272,8 @@ a { color: var(--focus); }
 .bar.thin { height: 6px; }
 
 /* Segmented control inside Money */
-.seg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; background: var(--rule-soft); border-radius: var(--radius-field); padding: 3px; }
-.seg a { display: grid; place-items: center; min-height: 44px; border-radius: 8px; font-size: 13px; color: var(--ink-soft); text-decoration: none; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 2px; background: var(--rule-soft); border-radius: var(--radius-field); padding: 3px; }
+.seg a { display: grid; place-items: center; min-height: 44px; border-radius: 8px; font-size: 12.5px; color: var(--ink-soft); text-decoration: none; }
 .seg a[aria-current="page"] { background: var(--chit); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgb(26 35 64 / 0.15); }
 
 /* Options you pick one of (plan pace, kid's choices) */
@@ -441,3 +441,18 @@ body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
 .tier-dream { background: transparent; color: var(--ink); border-style: dashed; }
 .flow a { cursor: pointer; }
 .flow a:hover path { opacity: 0.55; }
+
+/* Accounts and cards */
+.card-warn { display: grid; gap: 4px; padding: 10px 12px; border: 1.5px dashed var(--waiting); background: var(--waiting-wash); border-radius: var(--radius-field); font-size: 14px; }
+.warn-stamp {
+  justify-self: start; transform: rotate(-2deg); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--waiting); border: 2px solid var(--waiting); border-radius: 6px; padding: 1px 8px;
+}
+.acct { display: grid; gap: 8px; }
+.acct-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.acct-num { font-variant-numeric: tabular-nums; color: var(--ink-soft); font-size: 13px; }
+.est { font-size: 12px; color: var(--ink-soft); }
+.acct-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; font-size: 13px; }
+.acct-facts span { display: grid; color: var(--ink-soft); }
+.acct-facts b { color: var(--ink); font-weight: 500; }
+.matched { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px; }

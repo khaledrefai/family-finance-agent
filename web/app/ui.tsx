@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { aed, plain } from "@/lib/api";
-import { SAMPLE_NOTE } from "@/lib/sample";
+import { accounts, cardCheck, SAMPLE_NOTE } from "@/lib/sample";
 
 // Shared pieces for the parent and kid screens: tab bars, icons, draft cards, the "Why this?" sheet
 // and the four charts. Charts only draw what the money engine (or the sample data) sends;
@@ -171,7 +171,7 @@ export function WhySheet({
   children,
 }: {
   title: string;
-  groups: { heading: string; rows: { label: string; value: string; good?: boolean }[] }[];
+  groups: { heading: string; rows: { label: string; value: string; good?: boolean; over?: boolean }[] }[];
   footer?: string;
   onClose: () => void;
   children?: React.ReactNode;
@@ -199,7 +199,7 @@ export function WhySheet({
               {g.rows.map((r) => (
                 <div className="row" key={r.label}>
                   <span>{r.label}</span>
-                  <b className={r.good ? "good" : undefined}>{r.value}</b>
+                  <b className={r.good ? "good" : r.over ? "over" : undefined}>{r.value}</b>
                 </div>
               ))}
             </div>
@@ -424,5 +424,37 @@ export function BucketFlow({
         );
       })}
     </svg>
+  );
+}
+
+// "Paid from": one chip per account the family typed in. Used on Add spending, the receipt and statement uploads.
+export function AccountPicker({ value, onChange, label = "Paid from" }: { value: string; onChange: (id: string) => void; label?: string }) {
+  return (
+    <div style={{ display: "grid", gap: 6 }}>
+      <span className="muted">{label}</span>
+      <div className="chips" style={{ marginBottom: 0 }} role="group" aria-label={label}>
+        {accounts.map((a) => (
+          <button key={a.id} type="button" className={`chip${a.id === value ? " on" : ""}`} aria-pressed={a.id === value} onClick={() => onChange(a.id)}>
+            {a.label}{a.last4 ? ` ···${a.last4}` : ""}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// The card bill warning, in the stamp style. Every figure is the engine's card bill forecast.
+export function CardWarning({ accountId, hint = true }: { accountId: string; hint?: boolean }) {
+  const check = cardCheck[accountId];
+  const acct = accounts.find((a) => a.id === accountId);
+  if (!check || !acct) return null;
+  return (
+    <div className="card-warn" role="note">
+      <span className="warn-stamp">Card check</span>
+      <p>
+        {acct.label}&apos;s bill on {check.due} would be <b>{aed(check.withMinor)}</b>. Only <b>{aed(check.freeByDueMinor)}</b> is free by then.
+      </p>
+      {hint && <p className="muted">Pay from a bank account instead, or wait until after the statement date.</p>}
+    </div>
   );
 }

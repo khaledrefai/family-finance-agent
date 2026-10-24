@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { spendCategories } from "@/lib/sample";
-import { Back, Icon, Masthead } from "../../../ui";
+import { accounts, spendCategories } from "@/lib/sample";
+import { AccountPicker, Back, CardWarning, Icon, Masthead } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // Add spending: upload a receipt for anything, or type in a payment that has no receipt
@@ -17,7 +17,7 @@ export default function AddSpendingPage() {
   const [category, setCategory] = useState("Restaurant");
   const [where, setWhere] = useState("");
   const [date, setDate] = useState("");
-  const [paidWith, setPaidWith] = useState("Credit card");
+  const [paidFrom, setPaidFrom] = useState("visa");
   const [forWhom, setForWhom] = useState("Whole family");
   const [error, setError] = useState<string | null>(null);
   const [added, setAdded] = useState<string | null>(null);
@@ -31,7 +31,8 @@ export default function AddSpendingPage() {
       return;
     }
     setError(null);
-    setAdded(`Added: AED ${amount.trim()} for ${category.toLowerCase()}${where ? `, ${where}` : ""}. It counts toward this month's budget.`);
+    const from = accounts.find((a) => a.id === paidFrom)?.label ?? "";
+    setAdded(`Added: AED ${amount.trim()} for ${category.toLowerCase()}${where ? `, ${where}` : ""}, paid from ${from}. It counts toward this month's budget.`);
     setAmount("");
     setWhere("");
   }
@@ -73,16 +74,12 @@ export default function AddSpendingPage() {
           Where
           <input placeholder="Family dinner, Dubai Marina" value={where} onChange={(e) => setWhere(e.target.value)} />
         </label>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          <label>
-            Date
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          </label>
-          <label>
-            Paid with
-            <input value={paidWith} onChange={(e) => setPaidWith(e.target.value)} />
-          </label>
-        </div>
+        <label>
+          Date
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        </label>
+        <AccountPicker value={paidFrom} onChange={setPaidFrom} />
+        <CardWarning accountId={paidFrom} hint={false} />
         <fieldset style={{ border: 0, padding: 0, margin: 0, display: "grid", gap: 4 }}>
           <legend className="muted" style={{ marginBottom: 4 }}>Who was it for?</legend>
           <div className="chips" style={{ marginBottom: 0 }}>

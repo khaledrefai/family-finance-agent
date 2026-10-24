@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { aed } from "@/lib/api";
 import { receipt } from "@/lib/sample";
-import { Back, Masthead, SampleNote } from "../../../ui";
+import { AccountPicker, Back, Masthead, SampleNote } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // A receipt the agent has read, shown as a draft to confirm. When the family follows the meal plan,
@@ -11,6 +11,7 @@ import { useSession } from "../../../use-session";
 export default function ReceiptPage() {
   const { me } = useSession("PARENT");
   const [done, setDone] = useState(false);
+  const [paidFrom, setPaidFrom] = useState(receipt.accountId);
   if (!me) return <p className="muted">Loading…</p>;
 
   return (
@@ -22,9 +23,9 @@ export default function ReceiptPage() {
         {done && <span className="confirmed">Confirmed</span>}
         <div className="row"><span>Shop</span><b>{receipt.shop}</b></div>
         <div className="row"><span>Date</span><b>{receipt.date}</b></div>
-        <div className="row"><span>Paid by</span><b>{receipt.paidBy}</b></div>
         <div className="row"><span>Budget</span><b>{receipt.budget}</b></div>
         <div className="row total" style={{ borderTopWidth: 1 }}><span>Total</span><b>{aed(receipt.totalMinor, { cents: true })}</b></div>
+        {!done && <AccountPicker value={paidFrom} onChange={setPaidFrom} label="Paid from (read from the receipt's card digits)" />}
       </div>
 
       <section className="card">
@@ -50,7 +51,7 @@ export default function ReceiptPage() {
 
       <section className="card">
         <p style={{ fontSize: 14 }}>
-          <b>This may already be on your card statement.</b> When the October statement is uploaded, I'll match it so it isn't counted twice.
+          <b>This may already be on your card statement.</b> When that card's October statement is uploaded, I'll match this line so it isn't counted twice.
         </p>
       </section>
 
