@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { aed } from "@/lib/api";
-import { AccountKind, accounts, statementUpload } from "@/lib/sample";
+import Link from "next/link";
+import { AccountKind, accounts, gold, statementUpload } from "@/lib/sample";
 import { AccountPicker, SampleNote, TRUST } from "../../../ui";
 import { useSession } from "../../../use-session";
 import { MoneyHeader } from "../money-tabs";
@@ -93,6 +94,20 @@ export default function AccountsPage() {
           ))}
         </section>
       ))}
+
+      <section className="stack" style={{ gap: 10 }}>
+        <h2 className="first">Gold</h2>
+        <Link href="/parent/money/gold" className="card acct" style={{ color: "inherit", textDecoration: "none" }}>
+          <div className="acct-head">
+            <b style={{ fontWeight: 600 }}>Gold savings</b>
+            <span aria-hidden="true">›</span>
+          </div>
+          <div>
+            <p style={{ fontSize: 24, fontWeight: 300, fontVariantNumeric: "tabular-nums" }}>{aed(gold.valueMinor)}</p>
+            <p className="est">{gold.totalGrams.map((g) => `${g.grams} g ${g.purity}`).join(" + ")} · at today's price, {gold.priceAsOf}</p>
+          </div>
+        </Link>
+      </section>
 
       <section className="card" style={{ display: "grid", gap: 10 }}>
         <p className="card-title">Latest statement upload</p>
