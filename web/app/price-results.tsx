@@ -10,8 +10,8 @@ function priceParts(o: Offer) {
   return `${o.price.text} + ${delivery}${o.fees.minor ? ` + ${o.fees.text} fees` : ""}`;
 }
 
-function OfferRow({ o, best, action, onPick, busy, showLink }: {
-  o: Offer; best: boolean; action?: string; onPick?: (o: Offer) => void; busy?: boolean; showLink?: boolean;
+function OfferRow({ o, best, action, onPick, busy, done, showLink }: {
+  o: Offer; best: boolean; action?: string; onPick?: (o: Offer) => void; busy?: boolean; done?: string; showLink?: boolean;
 }) {
   return (
     <article className={`card offer${best ? " best" : ""}`}>
@@ -30,8 +30,8 @@ function OfferRow({ o, best, action, onPick, busy, showLink }: {
       {(onPick || (showLink && o.link)) && (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {onPick && action && (
-            <button type="button" className={best ? undefined : "quiet"} onClick={() => onPick(o)} disabled={busy}>
-              {action}
+            <button type="button" className={best ? undefined : "quiet"} onClick={() => onPick(o)} disabled={busy || !!done}>
+              {done ?? action}
             </button>
           )}
           {showLink && o.link && (
@@ -43,8 +43,11 @@ function OfferRow({ o, best, action, onPick, busy, showLink }: {
   );
 }
 
-export function PriceResults({ comparison: c, action, onPick, busy, showLinks = false }: {
-  comparison: Comparison; action?: string; onPick?: (o: Offer) => void; busy?: boolean; showLinks?: boolean;
+// busy: an action is on its way, so every button waits. done: offer key -> what its button says once the action
+// worked ("Sent"), and that button stays off so the same offer can't be sent twice.
+export function PriceResults({ comparison: c, action, onPick, busy, done = {}, showLinks = false }: {
+  comparison: Comparison; action?: string; onPick?: (o: Offer) => void; busy?: boolean; done?: Record<string, string>;
+  showLinks?: boolean;
 }) {
   return (
     <section className="stack" style={{ gap: 10 }} aria-label={`Prices for ${c.searchedFor}`}>
@@ -55,13 +58,13 @@ export function PriceResults({ comparison: c, action, onPick, busy, showLinks = 
         <p className="empty">{c.exact ? "I couldn't find that exact model in the shops I searched." : "I couldn't find that in the shops I searched. Try other words."}</p>
       )}
       {c.offers.map((o) => (
-        <OfferRow key={o.key} o={o} best={o.key === c.best?.key} action={action} onPick={onPick} busy={busy} showLink={showLinks} />
+        <OfferRow key={o.key} o={o} best={o.key === c.best?.key} action={action} onPick={onPick} busy={busy} done={done[o.key]} showLink={showLinks} />
       ))}
       {c.substitutes.length > 0 && (
         <>
           <h3 style={{ margin: "6px 0 0" }}>Similar, but not the same model</h3>
           {c.substitutes.map((o) => (
-            <OfferRow key={o.key} o={o} best={false} action={action} onPick={onPick} busy={busy} showLink={showLinks} />
+            <OfferRow key={o.key} o={o} best={false} action={action} onPick={onPick} busy={busy} done={done[o.key]} showLink={showLinks} />
           ))}
         </>
       )}

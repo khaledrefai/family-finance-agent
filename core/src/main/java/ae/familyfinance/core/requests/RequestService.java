@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,9 @@ public class RequestService {
     private final JdbcClient db;
     private final ObjectMapper json;
     private final PricingService pricing;
+
+    /** How long the same ask counts as a repeat of the one already sent. */
+    static final Duration REPEAT_WINDOW = Duration.ofMinutes(10);
 
     public RequestService(SpendingRequestRepository requests, ApprovalRepository approvals, FamilyRepository families,
                           AffordabilityService affordability, WalletService wallets, Outbox outbox, JdbcClient db,
@@ -88,6 +93,16 @@ public class RequestService {
 
     private SpendingRequest create(CurrentMember me, RequestKind kind, String title, long amountMinor,
                                    String category, String productUrl, Map<String, Object> offer) {
+        // Sending is safe to repeat: a second tap (or a retry after a slow reply) gets the request already sent,
+        // not a new one. The lock makes taps that arrive at the same moment wait for each other.
+        db.sql("SELECT pg_advisory_xact_lock(hashtext(?))").param(me.memberId().toString()).query().singleRow();
+        Optional<SpendingRequest> sent = requests
+                .findFirstByRequesterIdAndKindAndTitleAndAmountMinorAndStatusInAndCreatedAtAfterOrderByCreatedAtDesc(
+                        me.memberId(), kind, title, amountMinor, List.of(RequestStatus.PENDING, RequestStatus.BLOCKED),
+                        OffsetDateTime.now().minus(REPEAT_WINDOW));
+        if (sent.isPresent()) {
+            return sent.get();
+        }
         String currency = families.findById(me.familyId()).orElseThrow().getCurrency();
         SpendingRequest request = new SpendingRequest(me.familyId(), me.memberId(), kind, title, amountMinor, currency,
                 category, productUrl);
@@ -140,8 +155,9 @@ public class RequestService {
     @Transactional(readOnly = true)
     public List<SpendingRequest> list(CurrentMember me) {
         return me.isParent()
-                ? requests.findByFamilyIdOrderByCreatedAtDesc(me.familyId())
-                : requests.findByFamilyIdAndRequesterIdOrderByCreatedAtDesc(me.familyId(), me.memberId());
+                ? requests.findByFamilyIdAndStatusNotOrderByCreatedAtDesc(me.familyId(), RequestStatus.CANCELLED)
+                : requests.findByFamilyIdAndRequesterIdAndStatusNotOrderByCreatedAtDesc(me.familyId(), me.memberId(),
+                        RequestStatus.CANCELLED);
     }
 
     @Transactional

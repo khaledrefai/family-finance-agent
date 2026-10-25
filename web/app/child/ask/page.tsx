@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { Comparison, findPrices, Offer } from "@/lib/prices";
 import { AgentChat } from "../../agent-chat";
@@ -12,6 +12,8 @@ import { BuddySays } from "../kid-ui";
 // Kid Ask: tell the agent what I bought, find the best price for something I want and ask a parent for it,
 // or ask for something directly. Nobody pastes links: the kid says what it is and the app searches the shops
 // (the core's price comparison). Picking an offer sends a request with the core's price, not a typed one.
+// While a request is on its way the buttons wait, and the answer shows right under the button that was pressed,
+// so nobody taps again thinking nothing happened. The core also treats a repeat of the same ask as the same request.
 const IDEAS = ["Sony WH-CH720N headphones", "wireless headphones", "LEGO building set", "Nintendo Switch game"];
 
 export default function ChildAsk() {
@@ -21,16 +23,29 @@ export default function ChildAsk() {
   const [found, setFound] = useState<{ comparison: Comparison | null; reply: string } | null>(null);
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
-  const [sent, setSent] = useState<string | null>(null);
+  // What happened to the last send, shown next to where it was sent from: an offer or the "something else" form
+  const [sent, setSent] = useState<{ text: string; ok: boolean; at: "offer" | "form" } | null>(null);
+  const [sending, setSending] = useState(false);
+  const [sentOffers, setSentOffers] = useState<Record<string, string>>({});
+  const notice = useRef<HTMLDivElement>(null);
+
+  // Bring the answer into view on a phone, where it could be below the fold
+  useEffect(() => {
+    if (sent) notice.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [sent]);
 
   if (!me) return <Loading />;
   const young = me.ageBand === "CHILD_6_9";
 
-  function told(saved: { status: string; agentSummary?: string }, what: string) {
+  function told(saved: { status: string; agentSummary?: string }, what: string, at: "offer" | "form") {
     // A family rule can stop a request before it reaches a parent; the core says which rule and why
-    setSent(saved.status === "BLOCKED"
-      ? `Not sent: ${saved.agentSummary ?? "it is against a family rule."} Ask a parent if you think that's wrong.`
-      : `Sent. Your parents can see "${what}" now, and their answer will show on Home.`);
+    const blocked = saved.status === "BLOCKED";
+    setSent({
+      at, ok: !blocked,
+      text: blocked
+        ? `Not sent: ${saved.agentSummary ?? "it is against a family rule."} Ask a parent if you think that's wrong.`
+        : `Sent to your parents! They can see "${what}" now, and their answer will show on Home.`,
+    });
   }
 
   async function find(text: string) {
@@ -39,6 +54,7 @@ export default function ChildAsk() {
     setFinding(true);
     setSent(null);
     setFound(null);
+    setSentOffers({});
     try {
       setFound(await findPrices(text));
       setError(null);
@@ -50,38 +66,55 @@ export default function ChildAsk() {
   }
 
   async function ask(o: Offer) {
-    if (!found?.comparison) return;
+    if (!found?.comparison || sending) return;
+    setSending(true);
+    setSent(null);
     try {
       const saved = await api.requestOffer(found.comparison.id, o.key, o.title);
       setError(null);
-      told(saved, saved.title);
-      await reload();
+      setSentOffers((m) => ({ ...m, [o.key]: saved.status === "BLOCKED" ? "Not sent" : "Sent ✓" }));
+      told(saved, saved.title, "offer");
+      reload();
     } catch (err) {
-      setError((err as Error).message);
+      setSent({ at: "offer", ok: false, text: `That didn't go through: ${(err as Error).message} Try again.` });
+    } finally {
+      setSending(false);
     }
   }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (sending) return;
     setSent(null);
     // Convert "300" or "12.50" to fils without floating-point maths.
     const match = amount.trim().match(/^(\d+)(?:\.(\d{1,2}))?$/);
     if (!match) {
-      setError("Enter the price as a number, like 300 or 12.50.");
+      setSent({ at: "form", ok: false, text: "Enter the price as a number, like 300 or 12.50." });
       return;
     }
     const fils = Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"));
+    setSending(true);
     try {
       const saved = await api.createRequest(title, fils);
       setError(null);
-      told(saved, title);
-      await reload();
+      told(saved, title, "form");
+      setTitle("");
+      setAmount("");
+      reload();
     } catch (err) {
-      setError((err as Error).message);
-      return;
+      setSent({ at: "form", ok: false, text: `That didn't go through: ${(err as Error).message} Try again.` });
+    } finally {
+      setSending(false);
     }
-    setTitle("");
-    setAmount("");
+  }
+
+  function Notice({ at }: { at: "offer" | "form" }) {
+    if (sent?.at !== at) return null;
+    return (
+      <div ref={notice} className={sent.ok ? "sent-note" : "error"} role={sent.ok ? "status" : "alert"}>
+        {sent.text}
+      </div>
+    );
   }
 
   const c = found?.comparison;
@@ -139,7 +172,8 @@ export default function ChildAsk() {
               {c.assessment?.needsParent ? " A parent says yes first." : ""}
             </p>
           ) : null}
-          {!blocked && <PriceResults comparison={c} action="Ask for this one" onPick={ask} />}
+          <Notice at="offer" />
+          {!blocked && <PriceResults comparison={c} action={sending ? "Sending…" : "Ask for this one"} onPick={ask} busy={sending} done={sentOffers} />}
           <p className="trust">Prices and totals are worked out by the app from the shops&apos; own prices. Your parent sees the same comparison.</p>
         </section>
       )}
@@ -154,10 +188,10 @@ export default function ChildAsk() {
           Price in AED
           <input inputMode="decimal" placeholder="300 or 12.50" value={amount} onChange={(e) => setAmount(e.target.value)} required />
         </label>
-        <button type="submit">Send to a parent</button>
+        <button type="submit" disabled={sending}>{sending ? "Sending…" : "Send to a parent"}</button>
+        <Notice at="form" />
       </form>
       {error && <p className="error" role="alert">{error}</p>}
-      {sent && <p className="muted" role="status">{sent}</p>}
     </div>
   );
 }
