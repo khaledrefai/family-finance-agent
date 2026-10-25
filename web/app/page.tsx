@@ -94,7 +94,8 @@ const FEATURES: { title: string; items: { icon: IconName; title: string; text: s
     title: "Spend smarter",
     items: [
       { icon: "receipt", title: "Restaurants, hotels and trips", text: "Typed in with or without a receipt, each in its own category, so you see what eating out and trips really cost." },
-      { icon: "ask", title: "Compare before you buy", text: "Prices for products, restaurants and hotels, side by side.", soon: true },
+      { icon: "ask", title: "Compare before you buy", text: "Say what you want. The shops’ offers are ranked by the total you pay, and the best one is checked against free cash and the card’s next bill." },
+      { icon: "calendar", title: "Restaurants and hotels compared", text: "Prices side by side before you book.", soon: true },
       { icon: "today", title: "Weekly meals and a shopping list", text: "A dinner plan inside the food budget and the family’s food rules.", soon: true },
     ],
   },
@@ -113,7 +114,7 @@ const AGENTS = [
   { name: "Bookkeeper", tone: "var(--s1)", icon: "receipt" as const, text: "Reads receipts and statements, finds double charges, and logs what the kids say they bought." },
   { name: "Gatekeeper", tone: "var(--approved)", icon: "warn" as const, text: "Checks every request against the family rules, the family’s money and the card bills." },
   { name: "Coach", tone: "var(--kid-sun-deep)", icon: "star" as const, text: "Talks with the kids about their goals. Savings challenges and lessons are coming soon." },
-  { name: "Shopper", tone: "var(--cancelled)", icon: "money" as const, text: "Coming soon: comparing prices for products, restaurants and hotels, and a weekly shopping list." },
+  { name: "Shopper", tone: "var(--cancelled)", icon: "money" as const, text: "Compares shop prices by the total you pay. Restaurants, hotels and a weekly shopping list are coming soon." },
 ];
 
 const TRUST = [
