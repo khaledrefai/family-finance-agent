@@ -22,10 +22,15 @@ export interface SpendingRequest {
   amountMinor: number;
   currency: string;
   category?: string;
-  productUrl?: string;
+  productUrl?: string; // the shop's page, from a price comparison (nobody pastes links)
   status: RequestStatus;
   agentSummary?: string;
   createdAt: string;
+  // The price comparison offer it was made from: shop, price, delivery, total, when checked
+  offer?: {
+    store: string; price: string; delivery: string | null; total: string; source: "LIVE" | "CACHE" | "SEEDED";
+    verified: boolean; checkedAt: string; offersCompared: number;
+  } | null;
 }
 
 export interface MemberView {
@@ -94,10 +99,16 @@ export const api = {
   me: () => call<Me>("/api/me"),
   members: () => call<MemberView[]>("/api/family/members"),
   requests: () => call<SpendingRequest[]>("/api/requests"),
-  createRequest: (title: string, amountMinor: number, productUrl?: string) =>
+  createRequest: (title: string, amountMinor: number) =>
     call<SpendingRequest>("/api/requests", {
       method: "POST",
-      body: JSON.stringify({ kind: productUrl ? "ASK_TO_BUY" : "SPEND", title, amountMinor, productUrl }),
+      body: JSON.stringify({ kind: "SPEND", title, amountMinor }),
+    }),
+  // Ask for one offer of a price comparison: the core takes the title, total and shop from it, not from here
+  requestOffer: (comparisonId: string, offerKey: string, title: string) =>
+    call<SpendingRequest>("/api/requests", {
+      method: "POST",
+      body: JSON.stringify({ kind: "ASK_TO_BUY", title, amountMinor: 0, comparisonId, offerKey }),
     }),
   decide: (id: string, decision: "approve" | "reject") =>
     call<SpendingRequest>(`/api/requests/${id}/${decision}`, { method: "POST" }),

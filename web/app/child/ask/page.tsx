@@ -1,34 +1,60 @@
 "use client";
 
 import { useState } from "react";
-import { aed, api } from "@/lib/api";
-import { headphones } from "@/lib/sample";
+import { api } from "@/lib/api";
+import { Comparison, findPrices, Offer } from "@/lib/prices";
 import { AgentChat } from "../../agent-chat";
-import { Loading, SampleNote } from "../../ui";
+import { PriceResults } from "../../price-results";
+import { Loading } from "../../ui";
 import { useSession } from "../../use-session";
-import { BuddySays, GoalArt } from "../kid-ui";
+import { BuddySays } from "../kid-ui";
 
-// Kid Ask: tell the agent what I bought, see the agent's options for something I want,
-// or ask for something directly. The options card shows the seeded headphones example until the
-// assess API is built; picking an option sends a real request to a parent.
+// Kid Ask: tell the agent what I bought, find the best price for something I want and ask a parent for it,
+// or ask for something directly. Nobody pastes links: the kid says what it is and the app searches the shops
+// (the core's price comparison). Picking an offer sends a request with the core's price, not a typed one.
+const IDEAS = ["Sony WH-CH720N headphones", "wireless headphones", "LEGO building set", "Nintendo Switch game"];
+
 export default function ChildAsk() {
   const { me, error, setError, reload } = useSession("CHILD");
+  const [want, setWant] = useState("");
+  const [finding, setFinding] = useState(false);
+  const [found, setFound] = useState<{ comparison: Comparison | null; reply: string } | null>(null);
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
-  const [link, setLink] = useState("");
   const [sent, setSent] = useState<string | null>(null);
 
   if (!me) return <Loading />;
   const young = me.ageBand === "CHILD_6_9";
 
-  async function send(requestTitle: string, fils: number, url?: string) {
+  function told(saved: { status: string; agentSummary?: string }, what: string) {
+    // A family rule can stop a request before it reaches a parent; the core says which rule and why
+    setSent(saved.status === "BLOCKED"
+      ? `Not sent: ${saved.agentSummary ?? "it is against a family rule."} Ask a parent if you think that's wrong.`
+      : `Sent. Your parents can see "${what}" now, and their answer will show on Home.`);
+  }
+
+  async function find(text: string) {
+    if (!text.trim() || finding) return;
+    setWant(text);
+    setFinding(true);
+    setSent(null);
+    setFound(null);
     try {
-      const saved = await api.createRequest(requestTitle, fils, url);
+      setFound(await findPrices(text));
       setError(null);
-      // A family rule can stop a request before it reaches a parent; the core says which rule and why
-      setSent(saved.status === "BLOCKED"
-        ? `Not sent: ${saved.agentSummary ?? "it is against a family rule."} Ask a parent if you think that's wrong.`
-        : `Sent. Your parents can see "${requestTitle}" now, and their answer will show on Home.`);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setFinding(false);
+    }
+  }
+
+  async function ask(o: Offer) {
+    if (!found?.comparison) return;
+    try {
+      const saved = await api.requestOffer(found.comparison.id, o.key, o.title);
+      setError(null);
+      told(saved, saved.title);
       await reload();
     } catch (err) {
       setError((err as Error).message);
@@ -45,11 +71,22 @@ export default function ChildAsk() {
       return;
     }
     const fils = Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"));
-    await send(title, fils, link || undefined);
+    try {
+      const saved = await api.createRequest(title, fils);
+      setError(null);
+      told(saved, title);
+      await reload();
+    } catch (err) {
+      setError((err as Error).message);
+      return;
+    }
     setTitle("");
     setAmount("");
-    setLink("");
   }
+
+  const c = found?.comparison;
+  const blocked = c?.assessment?.blocked;
+  const wallet = c?.assessment?.kid;
 
   return (
     <div className={`stack${young ? " young" : ""}`}>
@@ -57,42 +94,53 @@ export default function ChildAsk() {
         <h1>Ask</h1>
       </header>
       <BuddySays>
-        <p>Tell me what you bought and I'll keep your picture right. Or tell me about something you want.</p>
+        <p>Tell me what you bought and I&apos;ll keep your picture right. Or tell me what you want, and I&apos;ll find the best price.</p>
       </BuddySays>
 
       <AgentChat
         title="What did you buy?"
-        placeholder="12 dirhams shawarma, or paste a link"
+        placeholder="12 dirhams shawarma"
         suggestions={["12 dirhams shawarma", "8 dirhams chicken wrap", "5 dirhams juice"]}
       />
 
-      {!young && (
-        <section className="stack" style={{ gap: 10 }}>
-          <h2 className="first">Something you want</h2>
-          <article className="card" style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span className="art-blob" aria-hidden="true">
-              <GoalArt art="headphones" size={56} />
-            </span>
-            <span style={{ flex: 1 }}>
-              <b>{headphones.title}</b>
-              <br />
-              <span style={{ fontSize: 18 }}>{aed(headphones.priceMinor, { cents: true })}</span>
-              <br />
-              <span className="muted" style={{ fontSize: 12 }}>{headphones.source}</span>
-            </span>
-          </article>
-          <p className="turn-agent">{headphones.intro}</p>
-          {headphones.options.map((o, i) => (
-            <div className="card option-card" key={o.id}>
-              <span className="option-num" aria-hidden="true">{i + 1}</span>
-              <p><b>{o.title}</b> {o.text}</p>
-              <button className={i === 0 ? undefined : "quiet"} onClick={() => send(o.requestTitle, o.amountMinor)}>
-                {o.button}
-              </button>
-            </div>
+      <section className="panel" aria-label="Something you want">
+        <strong>Something you want</strong>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            find(want);
+          }}
+          style={{ display: "flex", gap: 8 }}
+        >
+          <input aria-label="What do you want?" placeholder={young ? "A LEGO set" : "Wireless headphones"} value={want} onChange={(e) => setWant(e.target.value)} />
+          <button type="submit" disabled={finding}>Find it</button>
+        </form>
+        <div className="chips" style={{ marginBottom: 0 }}>
+          {IDEAS.map((s) => (
+            <button key={s} type="button" className="chip" onClick={() => find(s)} disabled={finding}>
+              {s}
+            </button>
           ))}
-          <p className="trust">Your numbers are worked out by the app. Your parent sees this plan and your savings so far.</p>
-          <SampleNote />
+        </div>
+        {finding && <p className="thinking">Looking in the shops…</p>}
+      </section>
+
+      {found && !c && <p className="turn-agent">{found.reply}</p>}
+      {c && (
+        <section className="stack" style={{ gap: 10 }}>
+          {blocked ? (
+            <p className="turn-agent">
+              {c.assessment!.facts.find((f) => f.startsWith("Family rule")) ?? "That one is against a family rule."} I won&apos;t send it to a parent.
+            </p>
+          ) : c.best ? (
+            <p className="turn-agent">
+              The best price I found is <b>{c.best.total.text}</b> at {c.best.store}.
+              {wallet && (wallet.walletCovers ? ` Your wallet has ${wallet.wallet.text}, enough for this.` : ` Your wallet has ${wallet.wallet.text}, so you'd need some help or a bit more saving.`)}
+              {c.assessment?.needsParent ? " A parent says yes first." : ""}
+            </p>
+          ) : null}
+          {!blocked && <PriceResults comparison={c} action="Ask for this one" onPick={ask} />}
+          <p className="trust">Prices and totals are worked out by the app from the shops&apos; own prices. Your parent sees the same comparison.</p>
         </section>
       )}
 
@@ -105,10 +153,6 @@ export default function ChildAsk() {
         <label>
           Price in AED
           <input inputMode="decimal" placeholder="300 or 12.50" value={amount} onChange={(e) => setAmount(e.target.value)} required />
-        </label>
-        <label>
-          Link to it, if it's online
-          <input inputMode="url" value={link} onChange={(e) => setLink(e.target.value)} />
         </label>
         <button type="submit">Send to a parent</button>
       </form>

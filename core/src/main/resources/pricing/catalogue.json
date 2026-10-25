@@ -1,0 +1,2585 @@
+{
+ "checkedOn": "2026-10-25",
+ "note": "Hand-filled saved price list, used only when there is no live price search. Prices are estimates typed in on the date above (verify before recording the demo); delivery null means the shop doesn't list it. Not live prices, and the app always says so.",
+ "items": [
+  {
+   "id": "sony-wh-ch720n",
+   "title": "Sony WH-CH720N Wireless Noise Cancelling Over-Ear Headphones",
+   "brand": "Sony",
+   "model": "WH-CH720N",
+   "kind": "headphones",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "289",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "299",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "329",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "sony-wh-ch520",
+   "title": "Sony WH-CH520 Wireless On-Ear Headphones",
+   "brand": "Sony",
+   "model": "WH-CH520",
+   "kind": "headphones",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "169",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "179",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "199",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "jbl-tune-520bt",
+   "title": "JBL Tune 520BT Wireless On-Ear Headphones",
+   "brand": "JBL",
+   "model": "Tune 520BT",
+   "kind": "headphones",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "noon",
+     "price": "149",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Amazon.ae",
+     "price": "159",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Virgin Megastore",
+     "price": "179",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "jbl-tune-720bt",
+   "title": "JBL Tune 720BT Wireless Over-Ear Headphones",
+   "brand": "JBL",
+   "model": "Tune 720BT",
+   "kind": "headphones",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "249",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "259",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "279",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "anker-q20i",
+   "title": "Soundcore by Anker Q20i Wireless Over-Ear Headphones",
+   "brand": "Anker",
+   "model": "Q20i",
+   "kind": "headphones",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "159",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "169",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "sony-wh-1000xm5",
+   "title": "Sony WH-1000XM5 Wireless Noise Cancelling Headphones",
+   "brand": "Sony",
+   "model": "WH-1000XM5",
+   "kind": "headphones",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "1099",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "1199",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "1129",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "jbl-jr310bt",
+   "title": "JBL JR310BT Kids Wireless On-Ear Headphones",
+   "brand": "JBL",
+   "model": "JR310BT",
+   "kind": "headphones",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "129",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "119",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Virgin Megastore",
+     "price": "149",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "apple-airpods-4",
+   "title": "Apple AirPods 4 Wireless Earbuds",
+   "brand": "Apple",
+   "model": "AirPods 4",
+   "kind": "earbuds",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "529",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "549",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "519",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "samsung-sm-r400n",
+   "title": "Samsung Galaxy Buds FE Wireless Earbuds",
+   "brand": "Samsung",
+   "model": "SM-R400N",
+   "kind": "earbuds",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "279",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "269",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "299",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "jbl-tune-flex",
+   "title": "JBL Tune Flex Wireless Earbuds",
+   "brand": "JBL",
+   "model": "Tune Flex",
+   "kind": "earbuds",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "299",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "289",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "jbl-go-4",
+   "title": "JBL Go 4 Portable Bluetooth Speaker",
+   "brand": "JBL",
+   "model": "Go 4",
+   "kind": "speaker",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "169",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "159",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "179",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "jbl-flip-6",
+   "title": "JBL Flip 6 Portable Bluetooth Speaker",
+   "brand": "JBL",
+   "model": "Flip 6",
+   "kind": "speaker",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "399",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "389",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "449",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "sony-srs-ult10",
+   "title": "Sony ULT Field 1 Portable Wireless Speaker",
+   "brand": "Sony",
+   "model": "SRS-ULT10",
+   "kind": "speaker",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "399",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "449",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "nintendo-heg-001",
+   "title": "Nintendo Switch OLED Model Console",
+   "brand": "Nintendo",
+   "model": "HEG-001",
+   "kind": "console",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "1249",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "1199",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Virgin Megastore",
+     "price": "1299",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "nintendo-hdh-001",
+   "title": "Nintendo Switch Lite Console",
+   "brand": "Nintendo",
+   "model": "HDH-001",
+   "kind": "console",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "799",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "779",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Virgin Megastore",
+     "price": "849",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "nintendo-mario-kart-8-deluxe",
+   "title": "Mario Kart 8 Deluxe Nintendo Switch Game",
+   "brand": "Nintendo",
+   "model": "Mario Kart 8 Deluxe",
+   "kind": "game",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "199",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "189",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Virgin Megastore",
+     "price": "229",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "mojang-minecraft-switch",
+   "title": "Minecraft Nintendo Switch Game",
+   "brand": "Mojang",
+   "model": "Minecraft Switch",
+   "kind": "game",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "119",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "109",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Virgin Megastore",
+     "price": "129",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "ea-fc-25-ps5",
+   "title": "EA Sports FC 25 PS5 Game",
+   "brand": "EA",
+   "model": "FC 25 PS5",
+   "kind": "game",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "179",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "169",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Virgin Megastore",
+     "price": "249",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "sony-cfi-zct1w",
+   "title": "Sony PlayStation 5 DualSense Wireless Controller",
+   "brand": "Sony",
+   "model": "CFI-ZCT1W",
+   "kind": "controller",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "269",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "259",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "299",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "roblox-roblox-50",
+   "title": "Roblox Gift Card AED 50 (Robux)",
+   "brand": "Roblox",
+   "model": "Roblox 50",
+   "kind": "gift card",
+   "category": "IN_GAME_PURCHASES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "50",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "50",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "apple-ipad-10th-gen",
+   "title": "Apple iPad 10.9-inch Wi-Fi 64GB Tablet (10th generation)",
+   "brand": "Apple",
+   "model": "iPad 10th gen",
+   "kind": "tablet",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "1349",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "1399",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "1329",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "samsung-sm-x210",
+   "title": "Samsung Galaxy Tab A9+ 11-inch Wi-Fi 64GB Tablet",
+   "brand": "Samsung",
+   "model": "SM-X210",
+   "kind": "tablet",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "749",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "729",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "799",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "amazon-fire-hd-10-kids",
+   "title": "Amazon Fire HD 10 Kids Tablet",
+   "brand": "Amazon",
+   "model": "Fire HD 10 Kids",
+   "kind": "tablet",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "649",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "amazon-kindle-paperwhite",
+   "title": "Amazon Kindle Paperwhite E-Reader",
+   "brand": "Amazon",
+   "model": "Kindle Paperwhite",
+   "kind": "e-reader",
+   "category": "BOOKS_AND_STATIONERY",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "599",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Virgin Megastore",
+     "price": "649",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "apple-watch-se-40mm",
+   "title": "Apple Watch SE GPS 40mm Smartwatch",
+   "brand": "Apple",
+   "model": "Watch SE 40mm",
+   "kind": "smartwatch",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "949",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "999",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "929",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "xiaomi-smart-band-9",
+   "title": "Xiaomi Smart Band 9 Fitness Tracker",
+   "brand": "Xiaomi",
+   "model": "Smart Band 9",
+   "kind": "fitness tracker",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "149",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "139",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "samsung-sm-r861",
+   "title": "Samsung Galaxy Watch FE Smartwatch",
+   "brand": "Samsung",
+   "model": "SM-R861",
+   "kind": "smartwatch",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "599",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "579",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "649",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "apple-iphone-16-128gb",
+   "title": "Apple iPhone 16 128GB Smartphone",
+   "brand": "Apple",
+   "model": "iPhone 16 128GB",
+   "kind": "phone",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "3399",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "3399",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "3349",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "samsung-sm-a356",
+   "title": "Samsung Galaxy A35 5G 128GB Smartphone",
+   "brand": "Samsung",
+   "model": "SM-A356",
+   "kind": "phone",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "1049",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "999",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "1099",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "apple-macbook-air-m3",
+   "title": "Apple MacBook Air 13-inch M3 256GB Laptop",
+   "brand": "Apple",
+   "model": "MacBook Air M3",
+   "kind": "laptop",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "3999",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "4199",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Jumbo Electronics",
+     "price": "4099",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "hp-15-fd0000",
+   "title": "HP 15 Laptop Intel Core i5 16GB 512GB",
+   "brand": "HP",
+   "model": "15-fd0000",
+   "kind": "laptop",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "2299",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "2399",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Emax",
+     "price": "2349",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "lenovo-ideapad-slim-3",
+   "title": "Lenovo IdeaPad Slim 3 15-inch Laptop Ryzen 5",
+   "brand": "Lenovo",
+   "model": "IdeaPad Slim 3",
+   "kind": "laptop",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "1899",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "1849",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "1999",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "logitech-m185",
+   "title": "Logitech M185 Wireless Mouse",
+   "brand": "Logitech",
+   "model": "M185",
+   "kind": "mouse",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "45",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "39",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "49",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "samsung-ua55du7000",
+   "title": "Samsung 55-inch Crystal UHD 4K Smart TV",
+   "brand": "Samsung",
+   "model": "UA55DU7000",
+   "kind": "tv",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "1599",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "1699",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "1649",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Jumbo Electronics",
+     "price": "1699",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "lg-65ut80006la",
+   "title": "LG 65-inch UHD 4K Smart TV",
+   "brand": "LG",
+   "model": "65UT80006LA",
+   "kind": "tv",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "2199",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "2299",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "2249",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "tcl-43s5400",
+   "title": "TCL 43-inch FHD Smart TV",
+   "brand": "TCL",
+   "model": "43S5400",
+   "kind": "tv",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "799",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Amazon.ae",
+     "price": "849",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "829",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "philips-hd9200",
+   "title": "Philips Airfryer 3000 Series 4.1L",
+   "brand": "Philips",
+   "model": "HD9200",
+   "kind": "air fryer",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "299",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "329",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Lulu Hypermarket",
+     "price": "319",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "289",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "ninja-af160me",
+   "title": "Ninja Air Fryer Max 5.2L",
+   "brand": "Ninja",
+   "model": "AF160ME",
+   "kind": "air fryer",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "449",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "429",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "499",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "tefal-ey501",
+   "title": "Tefal Easy Fry 6-in-1 Air Fryer 4.2L",
+   "brand": "Tefal",
+   "model": "EY501",
+   "kind": "air fryer",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "349",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Amazon.ae",
+     "price": "369",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "dyson-v8",
+   "title": "Dyson V8 Cordless Vacuum Cleaner",
+   "brand": "Dyson",
+   "model": "V8",
+   "kind": "vacuum",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "1499",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "1599",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "1449",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "xiaomi-robot-vacuum-s10",
+   "title": "Xiaomi Robot Vacuum S10",
+   "brand": "Xiaomi",
+   "model": "Robot Vacuum S10",
+   "kind": "vacuum",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "749",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "699",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "799",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "nespresso-vertuo-pop",
+   "title": "Nespresso Vertuo Pop Coffee Machine",
+   "brand": "Nespresso",
+   "model": "Vertuo Pop",
+   "kind": "coffee machine",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "399",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "449",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "389",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "philips-dst2020",
+   "title": "Philips Steam Iron 2000 Series",
+   "brand": "Philips",
+   "model": "DST2020",
+   "kind": "iron",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "129",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Amazon.ae",
+     "price": "139",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Lulu Hypermarket",
+     "price": "119",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "kenwood-kmx750",
+   "title": "Kenwood Stand Mixer kMix",
+   "brand": "Kenwood",
+   "model": "KMX750",
+   "kind": "mixer",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "1299",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "1399",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "samsung-ms23k3513",
+   "title": "Samsung 23L Solo Microwave Oven",
+   "brand": "Samsung",
+   "model": "MS23K3513",
+   "kind": "microwave",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "299",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Amazon.ae",
+     "price": "319",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Lulu Hypermarket",
+     "price": "289",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "samsung-ww80t",
+   "title": "Samsung 8kg Front Load Washing Machine",
+   "brand": "Samsung",
+   "model": "WW80T",
+   "kind": "washing machine",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "1599",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "1699",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Amazon.ae",
+     "price": "1649",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "bosch-sms4hvi33e",
+   "title": "Bosch 60cm Dishwasher Series 4",
+   "brand": "Bosch",
+   "model": "SMS4HVI33E",
+   "kind": "dishwasher",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Sharaf DG",
+     "price": "2199",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "2299",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Amazon.ae",
+     "price": "2249",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "philips-hr2683",
+   "title": "Philips Hand Blender 5000 Series",
+   "brand": "Philips",
+   "model": "HR2683",
+   "kind": "blender",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "229",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "249",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "ikea-malm-160",
+   "title": "IKEA MALM Bed Frame 160x200 cm",
+   "brand": "IKEA",
+   "model": "MALM 160",
+   "kind": "bed",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "IKEA UAE",
+     "price": "895",
+     "delivery": "149",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "ikea-kallax-77x147",
+   "title": "IKEA KALLAX Shelving Unit 77x147 cm",
+   "brand": "IKEA",
+   "model": "KALLAX 77x147",
+   "kind": "shelf",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "IKEA UAE",
+     "price": "299",
+     "delivery": "149",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "philips-hue-white-starter",
+   "title": "Philips Hue White Smart Bulb Starter Kit",
+   "brand": "Philips",
+   "model": "Hue White Starter",
+   "kind": "smart bulb",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "299",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Sharaf DG",
+     "price": "349",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "lego-10696",
+   "title": "LEGO Classic Medium Creative Brick Box 10696",
+   "brand": "LEGO",
+   "model": "10696",
+   "kind": "building set",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "159",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "179",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Hamleys UAE",
+     "price": "189",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "155",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "lego-60320",
+   "title": "LEGO City Fire Station 60320",
+   "brand": "LEGO",
+   "model": "60320",
+   "kind": "building set",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "429",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "469",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "419",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "lego-42138",
+   "title": "LEGO Technic Ford Mustang Dark Horse 42138",
+   "brand": "LEGO",
+   "model": "42138",
+   "kind": "building set",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "249",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "279",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "lego-42618",
+   "title": "LEGO Friends Heartlake City Cafe 42618",
+   "brand": "LEGO",
+   "model": "42618",
+   "kind": "building set",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "119",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "129",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "115",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "lego-21177",
+   "title": "LEGO Minecraft The Creeper Ambush 21177",
+   "brand": "LEGO",
+   "model": "21177",
+   "kind": "building set",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "99",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "109",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "rubik-s-rubik-3x3",
+   "title": "Rubik's Cube 3x3 Puzzle",
+   "brand": "Rubik's",
+   "model": "Rubik 3x3",
+   "kind": "puzzle",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "49",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "55",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "45",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "hasbro-monopoly-classic",
+   "title": "Monopoly Classic Board Game",
+   "brand": "Hasbro",
+   "model": "Monopoly Classic",
+   "kind": "board game",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "119",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "129",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "109",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "mattel-uno",
+   "title": "UNO Card Game",
+   "brand": "Mattel",
+   "model": "UNO",
+   "kind": "card game",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "25",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "22",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "29",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "hasbro-play-doh-kitchen",
+   "title": "Play-Doh Kitchen Creations Playset",
+   "brand": "Hasbro",
+   "model": "Play-Doh Kitchen",
+   "kind": "playset",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "89",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "99",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "mattel-hot-wheels-track-builder",
+   "title": "Hot Wheels Track Builder Set",
+   "brand": "Mattel",
+   "model": "Hot Wheels Track Builder",
+   "kind": "track set",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "119",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "139",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "mattel-barbie-dreamhouse",
+   "title": "Barbie Dreamhouse Doll House",
+   "brand": "Mattel",
+   "model": "Barbie Dreamhouse",
+   "kind": "doll house",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "899",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "999",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Hamleys UAE",
+     "price": "949",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "elmer-s-elmer-slime-kit",
+   "title": "Elmer's Slime Kit",
+   "brand": "Elmer's",
+   "model": "Elmer Slime Kit",
+   "kind": "slime kit",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "59",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "69",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "55",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "faber-castell-colour-grip-48",
+   "title": "Faber-Castell 48 Colour Pencils Set",
+   "brand": "Faber-Castell",
+   "model": "Colour Grip 48",
+   "kind": "colour pencils",
+   "category": "BOOKS_AND_STATIONERY",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "79",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "85",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Kinokuniya",
+     "price": "89",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "crayola-crayola-24-markers",
+   "title": "Crayola Washable Markers 24 Pack",
+   "brand": "Crayola",
+   "model": "Crayola 24 markers",
+   "kind": "markers",
+   "category": "BOOKS_AND_STATIONERY",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "45",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "49",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "decathlon-town-5",
+   "title": "Oxelo Town 5 Kids Scooter",
+   "brand": "Decathlon",
+   "model": "Town 5",
+   "kind": "scooter",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Decathlon UAE",
+     "price": "229",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "micro-maxi-deluxe",
+   "title": "Micro Maxi Deluxe Kids Scooter",
+   "brand": "Micro",
+   "model": "Maxi Deluxe",
+   "kind": "scooter",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "549",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Toys R Us UAE",
+     "price": "599",
+     "delivery": "20",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "decathlon-rockrider-st-500",
+   "title": "Btwin 24-inch Kids Mountain Bike Rockrider ST 500",
+   "brand": "Decathlon",
+   "model": "Rockrider ST 500",
+   "kind": "bike",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Decathlon UAE",
+     "price": "999",
+     "delivery": "49",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "adidas-starlancer",
+   "title": "Adidas Starlancer Football Size 5",
+   "brand": "Adidas",
+   "model": "Starlancer",
+   "kind": "football",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "59",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Decathlon UAE",
+     "price": "55",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "49",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "decathlon-f100",
+   "title": "Kipsta F100 Football Size 4",
+   "brand": "Decathlon",
+   "model": "F100",
+   "kind": "football",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Decathlon UAE",
+     "price": "25",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "nike-revolution-7",
+   "title": "Nike Revolution 7 Kids Running Shoes",
+   "brand": "Nike",
+   "model": "Revolution 7",
+   "kind": "shoes",
+   "category": "CLOTHES_AND_ACCESSORIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "199",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "179",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "adidas-duramo-sl",
+   "title": "Adidas Duramo SL Kids Running Shoes",
+   "brand": "Adidas",
+   "model": "Duramo SL",
+   "kind": "shoes",
+   "category": "CLOTHES_AND_ACCESSORIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "189",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "169",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "decathlon-nabaiji-100",
+   "title": "Kids Swimming Goggles Nabaiji 100",
+   "brand": "Decathlon",
+   "model": "Nabaiji 100",
+   "kind": "goggles",
+   "category": "TOYS_AND_HOBBIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Decathlon UAE",
+     "price": "25",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "skechers-skechers-backpack",
+   "title": "Skechers Kids School Backpack",
+   "brand": "Skechers",
+   "model": "Skechers backpack",
+   "kind": "backpack",
+   "category": "CLOTHES_AND_ACCESSORIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "149",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "139",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "smiggle-smiggle-backpack",
+   "title": "Smiggle Hey There Backpack",
+   "brand": "Smiggle",
+   "model": "Smiggle backpack",
+   "kind": "backpack",
+   "category": "CLOTHES_AND_ACCESSORIES",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "179",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "169",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "stanley-quencher-40oz",
+   "title": "Stanley Quencher 40oz Tumbler Water Bottle",
+   "brand": "Stanley",
+   "model": "Quencher 40oz",
+   "kind": "water bottle",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "189",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "179",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "casio-fx-991ex",
+   "title": "Casio fx-991EX Scientific Calculator",
+   "brand": "Casio",
+   "model": "fx-991EX",
+   "kind": "calculator",
+   "category": "BOOKS_AND_STATIONERY",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "89",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Carrefour UAE",
+     "price": "95",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Kinokuniya",
+     "price": "99",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "oxford-oxford-learner-s",
+   "title": "Oxford Learner's Dictionary Paperback Book",
+   "brand": "Oxford",
+   "model": "Oxford Learner's",
+   "kind": "dictionary",
+   "category": "BOOKS_AND_STATIONERY",
+   "words": [],
+   "offers": [
+    {
+     "store": "Kinokuniya",
+     "price": "79",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Amazon.ae",
+     "price": "75",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "puffin-wimpy-kid-1",
+   "title": "Diary of a Wimpy Kid Book 1 Paperback",
+   "brand": "Puffin",
+   "model": "Wimpy Kid 1",
+   "kind": "book",
+   "category": "BOOKS_AND_STATIONERY",
+   "words": [],
+   "offers": [
+    {
+     "store": "Kinokuniya",
+     "price": "45",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Amazon.ae",
+     "price": "39",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Virgin Megastore",
+     "price": "49",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "bloomsbury-harry-potter-box-set",
+   "title": "Harry Potter Paperback Box Set Books 1-7",
+   "brand": "Bloomsbury",
+   "model": "Harry Potter box set",
+   "kind": "book",
+   "category": "BOOKS_AND_STATIONERY",
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "249",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Kinokuniya",
+     "price": "299",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Virgin Megastore",
+     "price": "279",
+     "delivery": "15",
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "reese-s-reese-s-42g",
+   "title": "Reese's Peanut Butter Cups 42g",
+   "brand": "Reese's",
+   "model": "Reese's 42g",
+   "kind": "peanut butter cups",
+   "category": "SNACKS",
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "8",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Lulu Hypermarket",
+     "price": "7.50",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "mars-snickers-50g",
+   "title": "Snickers Chocolate Bar 50g",
+   "brand": "Mars",
+   "model": "Snickers 50g",
+   "kind": "chocolate bar",
+   "category": "SNACKS",
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "4.50",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Lulu Hypermarket",
+     "price": "4",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "nestle-kitkat-4-finger",
+   "title": "KitKat 4 Finger Chocolate Bar 41.5g",
+   "brand": "Nestle",
+   "model": "KitKat 4 Finger",
+   "kind": "chocolate bar",
+   "category": "SNACKS",
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "3.75",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Lulu Hypermarket",
+     "price": "3.50",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "pringles-pringles-165g",
+   "title": "Pringles Original Crisps 165g",
+   "brand": "Pringles",
+   "model": "Pringles 165g",
+   "kind": "crisps",
+   "category": "SNACKS",
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "13.50",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Lulu Hypermarket",
+     "price": "12.95",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "haribo-goldbears-160g",
+   "title": "Haribo Goldbears Gummy Sweets 160g",
+   "brand": "Haribo",
+   "model": "Goldbears 160g",
+   "kind": "sweets",
+   "category": "SNACKS",
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "9.95",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Lulu Hypermarket",
+     "price": "9.50",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "coca-cola-coke-6x330",
+   "title": "Coca-Cola Soft Drink Can 330ml 6 Pack",
+   "brand": "Coca-Cola",
+   "model": "Coke 6x330",
+   "kind": "soft drink",
+   "category": "SUGARY_DRINKS",
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "12.50",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Lulu Hypermarket",
+     "price": "11.95",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "red-bull-red-bull-250",
+   "title": "Red Bull Energy Drink 250ml",
+   "brand": "Red Bull",
+   "model": "Red Bull 250",
+   "kind": "energy drink",
+   "category": "SUGARY_DRINKS",
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "8.50",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Lulu Hypermarket",
+     "price": "8",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "al-ain-al-ain-6x1-5",
+   "title": "Al Ain Water 1.5L 6 Pack",
+   "brand": "Al Ain",
+   "model": "Al Ain 6x1.5",
+   "kind": "water",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Carrefour UAE",
+     "price": "10.50",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "Lulu Hypermarket",
+     "price": "9.95",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "joie-i-spin-360",
+   "title": "Joie i-Spin 360 Car Seat",
+   "brand": "Joie",
+   "model": "i-Spin 360",
+   "kind": "car seat",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "1499",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "1449",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  },
+  {
+   "id": "chicco-bravo-trio",
+   "title": "Chicco Bravo Trio Stroller",
+   "brand": "Chicco",
+   "model": "Bravo Trio",
+   "kind": "stroller",
+   "category": null,
+   "words": [],
+   "offers": [
+    {
+     "store": "Amazon.ae",
+     "price": "1899",
+     "delivery": "0",
+     "fees": null,
+     "link": null
+    },
+    {
+     "store": "noon",
+     "price": "1799",
+     "delivery": null,
+     "fees": null,
+     "link": null
+    }
+   ]
+  }
+ ]
+}

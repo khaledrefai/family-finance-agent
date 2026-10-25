@@ -21,7 +21,11 @@ services:
       DB_USER: ffa
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       APP_JWT_SECRET: ${APP_JWT_SECRET:?set APP_JWT_SECRET in .env}
-      SERPAPI_KEY: ${SERPAPI_KEY:-}         # web search for live prices; not read by any code yet
+      # Price search (week 6): SerpApi Google Shopping. SEARCH_LIVE = live (cache, then live, then the saved list),
+      # cache (cache of any age, then the saved list: for recording) or off (the saved list only).
+      SERPAPI_KEY: ${SERPAPI_KEY:-}
+      SEARCH_LIVE: ${SEARCH_LIVE:-live}
+      PRICE_VERIFY_TOP: ${PRICE_VERIFY_TOP:-3}
       # Week 5 notifications. All optional: without SMTP_HOST no email is sent; without VAPID keys the core
       # makes its own web push keys on first start and keeps them in the database.
       SMTP_HOST: ${SMTP_HOST:-}
@@ -48,7 +52,6 @@ services:
       AGENTS_LLM: ${AGENTS_LLM:-auto}
       AGENTS_LLM_MODEL: ${AGENTS_LLM_MODEL:-claude-opus-5-5}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      SERPAPI_KEY: ${SERPAPI_KEY:-}
     depends_on:
       - core
 

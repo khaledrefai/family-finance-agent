@@ -1,0 +1,112 @@
+{
+ "search_metadata": {
+  "id": "replay",
+  "status": "Success",
+  "created_at": "2026-10-25 17:30:00 UTC"
+ },
+ "search_parameters": {
+  "engine": "google_shopping",
+  "q": "wireless headphones",
+  "gl": "ae",
+  "hl": "en",
+  "google_domain": "google.ae"
+ },
+ "shopping_results": [
+  {
+   "position": 1,
+   "title": "Sony WH-CH720N Wireless Noise Cancelling Headphones, Black",
+   "product_link": "https://www.google.ae/shopping/product/1001",
+   "product_id": "9001",
+   "source": "Amazon.ae",
+   "price": "AED 289.00",
+   "extracted_price": 289.0,
+   "delivery": "Free delivery",
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 2,
+   "title": "Sony WH-CH720N Wireless Noise Cancelling Headphones, Black",
+   "product_link": "https://www.google.ae/shopping/product/1002",
+   "product_id": "9002",
+   "source": "noon",
+   "price": "AED 299.00",
+   "extracted_price": 299.0,
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 3,
+   "title": "JBL Tune 520BT Wireless On-Ear Headphones",
+   "product_link": "https://www.google.ae/shopping/product/1003",
+   "product_id": "9003",
+   "source": "noon",
+   "price": "AED 149.00",
+   "extracted_price": 149.0,
+   "extensions": [
+    "Free delivery by Wed"
+   ],
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 4,
+   "title": "JBL Tune 520BT Wireless On-Ear Headphones",
+   "product_link": "https://www.google.ae/shopping/product/1004",
+   "product_id": "9004",
+   "source": "noon",
+   "price": "AED 155.00",
+   "extracted_price": 155.0,
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 5,
+   "title": "Soundcore Q20i Hybrid Active Noise Cancelling Wireless Headphones",
+   "product_link": "https://www.google.ae/shopping/product/1005",
+   "product_id": "9005",
+   "source": "Amazon.ae",
+   "price": "AED 159.00",
+   "extracted_price": 159.0,
+   "delivery": "AED 10.00 delivery",
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 6,
+   "title": "Replacement Ear Pads for Sony WH-CH720N Headphones",
+   "product_link": "https://www.google.ae/shopping/product/1006",
+   "product_id": "9006",
+   "source": "Amazon.ae",
+   "price": "AED 39.00",
+   "extracted_price": 39.0,
+   "delivery": "Free delivery",
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 7,
+   "title": "Wireless Bluetooth Headphones Over Ear Foldable",
+   "product_link": "https://www.google.ae/shopping/product/1007",
+   "product_id": "9007",
+   "source": "dealzone.ae",
+   "price": "AED 35.00",
+   "extracted_price": 35.0,
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 8,
+   "title": "Beats Studio Pro Wireless Headphones",
+   "product_link": "https://www.google.ae/shopping/product/1008",
+   "product_id": "9008",
+   "source": "Virgin Megastore",
+   "price": "$349.99",
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 9,
+   "title": "Sony WH-1000XM5 Wireless Headphones",
+   "product_link": "https://www.google.ae/shopping/product/1009",
+   "product_id": "9009",
+   "source": "Sharaf DG",
+   "price": "AED 1,099.00",
+   "extracted_price": 1099.0,
+   "delivery": "Free delivery",
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  }
+ ]
+}
