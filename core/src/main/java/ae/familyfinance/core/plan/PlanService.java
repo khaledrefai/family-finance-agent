@@ -481,8 +481,18 @@ public class PlanService {
     public Buckets confirmBuckets(CurrentMember me) {
         requireParent(me);
         UUID draft = db.sql("SELECT id FROM bucket_plan WHERE family_id = ? AND status = 'DRAFT'").param(me.familyId())
-                .query(UUID.class).optional()
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "There is no split waiting to be confirmed"));
+                .query(UUID.class).optional().orElse(null);
+        if (draft == null) {
+            boolean active = db.sql("SELECT count(*) FROM bucket_plan WHERE family_id = ? AND status = 'ACTIVE'")
+                    .param(me.familyId()).query(Long.class).single() > 0;
+            if (active) {
+                throw new ApiException(HttpStatus.CONFLICT, "These buckets are already confirmed");
+            }
+            // Nothing drafted yet: the parent is confirming the engine's own suggestion
+            saveBucketDraft(me, suggestion(me), "ENGINE");
+            draft = db.sql("SELECT id FROM bucket_plan WHERE family_id = ? AND status = 'DRAFT'").param(me.familyId())
+                    .query(UUID.class).single();
+        }
         List<String> problems = BucketEngine.problems(shares(draft), needs(facts.load(me.familyId())));
         if (!problems.isEmpty()) {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,

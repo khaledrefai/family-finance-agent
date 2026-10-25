@@ -153,6 +153,21 @@ class PlanAndAccountsIntegrationTest extends PostgresIntegrationTest {
     }
 
     @Test
+    void a_parent_confirms_buckets_and_an_agent_cannot() throws Exception {
+        String sara = login("sara");
+        String run = openRun(sara, "PLANNER");
+        mvc.perform(post("/api/plan/buckets/confirm").header("Authorization", sara).header("X-Agent-Run-Id", run))
+                .andExpect(status().isForbidden());
+        jdbc.update("DELETE FROM bucket_plan WHERE family_id = ?", DemoFamily.FAMILY);
+        // No draft yet: confirming takes the engine's own suggestion
+        JsonNode b = read(mvc.perform(post("/api/plan/buckets/confirm").header("Authorization", sara)).andExpect(status().isOk()));
+        assertThat(b.get("status").asText()).isEqualTo("ACTIVE");
+        assertThat(b.get("proposedBy").asText()).isEqualTo("ENGINE");
+        mvc.perform(post("/api/plan/buckets/confirm").header("Authorization", sara)).andExpect(status().isConflict());
+        jdbc.update("DELETE FROM bucket_plan WHERE family_id = ?", DemoFamily.FAMILY);
+    }
+
+    @Test
     void an_agent_can_only_save_drafts_and_cannot_confirm_them() throws Exception {
         String sara = login("sara");
         String run = openRun(sara, "PLANNER");
