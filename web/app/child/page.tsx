@@ -12,7 +12,8 @@ import { Loading, SampleNote, StackBar } from "../ui";
 import { useSession } from "../use-session";
 import { artFor, Avatar, BuddySays, Camel, GoalArt, GoalJar, SmallStar } from "./kid-ui";
 
-// Kid Home: my goal jar, my demo wallet, where my pocket money went, the coin buddy's nudge, and my requests.
+// Kid Home: my goal jar, my demo wallet, my requests (a parent's answer lands here), the coin buddy's nudge,
+// and where my pocket money went.
 // Kids only ever see their own money. Requests, the wallet and the nudge are live: when a parent says yes, the
 // answer and the new wallet balance arrive on this screen by themselves. Goal and the chart are still sample
 // figures until the goals endpoint exists. Adam (6 to 9) gets bigger type and fewer words.
@@ -82,12 +83,6 @@ export default function ChildHome() {
         </section>
       )}
 
-      {nudge && (
-        <BuddySays>
-          <p>{nudge}</p>
-          <Link href="/child/ask" className="link">Tell me in Ask</Link>
-        </BuddySays>
-      )}
 
       {(wallet || kid) && (
         <section className={`card wallet${changed ? " changed" : ""}`} aria-live="polite">
@@ -99,6 +94,21 @@ export default function ChildHome() {
           </div>
           <span className="demo-tag">DEMO MONEY</span>
         </section>
+      )}
+
+      <section>
+        <h2 className="first">My requests</h2>
+        {requests.length === 0 && <p className="empty">When you ask for something, it shows up here with your parent's answer.</p>}
+        {requests.map((r) => (
+          <Chit key={r.id} request={r} small />
+        ))}
+      </section>
+
+      {nudge && (
+        <BuddySays>
+          <p>{nudge}</p>
+          <Link href="/child/ask" className="link">Tell me in Ask</Link>
+        </BuddySays>
       )}
 
       {kid?.pocket && (
@@ -115,13 +125,6 @@ export default function ChildHome() {
         </section>
       )}
 
-      <section>
-        <h2 className="first">My requests</h2>
-        {requests.length === 0 && <p className="empty">When you ask for something, it shows up here with your parent's answer.</p>}
-        {requests.map((r) => (
-          <Chit key={r.id} request={r} small />
-        ))}
-      </section>
       <NotifyCard parent={false} kid />
       {kid && <SampleNote />}
     </div>

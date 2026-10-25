@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { aed, api, MemberView, plain } from "@/lib/api";
 import { FamilyRule, rulesApi } from "@/lib/live";
@@ -16,7 +15,7 @@ import { useSession } from "../../use-session";
 const AGE: Record<string, string> = { CHILD_6_9: "6 to 9", PRETEEN_10_12: "10 to 12", TEEN_13_17: "13 to 17" };
 
 export default function FamilyPage() {
-  const { me, requests } = useSession("PARENT");
+  const { me } = useSession("PARENT");
   const [members, setMembers] = useState<MemberView[]>([]);
   const [rules, setRules] = useState<FamilyRule[] | null>(null);
   const [ruleNote, setRuleNote] = useState<string | null>(null);
@@ -49,7 +48,6 @@ export default function FamilyPage() {
   }
 
   if (!me) return <Loading />;
-  const decidedCount = requests.filter((r) => r.status !== "PENDING").length;
 
   return (
     <div className="stack">
@@ -132,16 +130,11 @@ export default function FamilyPage() {
         <p className="card-title">Food profiles</p>
         <p style={{ fontSize: 14 }}>Whole family: halal only</p>
         <p style={{ fontSize: 14 }}>Adam: peanut allergy</p>
-        <p style={{ fontSize: 14 }}>Weekly meal plan: on (optional)</p>
         <p className="muted" style={{ marginTop: 4 }}>
           Used for ask-to-buy. The app flags products but never certifies them: always check the halal mark and the pack label.
         </p>
       </section>
 
-      <Link href="/parent" className="askbar" style={{ justifyContent: "space-between", color: "var(--ink)", borderColor: "var(--rule)" }}>
-        <span>Decided requests</span>
-        <span className="muted">{decidedCount} ›</span>
-      </Link>
       <SampleNote />
     </div>
   );
