@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { aed, plain } from "@/lib/api";
-import { accounts, cardCheck, SAMPLE_NOTE } from "@/lib/sample";
+import { accounts as sampleAccounts, cardCheck, SAMPLE_NOTE } from "@/lib/sample";
 
 // Shared pieces for the parent and kid screens: tab bars, icons, draft cards, the "Why this?" sheet
 // and the four charts. Charts only draw what the money engine (or the sample data) sends;
@@ -138,9 +138,9 @@ export function Back({ href, label }: { href: string; label: string }) {
   );
 }
 
-// Shown on any screen that still uses sample figures.
-export function SampleNote() {
-  return <p className="sample">{SAMPLE_NOTE}</p>;
+// Shown on any screen that still uses sample figures. `live` hides it once the family's own figures load.
+export function SampleNote({ live = false }: { live?: boolean }) {
+  return live ? null : <p className="sample">{SAMPLE_NOTE}</p>;
 }
 
 export const TRUST = "Worked out exactly by the app, not guessed by the AI.";
@@ -428,7 +428,9 @@ export function BucketFlow({
 }
 
 // "Paid from": one chip per account the family typed in. Used on Add spending, the receipt and statement uploads.
-export function AccountPicker({ value, onChange, label = "Paid from" }: { value: string; onChange: (id: string) => void; label?: string }) {
+export function AccountPicker({ value, onChange, label = "Paid from", accounts = sampleAccounts }: {
+  value: string; onChange: (id: string) => void; label?: string; accounts?: { id: string; label: string; last4?: string }[];
+}) {
   return (
     <div style={{ display: "grid", gap: 6 }}>
       <span className="muted">{label}</span>
@@ -444,15 +446,21 @@ export function AccountPicker({ value, onChange, label = "Paid from" }: { value:
 }
 
 // The card bill warning, in the stamp style. Every figure is the engine's card bill forecast.
-export function CardWarning({ accountId, hint = true }: { accountId: string; hint?: boolean }) {
-  const check = cardCheck[accountId];
-  const acct = accounts.find((a) => a.id === accountId);
-  if (!check || !acct) return null;
+// Pass `live` (the core's card check for this amount) to show the family's own; otherwise the sample is used.
+export function CardWarning({ accountId, hint = true, live }: {
+  accountId: string; hint?: boolean; live?: { card: string; due: string; withMinor: number; freeByDueMinor: number; fits: boolean } | null;
+}) {
+  const sample = cardCheck[accountId];
+  const acct = sampleAccounts.find((a) => a.id === accountId);
+  const check = live !== undefined
+    ? (live && !live.fits ? live : null)
+    : sample && acct ? { card: acct.label, due: sample.due, withMinor: sample.withMinor, freeByDueMinor: sample.freeByDueMinor } : null;
+  if (!check) return null;
   return (
     <div className="card-warn" role="note">
       <span className="warn-stamp">Card check</span>
       <p>
-        {acct.label}&apos;s bill on {check.due} would be <b>{aed(check.withMinor)}</b>. Only <b>{aed(check.freeByDueMinor)}</b> is free by then.
+        {check.card}&apos;s bill on {check.due} would be <b>{aed(check.withMinor)}</b>. Only <b>{aed(check.freeByDueMinor)}</b> is free by then.
       </p>
       {hint && <p className="muted">Pay from a bank account instead, or wait until after the statement date.</p>}
     </div>

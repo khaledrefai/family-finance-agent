@@ -1,15 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { accounts, spendCategories } from "@/lib/sample";
+import { useEffect, useState } from "react";
+import { aed } from "@/lib/api";
+import { CardCheck, core, dayLongMonth, useAccounts } from "@/lib/live";
+import { spendCategories } from "@/lib/sample";
 import { AccountPicker, Back, CardWarning, Icon, Masthead } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // Add spending: upload a receipt for anything, or type in a payment that has no receipt
-// (a restaurant, a hotel, a taxi). It becomes a draft line the core checks and stores.
-// Saving it needs the documents endpoint, so for now the form confirms on screen only.
+// (a restaurant, a hotel, a taxi). The core stores it with what paid for it (POST /api/payments),
+// and before saving, a card payment gets the engine's card check for that amount.
 const FOR_WHOM = ["Whole family", "Omar", "Sara", "A kid"];
+const CATEGORY: Record<string, string> = {
+  Restaurant: "EATING_OUT", Hotel: "HOTEL", Transport: "TRANSPORT", Groceries: "GROCERIES", Shopping: "SHOPPING", Other: "OTHER",
+};
+const AMOUNT = /^\d+(\.\d{1,2})?$/;
 
 export default function AddSpendingPage() {
   const { me } = useSession("PARENT");
@@ -21,18 +27,50 @@ export default function AddSpendingPage() {
   const [forWhom, setForWhom] = useState("Whole family");
   const [error, setError] = useState<string | null>(null);
   const [added, setAdded] = useState<string | null>(null);
+  const { accounts, live } = useAccounts(!!me);
+  const [check, setCheck] = useState<CardCheck | null>(null);
+
+  // Start on the first card once the family's own accounts load
+  useEffect(() => {
+    if (live && !accounts.some((a) => a.id === paidFrom)) {
+      setPaidFrom((accounts.find((a) => a.kind === "CREDIT_CARD") ?? accounts[0])?.id ?? "");
+    }
+  }, [live, accounts, paidFrom]);
+
+  // The engine's card check for this amount on this card, a moment after typing stops
+  const isCard = accounts.find((a) => a.id === paidFrom)?.kind === "CREDIT_CARD";
+  useEffect(() => {
+    setCheck(null);
+    if (!live || !isCard || !AMOUNT.test(amount.trim())) return;
+    const t = setTimeout(() => core.cardCheck(paidFrom, amount.trim()).then(setCheck).catch(() => setCheck(null)), 400);
+    return () => clearTimeout(t);
+  }, [live, isCard, paidFrom, amount]);
 
   if (!me) return <p className="muted">Loading…</p>;
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!/^\d+(\.\d{1,2})?$/.test(amount.trim())) {
+    if (!AMOUNT.test(amount.trim())) {
       setError("Enter the amount as a number, like 186 or 42.50.");
       return;
     }
     setError(null);
     const from = accounts.find((a) => a.id === paidFrom)?.label ?? "";
-    setAdded(`Added: AED ${amount.trim()} for ${category.toLowerCase()}${where ? `, ${where}` : ""}, paid from ${from}. It counts toward this month's budget.`);
+    const what = `${category.toLowerCase()}${where ? `, ${where}` : ""}`;
+    if (live) {
+      try {
+        const paid = await core.pay({
+          amount: amount.trim(), description: where ? `${category}: ${where}` : category, category: CATEGORY[category] ?? "OTHER",
+          paidFromAccountId: paidFrom, occurredOn: date || undefined,
+        });
+        setAdded(`Added: ${paid.amount.text} for ${what}, paid from ${paid.paidFrom}. It counts toward this month's budget.`);
+      } catch (err) {
+        setError((err as Error).message);
+        return;
+      }
+    } else {
+      setAdded(`Added: AED ${amount.trim()} for ${what}, paid from ${from}. It counts toward this month's budget.`);
+    }
     setAmount("");
     setWhere("");
   }
@@ -78,8 +116,15 @@ export default function AddSpendingPage() {
           Date
           <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         </label>
-        <AccountPicker value={paidFrom} onChange={setPaidFrom} />
-        <CardWarning accountId={paidFrom} hint={false} />
+        <AccountPicker value={paidFrom} onChange={setPaidFrom} accounts={accounts} />
+        {live ? (
+          <CardWarning accountId={paidFrom} hint={false} live={check && {
+            card: check.card, due: dayLongMonth(check.dueOn), withMinor: check.billWith.minor, freeByDueMinor: check.freeByDue.minor, fits: check.fits,
+          }} />
+        ) : (
+          <CardWarning accountId={paidFrom} hint={false} />
+        )}
+        {live && check?.fits && <p className="muted">Card check: the bill on {dayLongMonth(check.dueOn)} would be {aed(check.billWith.minor)}, and that is covered.</p>}
         <fieldset style={{ border: 0, padding: 0, margin: 0, display: "grid", gap: 4 }}>
           <legend className="muted" style={{ marginBottom: 4 }}>Who was it for?</legend>
           <div className="chips" style={{ marginBottom: 0 }}>

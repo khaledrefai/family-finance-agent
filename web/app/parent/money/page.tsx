@@ -3,17 +3,21 @@
 import Link from "next/link";
 import { useState } from "react";
 import { aed } from "@/lib/api";
-import { bills, cashflow, findings, monthly, wealth } from "@/lib/sample";
+import { useMoney } from "@/lib/live";
+import { findings, wealth } from "@/lib/sample";
 import { MonthColumns, SampleNote, TRUST, Waterfall } from "../../ui";
 import { useSession } from "../../use-session";
 import { MoneyHeader } from "./money-tabs";
 
 // Money overview: where each month's money goes, the next 12 months, bills coming up,
-// and anything odd found in uploads. Sample figures until GET /api/plan/cashflow exists.
+// and anything odd found in uploads. The first three come from GET /api/plan/cashflow; wealth and the
+// upload findings are still sample figures (weeks 3 and 5).
 export default function MoneyPage() {
   const { me } = useSession("PARENT");
+  const { monthly, cashflow, bills, live } = useMoney(!!me);
   const [handled, setHandled] = useState<Record<string, string>>({});
   if (!me) return <p className="muted">Loading…</p>;
+  const tight = cashflow.months.filter((c) => c.tight).map((c) => `${aed(c.freeMinor)} in ${c.m}`);
 
   return (
     <div className="stack">
@@ -31,11 +35,11 @@ export default function MoneyPage() {
       <section className="card" style={{ display: "grid", gap: 10 }}>
         <div>
           <p className="card-title">Where each month's money goes</p>
-          <p className="muted">From AED 34,500 coming in to AED 3,410 spare</p>
+          <p className="muted">From {aed(monthly.incomeMinor)} coming in to {aed(monthly.spareMinor)} spare</p>
         </div>
         <Waterfall
           steps={monthly.steps}
-          label="Income AED 34,500, minus commitments 17,200 and everyday spending 7,390, leaves free cash 9,910. Saving takes 6,500, leaving 3,410 spare."
+          label={`Income ${aed(monthly.incomeMinor)}, minus commitments ${aed(monthly.commitmentsMinor)} and everyday spending ${aed(monthly.everydayMinor)}, leaves free cash ${aed(monthly.freeMinor)}. Saving takes ${aed(monthly.savingMinor)}, leaving ${aed(monthly.spareMinor)} spare.`}
         />
         <p className="trust">All amounts in AED. The full list is below.</p>
         <Link href="/parent/plan/buckets" className="link">See the same money as buckets</Link>
@@ -64,7 +68,7 @@ export default function MoneyPage() {
         <div style={{ marginTop: 12 }}>
           <MonthColumns
             months={cashflow.months.map((c) => ({ m: c.m, share: c.share, amountMinor: c.freeMinor, tone: c.tight ? "tight" : undefined }))}
-            label="Free cash is about AED 9,900 most months, AED 7,510 in December and about AED 9,400 in summer"
+            label={`Free cash each month for the next 12 months${tight.length ? `, lower in tight months: ${tight.join(", ")}` : ""}`}
           />
         </div>
         <p className="muted" style={{ marginTop: 10 }}>{cashflow.note}</p>
@@ -74,10 +78,10 @@ export default function MoneyPage() {
         <p className="card-title" style={{ marginBottom: 2 }}>Coming up</p>
         <div className="rows">
           {bills.map((b) => (
-            <div className="row" key={b.name} style={{ padding: "10px 0" }}>
+            <div className="row" key={b.name + b.due} style={{ padding: "10px 0" }}>
               <span>{b.name} · {b.due}</span>
               <b className={b.state === "short" ? "over" : "good"} style={{ fontSize: 13 }}>
-                {aed(b.amountMinor)} {b.state === "short" ? "short" : "reserved"}
+                {aed(b.amountMinor, { cents: b.amountMinor % 100 !== 0 })} {b.state === "short" ? "short" : "reserved"}
               </b>
             </div>
           ))}
@@ -102,7 +106,7 @@ export default function MoneyPage() {
           </div>
         ))}
       </section>
-      <SampleNote />
+      <SampleNote live={live} />
     </div>
   );
 }
