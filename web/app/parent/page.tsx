@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { aed, api, MemberView } from "@/lib/api";
-import { accounts, advice, bills, familyGoal, kids, monthly, waysToSave } from "@/lib/sample";
+import { CardCheck, core, dayLongMonth, Goal, useAccounts, useLive, useMoney } from "@/lib/live";
+import { advice, familyGoal, kids, waysToSave } from "@/lib/sample";
 import { Chit } from "../chit";
 import { AccountPicker, BigAmount, CardWarning, Icon, Masthead, Progress, SampleNote, TRUST, WhySheet } from "../ui";
 import { useSession } from "../use-session";
 
 // Today: only what needs a parent, in this order: bills due, ask, waiting requests,
 // what is free this month, the family goal, one piece of advice, ways to save, then what was decided.
-// Requests are live from the core; the money cards use sample figures until the plan endpoints exist.
+// Requests, bills, cards, free cash and the family goal come from the core's money engine.
+// The advice and ways to save are still sample figures (they arrive with the agents in later weeks).
 export default function TodayPage() {
   const { me, requests, error, setError, reload, logout } = useSession("PARENT");
   const [members, setMembers] = useState<MemberView[]>([]);
@@ -22,6 +24,10 @@ export default function TodayPage() {
   const [tipWhy, setTipWhy] = useState<string | null>(null);
   // Which account a parent would pay a request from. Sample default until requests carry it.
   const [payFrom, setPayFrom] = useState<Record<string, string>>({});
+
+  const { monthly, bills, live: moneyLive } = useMoney(!!me);
+  const { accounts, live: accountsLive } = useAccounts(!!me);
+  const { data: goals } = useLive<Goal[] | null>(() => core.goals(), null, !!me);
 
   useEffect(() => {
     if (me) api.members().then(setMembers).catch(() => {});
@@ -46,6 +52,8 @@ export default function TodayPage() {
   const fresh = requests.find((r) => r.id === justDecided);
   const nextBill = bills[0];
   const tightCard = accounts.find((a) => a.bill && !a.bill.ok);
+  const goal = goals?.find((g) => g.tier === "GOOD_LIFE");
+  const defaultCard = accounts.find((a) => a.kind === "CREDIT_CARD")?.id ?? "visa";
 
   return (
     <div className="stack">
@@ -59,7 +67,11 @@ export default function TodayPage() {
       <Link href="/parent/money" className="alert">
         <Icon name="bell" size={20} />
         <span style={{ flex: 1 }}>
-          <b>{nextBill.name} due in {nextBill.daysLeft} days.</b> AED 850 reserved, enough to cover it.
+          {moneyLive ? (
+            <><b>{nextBill.name} due {nextBill.daysLeft === 1 ? "tomorrow" : `in ${nextBill.daysLeft} days`}.</b> {aed(nextBill.amountMinor)}{nextBill.state === "short" ? " short: the reserve won't be full by then." : ", planned for this month."}</>
+          ) : (
+            <><b>{nextBill.name} due in {nextBill.daysLeft} days.</b> AED 850 reserved, enough to cover it.</>
+          )}
         </span>
         <span aria-hidden="true">›</span>
       </Link>
@@ -93,8 +105,11 @@ export default function TodayPage() {
           <Chit key={r.id} request={r} from={`${nameOf(r.requesterId)} asks`} stamp={false}>
             {r.requesterId !== me.memberId && (
               <div style={{ display: "grid", gap: 8, padding: "10px 0 8px" }}>
-                <AccountPicker label="Pay from" value={payFrom[r.id] ?? "visa"} onChange={(id) => setPayFrom((p) => ({ ...p, [r.id]: id }))} />
-                <CardWarning accountId={payFrom[r.id] ?? "visa"} />
+                <AccountPicker label="Pay from" value={payFrom[r.id] ?? defaultCard} accounts={accounts}
+                  onChange={(id) => setPayFrom((p) => ({ ...p, [r.id]: id }))} />
+                {accountsLive
+                  ? <LiveCardWarning accountId={payFrom[r.id] ?? defaultCard} amountMinor={r.amountMinor} isCard={accounts.find((a) => a.id === (payFrom[r.id] ?? defaultCard))?.kind === "CREDIT_CARD"} />
+                  : <CardWarning accountId={payFrom[r.id] ?? defaultCard} />}
               </div>
             )}
             {r.requesterId !== me.memberId ? (
@@ -113,18 +128,20 @@ export default function TodayPage() {
       <section className="card">
         <p className="muted">Free this month, after commitments</p>
         <BigAmount minor={monthly.freeMinor} />
-        <p style={{ fontSize: 14 }}>AED 2,140 free until pay day on {monthly.payday}.</p>
+        <p style={{ fontSize: 14 }}>{aed(monthly.freeUntilPaydayMinor)} free until pay day on {monthly.payday}.</p>
         <p className="trust" style={{ marginTop: 4 }}>{TRUST}</p>
       </section>
 
       <section className="card" style={{ display: "grid", gap: 8 }}>
         <div className="row" style={{ padding: 0 }}>
-          <span className="card-title">{familyGoal.name}</span>
+          <span className="card-title">{goal?.name ?? familyGoal.name}</span>
           <span className="muted">Family goal</span>
         </div>
-        <Progress percent={familyGoal.percent} label={`${familyGoal.percent} percent saved`} />
+        <Progress percent={goal?.percent ?? familyGoal.percent} label={`${goal?.percent ?? familyGoal.percent} percent saved`} />
         <p style={{ fontSize: 14 }}>
-          AED 3,600 of 12,000 saved · {familyGoal.percent}% · on track for {familyGoal.onTrackFor}
+          {goal
+            ? <>{goal.saved.text} of {goal.target.text.replace("AED ", "")} saved · {goal.percent}%{goal.fullBy ? ` · full by ${goal.fullBy}` : ""}</>
+            : <>AED 3,600 of 12,000 saved · {familyGoal.percent}% · on track for {familyGoal.onTrackFor}</>}
         </p>
         <p className="muted">
           Own goals: Layla {kids.Layla.percent}% · Adam {kids.Adam.percent}%
@@ -176,7 +193,7 @@ export default function TodayPage() {
       )}
 
       <Link href="/parent/summary" className="link">See October's family summary</Link>
-      <SampleNote />
+      <SampleNote live={false} />
 
       <section>
         <h2 className="first">Decided</h2>
@@ -201,5 +218,20 @@ export default function TodayPage() {
         />
       )}
     </div>
+  );
+}
+
+// The engine's card check for one request on one card: shown only when the bill would not be covered.
+function LiveCardWarning({ accountId, amountMinor, isCard }: { accountId: string; amountMinor: number; isCard: boolean }) {
+  const [check, setCheck] = useState<CardCheck | null>(null);
+  useEffect(() => {
+    setCheck(null);
+    if (!isCard || amountMinor <= 0) return;
+    core.cardCheck(accountId, (amountMinor / 100).toFixed(2)).then(setCheck).catch(() => setCheck(null));
+  }, [accountId, amountMinor, isCard]);
+  return (
+    <CardWarning accountId={accountId} live={check && {
+      card: check.card, due: dayLongMonth(check.dueOn), withMinor: check.billWith.minor, freeByDueMinor: check.freeByDue.minor, fits: check.fits,
+    }} />
   );
 }

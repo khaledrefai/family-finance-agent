@@ -5,3 +5,4 @@ httpx==0.28.1
 pydantic==2.12.5
 pydantic-settings==2.11.0
 pytest==8.4.2
+anthropic==2.3.0

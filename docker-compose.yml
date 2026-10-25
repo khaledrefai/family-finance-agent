@@ -33,6 +33,9 @@ services:
     build: ./agents
     environment:
       AGENTS_CORE_URL: http://core:8080
+      AGENTS_LLM: ${AGENTS_LLM:-auto}
+      AGENTS_LLM_MODEL: ${AGENTS_LLM_MODEL:-claude-opus-5-5}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     depends_on:
       - core
 

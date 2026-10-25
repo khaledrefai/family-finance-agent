@@ -1,0 +1,403 @@
+{
+    "planId": null,
+    "status": null,
+    "proposedBy": "ENGINE",
+    "month": "October 2026",
+    "income": {
+        "minor": 3450000,
+        "currency": "AED",
+        "text": "AED 34,500"
+    },
+    "buckets": [
+        {
+            "kind": "COMMITMENTS",
+            "label": "Commitments",
+            "about": "Survival first: rent, school and bills are covered before anything else.",
+            "shareBp": 4264,
+            "amount": {
+                "minor": 1471100,
+                "currency": "AED",
+                "text": "AED 14,711"
+            },
+            "fromBp": 0,
+            "toBp": 4264,
+            "needed": {
+                "minor": 1470900,
+                "currency": "AED",
+                "text": "AED 14,709"
+            },
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "reason": "Covers AED 14,709 due this month",
+            "items": [
+                {
+                    "label": "Apartment rent reserve",
+                    "amount": {
+                        "minor": 1000000,
+                        "currency": "AED",
+                        "text": "AED 10,000"
+                    },
+                    "shareBp": 6798,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": "Reserve for 4 payments in the next 12 months"
+                },
+                {
+                    "label": "School fees reserve",
+                    "amount": {
+                        "minor": 375000,
+                        "currency": "AED",
+                        "text": "AED 3,750"
+                    },
+                    "shareBp": 2549,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": "Reserve for 3 payments in the next 12 months"
+                },
+                {
+                    "label": "DEWA electricity and water",
+                    "amount": {
+                        "minor": 90000,
+                        "currency": "AED",
+                        "text": "AED 900"
+                    },
+                    "shareBp": 612,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": "About, it changes"
+                },
+                {
+                    "label": "Streaming bundle",
+                    "amount": {
+                        "minor": 5900,
+                        "currency": "AED",
+                        "text": "AED 59"
+                    },
+                    "shareBp": 40,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": "Subscription"
+                }
+            ]
+        },
+        {
+            "kind": "EVERYDAY",
+            "label": "Everyday",
+            "about": "What the family spends week to week. The budgets live here.",
+            "shareBp": 2144,
+            "amount": {
+                "minor": 739700,
+                "currency": "AED",
+                "text": "AED 7,397"
+            },
+            "fromBp": 4264,
+            "toBp": 6408,
+            "needed": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "reason": "Covers the budgets, AED 7,393.33 a month",
+            "items": [
+                {
+                    "label": "Groceries",
+                    "amount": {
+                        "minor": 300000,
+                        "currency": "AED",
+                        "text": "AED 3,000"
+                    },
+                    "shareBp": 4056,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": null
+                },
+                {
+                    "label": "Eating out",
+                    "amount": {
+                        "minor": 150000,
+                        "currency": "AED",
+                        "text": "AED 1,500"
+                    },
+                    "shareBp": 2028,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": null
+                },
+                {
+                    "label": "Entertainment",
+                    "amount": {
+                        "minor": 120000,
+                        "currency": "AED",
+                        "text": "AED 1,200"
+                    },
+                    "shareBp": 1622,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": null
+                },
+                {
+                    "label": "Transport",
+                    "amount": {
+                        "minor": 100000,
+                        "currency": "AED",
+                        "text": "AED 1,000"
+                    },
+                    "shareBp": 1352,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": null
+                },
+                {
+                    "label": "Pocket money, Layla",
+                    "amount": {
+                        "minor": 43333,
+                        "currency": "AED",
+                        "text": "AED 433.33"
+                    },
+                    "shareBp": 586,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": null
+                },
+                {
+                    "label": "Pocket money, Adam",
+                    "amount": {
+                        "minor": 26000,
+                        "currency": "AED",
+                        "text": "AED 260"
+                    },
+                    "shareBp": 351,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": null
+                }
+            ]
+        },
+        {
+            "kind": "GOALS",
+            "label": "Goals",
+            "about": "Saving for what the family wants, the safety net first.",
+            "shareBp": 1885,
+            "amount": {
+                "minor": 650300,
+                "currency": "AED",
+                "text": "AED 6,503"
+            },
+            "fromBp": 6408,
+            "toBp": 8293,
+            "needed": {
+                "minor": 650000,
+                "currency": "AED",
+                "text": "AED 6,500"
+            },
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "reason": "Covers AED 6,500 of goal saving",
+            "items": [
+                {
+                    "label": "Emergency buffer",
+                    "amount": {
+                        "minor": 500000,
+                        "currency": "AED",
+                        "text": "AED 5,000"
+                    },
+                    "shareBp": 7689,
+                    "tier": "SURVIVAL",
+                    "tierLabel": "Survival",
+                    "note": "AED 10,000 of AED 25,000 saved"
+                },
+                {
+                    "label": "Summer trip",
+                    "amount": {
+                        "minor": 150000,
+                        "currency": "AED",
+                        "text": "AED 1,500"
+                    },
+                    "shareBp": 2307,
+                    "tier": "GOOD_LIFE",
+                    "tierLabel": "Good Life",
+                    "note": "AED 3,600 of AED 12,000 saved"
+                },
+                {
+                    "label": "Home deposit",
+                    "amount": {
+                        "minor": 0,
+                        "currency": "AED",
+                        "text": "AED 0"
+                    },
+                    "shareBp": 0,
+                    "tier": "DREAM",
+                    "tierLabel": "Dream",
+                    "note": "AED 0 of AED 150,000 saved, not funded yet"
+                }
+            ]
+        },
+        {
+            "kind": "INVEST_ASIDE",
+            "label": "Set aside for investing",
+            "about": "An amount kept apart for the long term. The app never names a fund or product.",
+            "shareBp": 300,
+            "amount": {
+                "minor": 103500,
+                "currency": "AED",
+                "text": "AED 1,035"
+            },
+            "fromBp": 8293,
+            "toBp": 8593,
+            "needed": null,
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "reason": "A small amount kept apart for the long term",
+            "items": [
+                {
+                    "label": "Set aside this month",
+                    "amount": {
+                        "minor": 103500,
+                        "currency": "AED",
+                        "text": "AED 1,035"
+                    },
+                    "shareBp": 10000,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": "Education only: the app never names a fund or product"
+                }
+            ]
+        },
+        {
+            "kind": "FUN",
+            "label": "Fun",
+            "about": "Money to enjoy: outings, eating out, each parent's own money.",
+            "shareBp": 1257,
+            "amount": {
+                "minor": 433700,
+                "currency": "AED",
+                "text": "AED 4,337"
+            },
+            "fromBp": 8593,
+            "toBp": 9850,
+            "needed": null,
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "reason": "What is left after the rest",
+            "items": [
+                {
+                    "label": "Fun money this month",
+                    "amount": {
+                        "minor": 433700,
+                        "currency": "AED",
+                        "text": "AED 4,337"
+                    },
+                    "shareBp": 10000,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": null
+                }
+            ]
+        },
+        {
+            "kind": "GIVING",
+            "label": "Giving",
+            "about": "Optional. Charity and sadaqah. Turn it off any time.",
+            "shareBp": 150,
+            "amount": {
+                "minor": 51700,
+                "currency": "AED",
+                "text": "AED 517"
+            },
+            "fromBp": 9850,
+            "toBp": 10000,
+            "needed": null,
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "reason": "Optional. Turn it off any time",
+            "items": [
+                {
+                    "label": "Charity and sadaqah",
+                    "amount": {
+                        "minor": 51700,
+                        "currency": "AED",
+                        "text": "AED 517"
+                    },
+                    "shareBp": 10000,
+                    "tier": null,
+                    "tierLabel": null,
+                    "note": null
+                }
+            ]
+        }
+    ],
+    "survivalNeeded": {
+        "minor": 2210233,
+        "currency": "AED",
+        "text": "AED 22,102.33"
+    },
+    "survivalCovered": true,
+    "tiers": [
+        {
+            "tier": "SURVIVAL",
+            "label": "Survival",
+            "goals": 1,
+            "left": {
+                "minor": 1500000,
+                "currency": "AED",
+                "text": "AED 15,000"
+            },
+            "monthly": {
+                "minor": 500000,
+                "currency": "AED",
+                "text": "AED 5,000"
+            }
+        },
+        {
+            "tier": "GOOD_LIFE",
+            "label": "Good Life",
+            "goals": 1,
+            "left": {
+                "minor": 840000,
+                "currency": "AED",
+                "text": "AED 8,400"
+            },
+            "monthly": {
+                "minor": 150000,
+                "currency": "AED",
+                "text": "AED 1,500"
+            }
+        },
+        {
+            "tier": "DREAM",
+            "label": "Dream",
+            "goals": 1,
+            "left": {
+                "minor": 15000000,
+                "currency": "AED",
+                "text": "AED 150,000"
+            },
+            "monthly": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            }
+        }
+    ],
+    "warnings": []
+}

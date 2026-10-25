@@ -1,0 +1,32 @@
+[
+    {
+        "kind": "COMMITMENTS",
+        "shareBp": 4264,
+        "reason": "Covers AED 14,709 due this month"
+    },
+    {
+        "kind": "EVERYDAY",
+        "shareBp": 2144,
+        "reason": "Covers the budgets, AED 7,393.33 a month"
+    },
+    {
+        "kind": "GOALS",
+        "shareBp": 1885,
+        "reason": "Covers AED 6,500 of goal saving"
+    },
+    {
+        "kind": "INVEST_ASIDE",
+        "shareBp": 300,
+        "reason": "A small amount kept apart for the long term"
+    },
+    {
+        "kind": "FUN",
+        "shareBp": 1257,
+        "reason": "What is left after the rest"
+    },
+    {
+        "kind": "GIVING",
+        "shareBp": 150,
+        "reason": "Optional. Turn it off any time"
+    }
+]

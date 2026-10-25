@@ -81,8 +81,32 @@ npm install && npm run dev       # forwards /api/* to http://localhost:8080
 | GET | `/api/spend?memberId=&month=` | parents: anyone in the family; children: themselves |
 | GET | `/api/spend/summary?memberId=&month=` | same; every number the agent may use ("where did the money go?") |
 | GET | `/api/spend/status` | my logging today, for the agent's nudge |
+| POST | `/api/requests/assess` | any member: "can I afford it?" (children see only their own wallet side) |
+| GET | `/api/plan/cashflow` | parents: free cash, free until pay day, the 12-month calendar, bills coming up |
+| GET, POST | `/api/plan/income`, `/api/plan/commitments` | parents; through an agent run they are saved as drafts |
+| POST | `/api/plan/income/{id}/receipts` | parents: what a commission income paid this month |
+| GET | `/api/plan/drafts` | parents: what is waiting for Confirm |
+| POST | `/api/plan/drafts/{type}/{id}/confirm`, `.../discard` | a parent in the app (an agent run is refused) |
+| GET | `/api/plan/goals`, POST `/api/plan/options` | parents: relaxed, steady and faster paces for a goal |
+| POST | `/api/plan/goals/{id}/pace` | a parent in the app |
+| GET | `/api/plan/buckets`, `/api/plan/buckets/suggestion` | parents |
+| POST | `/api/plan/buckets/draft`, `/api/plan/buckets/confirm` | draft: the Planner or a parent; confirm: a parent in the app |
+| GET, POST | `/api/accounts`, POST `/api/accounts/{id}/balance` | parents: accounts, cards and cash, typed in |
+| GET | `/api/accounts/{id}/card-check?amount=` | parents: the card's bill with this purchase, against free cash on its due date |
+| POST | `/api/payments` | parents: a payment typed in; it must say what paid it |
+| POST | `/api/agent-runs`, `/api/agent-runs/{id}/finish`, GET `/api/agent-runs` | the agent service opens and closes runs; parents read the trail |
 
 Agent service (the web app reaches it at `/agent/...`): `POST /chat` and `GET /nudge`.
+
+## The Planner's Claude step (week 2)
+
+"Make our plan for this month" goes to the Planner (`agents/app/planner.py`). It reads the plan from the core,
+saves a draft bucket split with the engine's own shares, and asks Claude only for the words. Claude answers as JSON
+(structured outputs), with server-side refusal fallbacks on. If any number in Claude's text is not in the core's
+facts, or Claude is off, slow (6 s) or fails, the rule-based template answers instead. Set `ANTHROPIC_API_KEY` to
+turn it on; `AGENTS_LLM=off` forces the template (use it for a recording if the network is unsure). The model is
+`AGENTS_LLM_MODEL` (default `claude-opus-5-5`). Every run is in "What the agent did" (`GET /api/agent-runs`),
+including whether Claude or the fallback answered and why.
 
 ## Spend logging (spike)
 

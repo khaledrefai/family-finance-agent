@@ -33,6 +33,9 @@ class FakeCore:
         self.posted: list[dict] = []
         self.summary_calls: list[dict] = []
         self.logged_today = False
+        self.runs: list[dict] = []          # agent runs opened, with what they finished as
+        self.run_headers: list[str] = []    # X-Agent-Run-Id seen on plan calls
+        self.bucket_drafts: list[dict] = []
 
     def handler(self, request: httpx.Request) -> httpx.Response:
         path = request.url.path
@@ -56,6 +59,27 @@ class FakeCore:
             return httpx.Response(200, json={"today": "2026-10-22", "dayOfWeek": "THURSDAY", "schoolDay": True,
                                              "loggedToday": self.logged_today, "lastLoggedOn": "2026-10-21",
                                              "todayTotal": {"minor": 0, "currency": "AED", "text": "AED 0"}})
+        if path == "/api/agent-runs" and request.method == "POST":
+            self.runs.append(json.loads(request.content))
+            return httpx.Response(201, json={"id": "11111111-1111-1111-1111-%012d" % len(self.runs)})
+        if path.startswith("/api/agent-runs/") and path.endswith("/finish"):
+            self.runs[-1]["finished"] = json.loads(request.content)
+            return httpx.Response(204)
+        if path.startswith("/api/plan/") or path == "/api/requests/assess":
+            self.run_headers.append(request.headers.get("X-Agent-Run-Id", ""))
+        if path == "/api/plan/cashflow":
+            return httpx.Response(200, json=load("cashflow.json"))
+        if path == "/api/plan/goals":
+            return httpx.Response(200, json=load("goals.json"))
+        if path == "/api/plan/buckets/suggestion":
+            return httpx.Response(200, json=load("bucket_suggestion.json"))
+        if path == "/api/plan/options":
+            return httpx.Response(200, json=load("options_trip.json"))
+        if path == "/api/plan/buckets/draft":
+            self.bucket_drafts.append(json.loads(request.content))
+            return httpx.Response(200, json=load("buckets.json"))
+        if path == "/api/requests/assess":
+            return httpx.Response(200, json=load("assess_layla.json"))
         return httpx.Response(404, json={"detail": "not found"})
 
     def client(self) -> CoreClient:

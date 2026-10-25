@@ -3,15 +3,17 @@
 import { useState } from "react";
 import { aed } from "@/lib/api";
 import Link from "next/link";
-import { AccountKind, accounts, gold, statementUpload } from "@/lib/sample";
+import { call } from "@/lib/api";
+import { Account, fromAccount, useLive } from "@/lib/live";
+import { AccountKind, accounts as sampleAccounts, gold, statementUpload } from "@/lib/sample";
 import { AccountPicker, SampleNote, TRUST } from "../../../ui";
 import { useSession } from "../../../use-session";
 import { MoneyHeader } from "../money-tabs";
 
 // Accounts and cards: the bank accounts, credit cards and cash the parents typed in by hand.
 // Every payment records which one it came from, so the engine can forecast each card's next bill
-// against the free cash on its due date. Nothing links to a real bank. Sample figures until
-// GET /api/accounts exists.
+// against the free cash on its due date. Nothing links to a real bank. From GET /api/accounts;
+// gold and the statement upload are still sample figures.
 const GROUPS: { kind: AccountKind; title: string }[] = [
   { kind: "BANK", title: "Bank accounts" },
   { kind: "CREDIT_CARD", title: "Credit cards" },
@@ -29,15 +31,37 @@ export default function AccountsPage() {
   const [adding, setAdding] = useState(false);
   const [kind, setKind] = useState<AccountKind>("BANK");
   const [label, setLabel] = useState("");
+  const [form, setForm] = useState({ last4: "", balance: "", limit: "", statementDay: "", dueDay: "" });
   const [added, setAdded] = useState<string | null>(null);
   const [statementAccount, setStatementAccount] = useState(statementUpload.accountId);
+  const { data: accounts, live, reload } = useLive(async () => (await call<Account[]>("/api/accounts")).map(fromAccount),
+    sampleAccounts, !!me);
   if (!me) return <p className="muted">Loading…</p>;
+  const field = (k: keyof typeof form) => ({ value: form[k], onChange: (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value }) });
 
-  function save(e: React.FormEvent) {
+  async function save(e: React.FormEvent) {
     e.preventDefault();
-    setAdded(`Added ${label}. The app saves it once the accounts service is ready.`);
-    setLabel("");
-    setAdding(false);
+    if (!live) {
+      setAdded(`Added ${label}.`);
+      setAdding(false);
+      return;
+    }
+    try {
+      await call<Account>("/api/accounts", {
+        method: "POST",
+        body: JSON.stringify({
+          kind, label, last4: form.last4 || null, balance: form.balance || "0", limit: form.limit || null,
+          statementDay: form.statementDay ? Number(form.statementDay) : null, dueDay: form.dueDay ? Number(form.dueDay) : null,
+        }),
+      });
+      setAdded(`Added ${label}.`);
+      setLabel("");
+      setForm({ last4: "", balance: "", limit: "", statementDay: "", dueDay: "" });
+      setAdding(false);
+      reload();
+    } catch (err) {
+      setAdded((err as Error).message);
+    }
   }
 
   return (
@@ -116,7 +140,7 @@ export default function AccountsPage() {
           <span className="confirmed">Matched</span>
         </div>
         <p className="muted">Matched by its {statementUpload.matchedBy}. Change it if that's wrong.</p>
-        <AccountPicker label="This statement is for" value={statementAccount} onChange={setStatementAccount} />
+        <AccountPicker label="This statement is for" value={statementAccount} onChange={setStatementAccount} accounts={accounts} />
       </section>
 
       {adding ? (
@@ -136,26 +160,26 @@ export default function AccountsPage() {
           {kind !== "CASH" && (
             <label>
               Last 4 digits
-              <input inputMode="numeric" pattern="\d{4}" maxLength={4} placeholder="1234" />
+              <input inputMode="numeric" pattern="\d{4}" maxLength={4} placeholder="1234" {...field("last4")} />
             </label>
           )}
           <label>
             {kind === "CREDIT_CARD" ? "Spent on it so far, AED" : "Balance, AED"}
-            <input inputMode="decimal" placeholder="2,500" />
+            <input inputMode="decimal" placeholder="2,500" {...field("balance")} />
           </label>
           {kind === "CREDIT_CARD" && (
             <>
               <label>
                 Card limit, AED
-                <input inputMode="decimal" placeholder="15,000" />
+                <input inputMode="decimal" placeholder="15,000" {...field("limit")} required />
               </label>
               <label>
                 Statement day
-                <input inputMode="numeric" placeholder="27" />
+                <input inputMode="numeric" placeholder="27" {...field("statementDay")} required />
               </label>
               <label>
                 Bill due day
-                <input inputMode="numeric" placeholder="5" />
+                <input inputMode="numeric" placeholder="5" {...field("dueDay")} required />
               </label>
             </>
           )}
@@ -166,7 +190,7 @@ export default function AccountsPage() {
       )}
       {added && <p className="muted" role="status">{added}</p>}
       <p className="trust">{TRUST}</p>
-      <SampleNote />
+      <SampleNote live={live} />
     </div>
   );
 }

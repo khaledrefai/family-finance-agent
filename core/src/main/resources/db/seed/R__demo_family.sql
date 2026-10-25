@@ -19,6 +19,10 @@ DELETE FROM demo_wallet_entry e USING demo_wallet w
 DELETE FROM agent_run         WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM ledger_transaction WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM spending_request  WHERE family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM commitment        WHERE family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM income            WHERE family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM bucket_plan       WHERE family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM money_account     WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM family WHERE id = '00000000-0000-0000-0000-00000000f001';
 
 INSERT INTO family (id, name, currency, is_demo)
@@ -36,25 +40,61 @@ SELECT '00000000-0000-0000-0000-00000000f001', c.id, '00000000-0000-0000-0000-00
 FROM (VALUES ('00000000-0000-0000-0000-0000000000c1'::uuid), ('00000000-0000-0000-0000-0000000000c2'::uuid)) AS c(id)
 CROSS JOIN (VALUES ('CHILD_ACCOUNT'), ('AI_PROCESSING')) AS p(purpose);
 
--- Income (amounts in fils: 2500000 = AED 25,000)
-INSERT INTO income (family_id, member_id, name, amount_minor, frequency, next_on) VALUES
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', 'Sara salary', 1800000, 'MONTHLY', date_trunc('month', current_date)::date + 24),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', 'Omar salary', 1500000, 'MONTHLY', date_trunc('month', current_date)::date + 24);
+-- ---------------------------------------------------------------- the money plan (week 2)
+-- PROVISIONAL numbers, taken from the app mockups' sample family. khaled to confirm or correct them.
+-- Amounts in fils: 2800000 = AED 28,000.
 
--- Commitments: rent, school fees soon, car instalment, and a forgotten subscription
-INSERT INTO commitment (family_id, name, kind, amount_minor, frequency, next_due_on, remaining_count) VALUES
- ('00000000-0000-0000-0000-00000000f001', 'Apartment rent (cheque)',    'RENT',         2000000, 'QUARTERLY', current_date + 40, NULL),
- ('00000000-0000-0000-0000-00000000f001', 'School fees, term 2',        'SCHOOL_FEES',  1450000, 'TERMLY',    current_date + 18, NULL),
- ('00000000-0000-0000-0000-00000000f001', 'Car instalment',             'LOAN',          185000, 'MONTHLY',   current_date + 6,  22),
- ('00000000-0000-0000-0000-00000000f001', 'DEWA electricity and water', 'UTILITY',        95000, 'MONTHLY',   current_date + 12, NULL),
- ('00000000-0000-0000-0000-00000000f001', 'Streaming bundle',           'SUBSCRIPTION',    5900, 'MONTHLY',   current_date + 3,  NULL);
+-- Income: Omar's fixed salary and Sara's commission (variable). Sara's planning base is worked out by the
+-- engine from the last 6 months below: the average of the 3 lowest = AED 6,500.
+INSERT INTO income (id, family_id, member_id, name, kind, amount_minor, frequency, next_on, status, source) VALUES
+ ('00000000-0000-0000-0000-0000000001a2', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', 'Omar salary',     'FIXED',    2800000, 'MONTHLY', current_date + 20, 'ACTIVE', 'SEED'),
+ ('00000000-0000-0000-0000-0000000001a1', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', 'Sara commission', 'VARIABLE',  750000, 'MONTHLY', current_date + 24, 'ACTIVE', 'SEED');
 
--- Budgets: family food budget + weekly pocket money per child (Layla's AED 100 includes school canteen money)
-INSERT INTO budget (family_id, member_id, category, period, limit_minor) VALUES
- ('00000000-0000-0000-0000-00000000f001', NULL, 'GROCERIES', 'WEEKLY', 70000),
- ('00000000-0000-0000-0000-00000000f001', NULL, 'DINING_OUT', 'MONTHLY', 80000),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1', 'POCKET_MONEY', 'WEEKLY', 10000),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'POCKET_MONEY', 'WEEKLY', 6000);
+INSERT INTO income_receipt (income_id, received_on, amount_minor)
+SELECT '00000000-0000-0000-0000-0000000001a1', (date_trunc('month', current_date) - make_interval(months => k))::date + 24, amt
+FROM (VALUES (1, 980000), (2, 620000), (3, 740000), (4, 650000), (5, 1120000), (6, 680000)) AS r(k, amt);
+
+-- Accounts and cards, typed in by hand (no bank links). The Visa's bill falls due before Omar's next pay,
+-- so putting Layla's AED 300 headphones on it shows the card warning.
+INSERT INTO money_account (id, family_id, owner_member_id, kind, label, last4, balance_minor, balance_as_of,
+                           is_savings, limit_minor, statement_day, due_day) VALUES
+ ('00000000-0000-0000-0000-0000000000e1', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', 'BANK',        'ENBD current',      '4821', 1165000, current_date,     FALSE, NULL,    NULL, NULL),
+ ('00000000-0000-0000-0000-0000000000e2', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', 'BANK',        'ADCB savings',      '1093', 3260000, current_date,     TRUE,  NULL,    NULL, NULL),
+ ('00000000-0000-0000-0000-0000000000e3', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', 'CREDIT_CARD', 'Omar''s Visa',      '7710',  595000, current_date - 1, FALSE, 2000000,
+  extract(day FROM current_date + 1)::int, extract(day FROM current_date + 19)::int),
+ ('00000000-0000-0000-0000-0000000000e4', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', 'CREDIT_CARD', 'Sara''s Mastercard', '3356', 135000, current_date - 1, FALSE, 1200000,
+  extract(day FROM current_date + 3)::int, extract(day FROM current_date + 28)::int),
+ ('00000000-0000-0000-0000-0000000000e5', '00000000-0000-0000-0000-00000000f001', NULL,                                   'CASH',        'Cash at home',      NULL,     65000, current_date,     FALSE, NULL,    NULL, NULL);
+
+-- Commitments: rent in 4 cheques, school fees in 3 terms, the car loan, DEWA (an estimate, higher in summer),
+-- du, and a forgotten subscription. Half of term 2 is already put aside; term 3 comes too soon after it, so March is a tight month.
+INSERT INTO commitment (id, family_id, name, kind, amount_minor, frequency, next_due_on, remaining_count, status, source,
+                        is_estimate, summer_amount_minor, reserved_minor, balance_left_minor, paid_from_account_id) VALUES
+ ('00000000-0000-0000-0000-0000000002c1', '00000000-0000-0000-0000-00000000f001', 'Apartment rent',             'RENT',         3000000, 'CUSTOM',  current_date + 68, NULL, 'ACTIVE', 'SEED', FALSE, NULL,   2000000, NULL,    '00000000-0000-0000-0000-0000000000e1'),
+ ('00000000-0000-0000-0000-0000000002c2', '00000000-0000-0000-0000-00000000f001', 'School fees',                'SCHOOL_FEES',  1500000, 'CUSTOM',  current_date + 72, NULL, 'ACTIVE', 'SEED', FALSE, NULL,    750000, NULL,    '00000000-0000-0000-0000-0000000000e1'),
+ ('00000000-0000-0000-0000-0000000002c3', '00000000-0000-0000-0000-00000000f001', 'Car loan',                   'LOAN',          210000, 'MONTHLY', current_date + 22, 18,   'ACTIVE', 'SEED', FALSE, NULL,         0, 3840000, '00000000-0000-0000-0000-0000000000e1'),
+ ('00000000-0000-0000-0000-0000000002c4', '00000000-0000-0000-0000-00000000f001', 'DEWA electricity and water', 'UTILITY',        90000, 'MONTHLY', current_date + 1,  NULL, 'ACTIVE', 'SEED', TRUE,  140000,      0, NULL,    '00000000-0000-0000-0000-0000000000e1'),
+ ('00000000-0000-0000-0000-0000000002c5', '00000000-0000-0000-0000-00000000f001', 'du home and mobile',         'TELECOM',        45000, 'MONTHLY', current_date + 7,  NULL, 'ACTIVE', 'SEED', FALSE, NULL,         0, NULL,    '00000000-0000-0000-0000-0000000000e3'),
+ ('00000000-0000-0000-0000-0000000002c6', '00000000-0000-0000-0000-00000000f001', 'Streaming bundle',           'SUBSCRIPTION',    5900, 'MONTHLY', current_date + 3,  NULL, 'ACTIVE', 'SEED', FALSE, NULL,         0, NULL,    '00000000-0000-0000-0000-0000000000e4');
+
+INSERT INTO commitment_occurrence (commitment_id, due_on, amount_minor, label) VALUES
+ ('00000000-0000-0000-0000-0000000002c1', current_date + 68,  3000000, 'Cheque 2 of 4'),
+ ('00000000-0000-0000-0000-0000000002c1', current_date + 159, 3000000, 'Cheque 3 of 4'),
+ ('00000000-0000-0000-0000-0000000002c1', current_date + 250, 3000000, 'Cheque 4 of 4'),
+ ('00000000-0000-0000-0000-0000000002c1', current_date + 341, 3000000, 'Cheque 1 of 4, next contract'),
+ ('00000000-0000-0000-0000-0000000002c2', current_date + 72,  1500000, 'Term 2'),
+ ('00000000-0000-0000-0000-0000000002c2', current_date + 162, 1500000, 'Term 3'),
+ ('00000000-0000-0000-0000-0000000002c2', current_date + 312, 1500000, 'Term 1, next year');
+
+-- Budgets: the family's everyday money each month, and weekly pocket money per child
+-- (Layla's AED 100 includes school canteen money).
+INSERT INTO budget (family_id, member_id, category, period, limit_minor, bucket) VALUES
+ ('00000000-0000-0000-0000-00000000f001', NULL, 'GROCERIES',     'MONTHLY', 300000, 'EVERYDAY'),
+ ('00000000-0000-0000-0000-00000000f001', NULL, 'EATING_OUT',    'MONTHLY', 150000, 'FUN'),
+ ('00000000-0000-0000-0000-00000000f001', NULL, 'ENTERTAINMENT', 'MONTHLY', 120000, 'FUN'),
+ ('00000000-0000-0000-0000-00000000f001', NULL, 'TRANSPORT',     'MONTHLY', 100000, 'EVERYDAY'),
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1', 'POCKET_MONEY', 'WEEKLY', 10000, 'EVERYDAY'),
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'POCKET_MONEY', 'WEEKLY',  6000, 'EVERYDAY');
 
 -- Family rules
 INSERT INTO family_rule (family_id, applies_to_member_id, kind, category, allergen, limit_minor, note, created_by) VALUES
@@ -81,20 +121,26 @@ CROSS JOIN (VALUES ('00000000-0000-0000-0000-0000000000d1'::uuid, 10000),
 INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description) VALUES
  ('00000000-0000-0000-0000-0000000000d1', 'PAYMENT', -1200, 'Bookshop (demo money)');
 
--- Goals
-INSERT INTO goal (family_id, member_id, name, target_minor, saved_minor, target_date) VALUES
- ('00000000-0000-0000-0000-00000000f001', NULL, 'Family emergency fund', 3000000, 850000, current_date + 365),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1', 'Headphones', 30000, 6000, NULL);
+-- Goals: the emergency buffer first (Survival), then the summer trip (Good life), then the dream.
+-- The kids' goals are their own and come out of their pocket money, not the family plan.
+INSERT INTO goal (id, family_id, member_id, name, tier, target_minor, saved_minor, monthly_minor, target_date, priority) VALUES
+ ('00000000-0000-0000-0000-0000000003f1', '00000000-0000-0000-0000-00000000f001', NULL, 'Emergency buffer', 'SURVIVAL',  2500000, 1000000, 500000, NULL,              10),
+ ('00000000-0000-0000-0000-0000000003f2', '00000000-0000-0000-0000-00000000f001', NULL, 'Summer trip',      'GOOD_LIFE', 1200000,  360000, 150000, current_date + 248, 50),
+ ('00000000-0000-0000-0000-0000000003f3', '00000000-0000-0000-0000-00000000f001', NULL, 'Home deposit',     'DREAM',    15000000,       0, NULL,   NULL,              90),
+ ('00000000-0000-0000-0000-0000000003c1', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1', 'Headphones',   'GOOD_LIFE', 30000, 12000, NULL, NULL, 100),
+ ('00000000-0000-0000-0000-0000000003c2', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'Building set', 'GOOD_LIFE', 16000,  7200, NULL, NULL, 100);
 
 INSERT INTO points_entry (family_id, member_id, points, reason) VALUES
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1', 40, 'Finished lesson: needs vs wants'),
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 25, 'Saved pocket money 2 weeks in a row');
 
--- A few ledger lines so dashboards are not empty (documents and duplicates arrive in week 3)
-INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, merchant, category, direction, amount_minor, duplicate_hash) VALUES
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', current_date - 5, 'Weekly groceries', 'Carrefour', 'GROCERIES', 'DEBIT', 61250, encode(digest('seed-1', 'sha256'), 'hex')),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', current_date - 3, 'Fuel', 'ENOC', 'TRANSPORT', 'DEBIT', 18000, encode(digest('seed-2', 'sha256'), 'hex')),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', current_date - 2, 'Dinner out', 'Local restaurant', 'DINING_OUT', 'DEBIT', 23500, encode(digest('seed-3', 'sha256'), 'hex'));
+-- A few parent payments, each tagged with what paid it (documents and duplicates arrive in week 3).
+-- They happened before the cards' balances were typed in, so the card balances already include them.
+INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, merchant, category, direction, amount_minor,
+                                duplicate_hash, source, paid_from_account_id) VALUES
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', current_date - 5, 'Weekly groceries', 'Carrefour',        'GROCERIES',  'DEBIT', 61250, encode(digest('seed-1', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e4'),
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', current_date - 3, 'Fuel',             'ENOC',             'TRANSPORT',  'DEBIT', 18000, encode(digest('seed-2', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e3'),
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', current_date - 2, 'Dinner out',       'Local restaurant', 'EATING_OUT', 'DEBIT', 23500, encode(digest('seed-3', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e3');
 
 -- ---------------------------------------------------------------- kids' logged spending (chat logging)
 -- About 10 weeks of what Layla and Adam told the agent they bought, so "where did Layla's money go this month?"
@@ -164,3 +210,14 @@ SELECT '00000000-0000-0000-0000-00000000f001', x.member, x.d, x.descr, x.merchan
        encode(digest('seed-kid-' || x.member || '-' || x.ago || '-' || x.descr, 'sha256'), 'hex'), 'SEED',
        (x.amt / 100) || ' dirhams ' || lower(x.descr)
 FROM (SELECT * FROM habits UNION ALL SELECT * FROM one_offs) AS x;
+
+-- What the kids logged came out of their demo wallets. Layla also moved AED 120 into her headphones goal
+-- and Adam AED 72 into his building set (the saved amounts on their goals).
+INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description)
+SELECT w.id, 'PAYMENT', -SUM(t.amount_minor), 'Spending logged in chat (demo money)'
+FROM demo_wallet w JOIN ledger_transaction t ON t.member_id = w.member_id AND t.source = 'SEED'
+WHERE w.family_id = '00000000-0000-0000-0000-00000000f001'
+GROUP BY w.id;
+INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description) VALUES
+ ('00000000-0000-0000-0000-0000000000d1', 'SAVINGS_MOVE', -12000, 'Into the headphones goal (demo money)'),
+ ('00000000-0000-0000-0000-0000000000d2', 'SAVINGS_MOVE',  -7200, 'Into the building set goal (demo money)');

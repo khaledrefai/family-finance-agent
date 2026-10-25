@@ -3,18 +3,34 @@
 import Link from "next/link";
 import { useState } from "react";
 import { aed } from "@/lib/api";
-import { buckets, gold } from "@/lib/sample";
+import { core, fromBuckets, useBuckets } from "@/lib/live";
+import { gold } from "@/lib/sample";
 import { Back, BucketFlow, Masthead, SampleNote, TRUST } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // Money buckets: every dirham of income gets a job. The flow chart shows how income splits into
 // the buckets, and each card below shows what is inside one bucket. The accountant suggests the
-// split, a parent confirms it, and the engine works out every amount. Sample figures for now.
+// split, a parent confirms it, and the engine works out every amount (GET /api/plan/buckets).
+// Confirming is a parent's tap in the app; the agent can only save a draft.
 export default function BucketsPage() {
   const { me } = useSession("PARENT");
-  const [confirmed, setConfirmed] = useState(buckets.confirmed);
+  const { data: buckets, live, setData } = useBuckets(!!me);
   const [givingOn, setGivingOn] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   if (!me) return <p className="muted">Loading…</p>;
+  const confirmed = buckets.confirmed;
+
+  async function confirm() {
+    if (!live) {
+      setData({ ...buckets, confirmed: true });
+      return;
+    }
+    try {
+      setData(fromBuckets(await core.confirmBuckets()));
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
 
   return (
     <div className="stack">
@@ -28,13 +44,14 @@ export default function BucketsPage() {
           </p>
         ) : (
           <>
-            <p><b>Suggested by the accountant.</b> It counts once you confirm. You can change any bucket first.</p>
+            <p><b>{buckets.proposedBy === "PARENT" ? "Your changes." : "Suggested by the accountant."}</b> It counts once you confirm. You can change any bucket first.</p>
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-              <button onClick={() => setConfirmed(true)}>Confirm buckets</button>
+              <button onClick={confirm}>Confirm buckets</button>
               <Link href="/parent/ask" className="link" style={{ alignSelf: "center" }}>Change in Ask</Link>
             </div>
           </>
         )}
+        {error && <p className="error" role="alert">{error}</p>}
       </section>
 
       <section className="card" style={{ display: "grid", gap: 8 }}>
@@ -107,7 +124,7 @@ export default function BucketsPage() {
           {b.id === "invest" && <p className="muted">Learning only for now. Real investing would come later through a licensed partner.</p>}
         </section>
       ))}
-      <SampleNote />
+      <SampleNote live={live} />
     </div>
   );
 }
