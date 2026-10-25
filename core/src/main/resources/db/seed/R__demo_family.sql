@@ -10,6 +10,11 @@
 --   Layla (13)      layla / demo1234   -> wants AED 300 headphones from noon
 --   Adam  (9)       adam / demo1234    -> peanut allergy, tries to buy peanut snacks
 
+-- "Today" is today in the UAE, as in the app (ClockConfig). Without this, current_date is the database's date (UTC),
+-- which from 20:00 to 24:00 UTC is a day behind the app: "DEWA due tomorrow" would read "due today", and the
+-- core's tests would fail every evening. Reset at the end, so a pooled connection goes back to its own zone.
+SET TIME ZONE 'Asia/Dubai';
+
 -- Phones that said yes to notifications, and email addresses a parent typed in, survive a reseed (the member ids
 -- are fixed), so there is no need to turn notifications on again before every recording.
 DROP TABLE IF EXISTS keep_push;
@@ -302,3 +307,5 @@ GROUP BY w.id;
 INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description) VALUES
  ('00000000-0000-0000-0000-0000000000d1', 'SAVINGS_MOVE', -12000, 'Into the headphones goal (demo money)'),
  ('00000000-0000-0000-0000-0000000000d2', 'SAVINGS_MOVE',  -7200, 'Into the building set goal (demo money)');
+
+RESET TIME ZONE;

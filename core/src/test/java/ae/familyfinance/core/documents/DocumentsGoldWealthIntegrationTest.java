@@ -197,7 +197,7 @@ class DocumentsGoldWealthIntegrationTest extends PostgresIntegrationTest {
         assertThat(left).isEmpty();
         assertThat(jdbc.queryForObject("""
                 SELECT count(*) FROM commitment WHERE kind = 'SUBSCRIPTION' AND status = 'ACTIVE' AND source = 'DOCUMENT'
-                  AND amount_minor = 3500 AND next_due_on >= current_date""", Long.class)).isEqualTo(1);
+                  AND amount_minor = 3500 AND next_due_on >= (now() AT TIME ZONE 'Asia/Dubai')::date""", Long.class)).isEqualTo(1);
     }
 
     @Test
