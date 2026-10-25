@@ -50,7 +50,8 @@ Every commit on `main` that passes CI is deployed to the VPS by `.github/workflo
 | `SMTP_PASSWORD` | secret | Optional. The SMTP password (for Gmail, an app password). |
 | `PUSH_CONTACT` | variable or secret | Optional. `mailto:you@example.com`, given to the browsers' push services. |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | secret | Optional. Web push keys; leave unset and the core makes them once and keeps them in the database. |
-| `DOMAIN` | variable | Optional. The domain Caddy serves over HTTPS (default `family-finance-coach.com`; `none` turns HTTPS off). |
+| `DOMAIN` | variable | Optional. The app's domain (default `family-finance-coach.com`; `none` = use the IP). |
+| `CADDY` | variable | Optional. `on` starts our own Caddy on ports 80/443. Off by default (another web server has them). |
 | `APP_PUBLIC_URL` | variable | Optional. The app's address for links in emails (default `https://DOMAIN`). |
 | `WEB_PORT`, `AGENTS_LLM` | variable | Optional (3000, auto). |
 
@@ -58,11 +59,11 @@ The VPS needs Docker with the compose plugin, and the user must be allowed to ru
 Releases live in `~/ffa/releases/<commit>`, `~/ffa/current` points at the running one,
 and `~/ffa/shared/.env` holds the settings (the JWT secret is generated there once).
 
-**HTTPS.** On the VPS a Caddy container sits in front of the web app on ports 80 and 443
-(`ops/caddy/Caddyfile`, started by `COMPOSE_PROFILES=https`). It gets and renews the Let's Encrypt
-certificate by itself and sends `www.` to the plain domain. It needs two DNS records at the registrar,
-`A @` and `A www`, both pointing at the VPS IP, and ports 80 and 443 open in any firewall
-(`sudo ufw allow 80,443/tcp` if `ufw` is on). `http://VPS_HOST:3000` keeps working too.
+**HTTPS.** DNS (Namecheap): `A @` and `A www`, both pointing at the VPS IP. This VPS also hosts other sites,
+so the web server already running there (on ports 80 and 443) forwards `family-finance-coach.com` and `www.` to
+`http://127.0.0.1:3000`, with a Let's Encrypt certificate from certbot. For live updates it must not buffer
+(nginx: `proxy_buffering off;`). The repo also has a Caddy option (`ops/caddy/Caddyfile`, GitHub variable
+`CADDY=on`) for a server where nothing else uses 80/443; it is off by default. `http://VPS_HOST:3000` keeps working.
 
 To reset the demo family on the server: `ssh` in, then `cd ~/ffa/current && COMPOSE_PROJECT_NAME=ffa ./deploy.sh reseed`.
 

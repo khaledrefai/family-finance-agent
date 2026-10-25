@@ -67,8 +67,12 @@ jobs:
           PUSH_CONTACT: ${{ secrets.PUSH_CONTACT || vars.PUSH_CONTACT }}
           VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY || vars.VAPID_PUBLIC_KEY }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
-          # The public web address. Caddy serves it over HTTPS; set the DOMAIN variable to "none" to turn that off.
+          # The public web address (used for links in emails). Set the DOMAIN variable to "none" to use the IP.
           DOMAIN: ${{ vars.DOMAIN || 'family-finance-coach.com' }}
+          # Our own Caddy for HTTPS on ports 80/443. Off by default, because on this VPS another web server
+          # (serving the other sites) already has those ports and forwards the domain to port 3000 instead.
+          # Set the CADDY variable to "on" only on a server where nothing else uses 80/443.
+          CADDY: ${{ vars.CADDY || 'off' }}
           APP_PUBLIC_URL: ${{ vars.APP_PUBLIC_URL }}
           FALLBACK_URL: ${{ format('http://{0}:{1}', env.VPS_HOST, vars.WEB_PORT || '3000') }}
           APP_JWT_SECRET: ${{ secrets.APP_JWT_SECRET }}
@@ -89,7 +93,7 @@ jobs:
             done
             echo "WEB_PORT=$WEB_PORT"
             echo "DOMAIN=$DOMAIN"
-            if [ -n "$DOMAIN" ]; then echo "COMPOSE_PROFILES=https"; else echo "COMPOSE_PROFILES="; fi
+            if [ -n "$DOMAIN" ] && [ "$CADDY" = "on" ]; then echo "COMPOSE_PROFILES=https"; else echo "COMPOSE_PROFILES="; fi
             echo "AGENTS_LLM=$AGENTS_LLM"
             if [ -n "$APP_JWT_SECRET" ]; then echo "APP_JWT_SECRET=$APP_JWT_SECRET"; fi
           } | ssh vps "umask 077 && mkdir -p ~/ffa/shared && cat > ~/ffa/shared/incoming.env"
@@ -125,6 +129,5 @@ jobs:
             fi
             sleep 10
           done
-          echo "::warning::https://$domain did not answer yet. Check that DNS points at the VPS and ports 80 and 443 are open."
-          ssh vps "cd ~/ffa/current && COMPOSE_PROJECT_NAME=ffa docker compose logs --tail=40 caddy" || true
+          echo "::warning::https://$domain did not answer yet. Check that DNS points at the VPS and the web server on it forwards the domain to port 3000 (see README, HTTPS)."
           exit 1
