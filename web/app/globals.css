@@ -377,7 +377,7 @@ a { color: var(--focus); }
 .hero-amount .cur { font-size: 15px; letter-spacing: 0.02em; vertical-align: 0.95em; margin-right: 6px; color: var(--hero-soft); }
 .hero-sub { font-size: 15px; }
 .hero-trust { font-size: 12px; color: var(--hero-soft); margin-top: 2px; }
-.quick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+.quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
 .quick a {
   display: grid; justify-items: center; align-content: start; gap: 4px; padding: 10px 4px 9px; border-radius: 14px;
   background: rgb(255 255 255 / 0.1); color: #fff; text-decoration: none; font-size: 13px; font-weight: 500; line-height: 1.25; text-align: center;
@@ -674,3 +674,25 @@ body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
 .offer-total { font-size: 18px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .offer-title { margin: 0; font-size: 14px; line-height: 1.35; }
 .offer-parts { margin: 0 0 4px; font-size: 13px; }
+
+/* Price search waiting screens (parent: calm steps; kid: the camel walking over the dunes) */
+.compare-entry { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
+.searching { display: grid; gap: 10px; }
+.search-steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; color: var(--ink-soft); }
+.search-steps li { padding-left: 24px; position: relative; }
+.search-steps li::before { content: ""; position: absolute; left: 4px; top: 5px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--track, #c9cfdb); }
+.search-steps li.done { color: var(--ink); }
+.search-steps li.done::before { background: var(--approved); border-color: var(--approved); }
+.search-steps li.now { color: var(--ink); font-weight: 600; }
+.search-steps li.now::before { border-color: var(--ink); animation: thinking 1.4s ease-in-out infinite; }
+.camel-search { position: relative; display: grid; justify-items: center; gap: 6px; padding: 14px 12px 12px; border-radius: 22px; background: var(--kid-a-wash); overflow: hidden; }
+.camel-search .bubble { margin: 0; font-weight: 700; font-size: 17px; text-align: center; }
+.camel-walk { width: 100%; height: 84px; position: relative; }
+.camel-walk svg { position: absolute; left: 0; animation: camel-walk 5s linear infinite, camel-bob 0.5s ease-in-out infinite alternate; }
+.dunes { width: 100%; height: 32px; margin-top: -26px; }
+@keyframes camel-walk { from { left: -20%; } to { left: 100%; } }
+@keyframes camel-bob { to { transform: translateY(-4px) rotate(-2deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .camel-walk svg { animation: none; left: calc(50% - 42px); }
+  .search-steps li.now::before { animation: none; }
+}

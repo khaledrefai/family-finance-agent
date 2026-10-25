@@ -137,6 +137,7 @@ export default function TodayPage() {
         <nav className="quick" aria-label="Quick actions">
           <Link href="/parent/money/add"><Icon name="plus" />Add spending</Link>
           <Link href="/parent/money#uploads"><Icon name="upload" />Upload receipt</Link>
+          <Link href="/parent/money/compare"><Icon name="tag" />Compare prices</Link>
           <Link href="/parent/ask"><Icon name="ask" />Ask</Link>
         </nav>
       </section>
