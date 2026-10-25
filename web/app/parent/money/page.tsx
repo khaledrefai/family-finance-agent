@@ -1,21 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { aed } from "@/lib/api";
-import { useMoney } from "@/lib/live";
-import { findings, wealth } from "@/lib/sample";
+import { useMoney, useWealth } from "@/lib/live";
 import { MonthColumns, SampleNote, TRUST, Waterfall } from "../../ui";
 import { useSession } from "../../use-session";
 import { MoneyHeader } from "./money-tabs";
+import { Uploads } from "./uploads";
 
 // Money overview: where each month's money goes, the next 12 months, bills coming up,
-// and anything odd found in uploads. The first three come from GET /api/plan/cashflow; wealth and the
-// upload findings are still sample figures (weeks 3 and 5).
+// receipts and statements, and anything odd found in the family's payments. All from the core: the plan
+// from GET /api/plan/cashflow, wealth from GET /api/wealth, uploads and findings from /api/documents and /api/findings.
 export default function MoneyPage() {
   const { me } = useSession("PARENT");
   const { monthly, cashflow, bills, live } = useMoney(!!me);
-  const [handled, setHandled] = useState<Record<string, string>>({});
+  const { wealth } = useWealth(!!me);
   // The page renders after the session loads, so the browser can't jump to #bills or #uploads on its own.
   useEffect(() => {
     if (me && window.location.hash) document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
@@ -92,30 +92,7 @@ export default function MoneyPage() {
         </div>
       </section>
 
-      <section id="uploads" className="stack" style={{ gap: 10 }}>
-        <h2 className="first">Found in your uploads</h2>
-        <div className="card" style={{ display: "grid", gap: 8 }}>
-          <p style={{ fontSize: 14 }}>
-            <b>Uploading receipts and statements comes next.</b> Reading them is the next build step, so the findings below are samples for now.
-          </p>
-          <Link href="/parent/money/receipt" className="link">See how a checked receipt will look</Link>
-        </div>
-        {findings.map((f) => (
-          <div className="card" key={f.id} style={{ display: "grid", gap: 8 }}>
-            <p style={{ fontSize: 14 }}>
-              <b>{f.text}</b> {f.detail}
-            </p>
-            {handled[f.id] ? (
-              <p className="muted" role="status">{handled[f.id]}</p>
-            ) : (
-              <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => setHandled((h) => ({ ...h, [f.id]: "Done." }))}>{f.yes}</button>
-                <button className="quiet" onClick={() => setHandled((h) => ({ ...h, [f.id]: "Left as it is." }))}>{f.no}</button>
-              </div>
-            )}
-          </div>
-        ))}
-      </section>
+      <Uploads enabled={!!me} />
       <SampleNote live={live} />
     </div>
   );

@@ -78,8 +78,8 @@ public final class FindingsEngine {
             String times = list.size() == 2 ? "Two" : String.valueOf(list.size());
             out.add(new Finding(cut(key), Kind.DUPLICATE,
                     times + " charges of " + amount.toDisplay() + " at " + shop + " on " + day(p.on()) + ".",
-                    "Same " + (p.accountLabel() == null ? "account" : p.accountLabel()) + ", same day, same amount. "
-                    + "Looks like a double charge.",
+                    "Both on " + (p.accountLabel() == null ? "the same account" : p.accountLabel()) + ", the same day, "
+                    + "the same amount. Looks like a double charge.",
                     MoneyView.of(amount), list.stream().map(Payment::id).toList(), shop, p.accountId(), null,
                     List.of("Charges: " + list.size(), "Each: " + amount.toDisplay(), "Shop: " + shop,
                             "Date: " + day(p.on()))));

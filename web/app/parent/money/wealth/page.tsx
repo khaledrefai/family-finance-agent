@@ -1,14 +1,20 @@
 "use client";
 
-import { wealth } from "@/lib/sample";
+import { plain } from "@/lib/api";
+import { useWealth } from "@/lib/live";
 import { Back, BigAmount, Masthead, SampleNote, TRUST, Waterfall } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // Family wealth: everything the family owns (bank, cash, gold at today's price) minus what it owes
-// (card balances, loans), all from what the parents typed in. Sample figures until GET /api/wealth exists.
+// (what is on the cards today, loans still to pay), all from what the parents typed in (GET /api/wealth).
 export default function WealthPage() {
   const { me } = useSession("PARENT");
+  const { wealth, live } = useWealth(!!me);
   if (!me) return <p className="muted">Loading…</p>;
+  const own = wealth.steps.filter((s) => s.kind !== "total" && s.amountMinor > 0);
+  const owe = wealth.steps.filter((s) => s.kind !== "total" && s.amountMinor < 0);
+  const label = `${own.map((s) => `${s.label} ${plain(s.amountMinor)}`).join(", ")} owned. Minus ${owe
+    .map((s) => `${s.label.toLowerCase()} ${plain(-s.amountMinor)}`).join(" and ")} leaves ${plain(wealth.totalMinor)}.`;
 
   return (
     <div className="stack">
@@ -23,7 +29,7 @@ export default function WealthPage() {
 
       <section className="card" style={{ display: "grid", gap: 10 }}>
         <p className="card-title">How it adds up</p>
-        <Waterfall steps={wealth.steps} label="Bank 51,050, cash 650 and gold 15,765 make 67,465 owned. Minus cards 7,250 and the car loan 38,400 leaves 21,815." />
+        <Waterfall steps={wealth.steps} label={label} />
         <div className="rows">
           {wealth.steps.filter((s) => s.asOf).map((s) => (
             <div className="row" key={s.label}><span className="muted">{s.label}</span><span className="est">as of {s.asOf}</span></div>
@@ -32,7 +38,7 @@ export default function WealthPage() {
         <p className="trust">{TRUST}</p>
       </section>
       <p className="muted">Paying a card bill from a bank account moves money between your own accounts, so it does not change this number.</p>
-      <SampleNote />
+      <SampleNote live={live} />
     </div>
   );
 }

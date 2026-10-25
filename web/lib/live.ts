@@ -7,7 +7,7 @@
 // Nothing here works out money: every amount and share is the engine's, the code only reshapes it.
 
 import { useCallback, useEffect, useState } from "react";
-import { call } from "./api";
+import { ApiError, call, getToken } from "./api";
 import * as sample from "./sample";
 
 // ---------------------------------------------------------------- what the core sends (mirrors core/ records)
@@ -148,6 +148,160 @@ export interface Assessment {
   facts: string[];
 }
 
+// ---------------------------------------------------------------- week 3: documents, findings, gold, wealth
+
+export interface DocLine {
+  no: number;
+  date: string | null;
+  description: string;
+  amount: MoneyView;
+  credit: boolean;
+  category: string | null;
+  status: "NEW" | "ALREADY_LOGGED" | "ITEM";
+  matchNote: string | null;
+  possibleDuplicate: boolean;
+}
+
+export interface Doc {
+  id: string;
+  kind: "RECEIPT" | "INVOICE" | "BANK_STATEMENT" | "CARD_STATEMENT";
+  fileName: string;
+  contentType: string;
+  status: "UPLOADED" | "EXTRACTED" | "CONFIRMED" | "FAILED";
+  uploadedAt: string;
+  uploadedBy: string;
+  accountId: string | null;
+  accountLabel: string | null;
+  accountLast4: string | null;
+  matchReason: string | null;
+  readBy: "LLM" | "RULES" | "PARENT" | null;
+  merchant: string | null;
+  date: string | null;
+  total: MoneyView | null;
+  category: string | null;
+  closingBalance: MoneyView | null;
+  note: string | null;
+  matchedNote: string | null;
+  counts: { lines: number; added: number; alreadyLogged: number; possibleDuplicates: number };
+  newTotal: MoneyView;
+  itemsTotal: MoneyView | null;
+  lines: DocLine[];
+  summary: string;
+}
+
+export interface Finding {
+  key: string;
+  kind: "DUPLICATE" | "SUBSCRIPTION";
+  title: string;
+  detail: string;
+  amount: MoneyView;
+  facts: string[];
+}
+
+export type Purity = "24K" | "22K" | "21K" | "18K";
+
+export interface GoldPrice {
+  purity: Purity;
+  perGram: MoneyView;
+  asOf: string;
+  source: string;
+  seeded: boolean;
+  typedByFamily: boolean;
+}
+
+export interface GoldHolding {
+  id: string;
+  description: string;
+  grams: string;
+  purity: Purity;
+  paid: MoneyView;
+  boughtOn: string;
+  seller: string | null;
+  bucket: "GOALS" | "INVEST_ASIDE";
+  goalId: string | null;
+  goalName: string;
+  jewellery: boolean;
+  value: MoneyView;
+  belowPaid: boolean;
+}
+
+export interface Gold {
+  value: MoneyView;
+  paid: MoneyView;
+  grams: { purity: Purity; grams: string; value: MoneyView }[];
+  byGoal: { goalId: string; name: string; grams: string; value: MoneyView }[];
+  holdings: GoldHolding[];
+  prices: GoldPrice[];
+  priceAsOf: string;
+  priceSource: string;
+  priceIsSample: boolean;
+  makingNote: string;
+}
+
+export interface Wealth {
+  total: MoneyView;
+  owned: MoneyView;
+  owed: MoneyView;
+  asOf: string;
+  steps: { label: string; amount: MoneyView; fromBp: number; toBp: number; kind: string; asOf: string | null; asOfLatest: string | null }[];
+  note: string;
+}
+
+/** Sends a file as multipart (the browser sets the boundary), with the same error wording as `call`. */
+async function upload(file: File, kind: string, accountId?: string): Promise<Doc> {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("kind", kind);
+  if (accountId) form.append("accountId", accountId);
+  const token = getToken();
+  let res: Response;
+  try {
+    res = await fetch("/api/documents", { method: "POST", body: form, headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  } catch {
+    throw new ApiError(0, "Can't connect right now. Check your internet and try again.");
+  }
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    const detail = typeof body.detail === "string" && res.status < 500 ? body.detail : null;
+    throw new ApiError(res.status, detail ?? (res.status === 413 ? "That file is over 5 MB. Try a smaller photo." : "Something went wrong on our side. Try again in a moment."));
+  }
+  return res.json();
+}
+
+/** A demo file from the core, dated to match the seeded family, ready to upload like any other file. */
+async function sampleFile(name: "receipt" | "statement"): Promise<File> {
+  const token = getToken();
+  const res = await fetch(`/api/documents/samples/${name}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  if (!res.ok) throw new ApiError(res.status, "Couldn't get the demo file. Try again in a moment.");
+  const text = await res.text();
+  return name === "receipt"
+    ? new File([text], "carrefour-receipt.txt", { type: "text/plain" })
+    : new File([text], "visa-statement.csv", { type: "text/csv" });
+}
+
+export const docs = {
+  list: () => call<Doc[]>("/api/documents"),
+  get: (id: string) => call<Doc>(`/api/documents/${id}`),
+  upload,
+  sampleFile,
+  // The Bookkeeper agent reads the file into a draft. Nothing counts until a parent confirms.
+  read: (id: string) => call<{ documentId: string | null; status: Doc["status"] | null; reply: string }>(`/agent/documents/${id}/read`, { method: "POST" }),
+  confirm: (id: string, body: { accountId?: string; category?: string; updateBalance?: boolean }) =>
+    call<Doc>(`/api/documents/${id}/confirm`, { method: "POST", body: JSON.stringify(body) }),
+  discard: (id: string) => call<void>(`/api/documents/${id}/discard`, { method: "POST" }),
+  findings: () => call<Finding[]>("/api/findings"),
+  decide: (key: string, action: "DUPLICATE" | "KEEP" | "ADD" | "IGNORE") =>
+    call<Finding[]>("/api/findings/decide", { method: "POST", body: JSON.stringify({ key, action }) }),
+};
+
+export const goldApi = {
+  get: () => call<Gold>("/api/gold"),
+  log: (body: { description?: string; grams: string; purity: Purity; paid: string; boughtOn?: string; seller?: string; goalId?: string; bucket?: string; jewellery?: boolean }) =>
+    call<GoldHolding>("/api/gold", { method: "POST", body: JSON.stringify(body) }),
+  setPrice: (purity: Purity, perGram: string) => call<GoldPrice>("/api/gold/price", { method: "POST", body: JSON.stringify({ purity, perGram }) }),
+  wealth: () => call<Wealth>("/api/wealth"),
+};
+
 export const core = {
   cashflow: () => call<Cashflow>("/api/plan/cashflow"),
   accounts: () => call<Account[]>("/api/accounts"),
@@ -161,6 +315,8 @@ export const core = {
     call<CardCheck>(`/api/accounts/${accountId}/card-check?amount=${encodeURIComponent(amount)}`),
   assess: (amount: string, requesterId?: string, paidFromAccountId?: string) =>
     call<Assessment>("/api/requests/assess", { method: "POST", body: JSON.stringify({ amount, requesterId, paidFromAccountId }) }),
+  setBalance: (accountId: string, balance: string) =>
+    call<Account>(`/api/accounts/${accountId}/balance`, { method: "POST", body: JSON.stringify({ balance }) }),
   pay: (body: { amount: string; description?: string; merchant?: string; category: string; paidFromAccountId: string; occurredOn?: string }) =>
     call<{ id: string; paidFrom: string; amount: MoneyView }>("/api/payments", { method: "POST", body: JSON.stringify(body) }),
 };
@@ -319,3 +475,74 @@ export function fromBuckets(b: Buckets): BucketsView {
     })),
   };
 }
+
+// ---------------------------------------------------------------- week 3 shapes
+
+export type WealthView = typeof sample.wealth;
+
+export function fromWealth(w: Wealth): WealthView {
+  return {
+    totalMinor: w.total.minor,
+    asOf: dayMonth(w.asOf),
+    steps: w.steps.map((s) => ({
+      label: s.label,
+      amountMinor: s.amount.minor,
+      from: s.fromBp / 100,
+      to: s.toBp / 100,
+      kind: s.kind,
+      asOf: !s.asOf ? "" : s.asOf === s.asOfLatest || !s.asOfLatest ? dayMonth(s.asOf) : `${dayMonth(s.asOf)} to ${dayMonth(s.asOfLatest)}`,
+    })),
+  };
+}
+
+export function useWealth(enabled = true) {
+  const { data, live } = useLive(async () => fromWealth(await goldApi.wealth()), sample.wealth, enabled);
+  return { wealth: data, live };
+}
+
+const TIME = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Dubai" });
+/** "2026-10-25T06:00:00Z" -> "25 Oct, 10:00" in UAE time. */
+export const dayTime = (iso: string) => TIME.format(new Date(iso));
+
+/** Plain words for a document's state, as the family sees it. */
+export function docState(d: Doc): { label: string; tone: "good" | "wait" | "bad" | "muted" } {
+  switch (d.status) {
+    case "CONFIRMED":
+      return { label: "Confirmed", tone: "good" };
+    case "EXTRACTED":
+      return { label: "Check and confirm", tone: "wait" };
+    case "FAILED":
+      return { label: "Couldn't read it", tone: "bad" };
+    default:
+      return { label: "Not read yet", tone: "muted" };
+  }
+}
+
+export function docName(d: Doc) {
+  if (d.kind === "RECEIPT" || d.kind === "INVOICE") return d.merchant ? `${d.merchant} receipt` : "Receipt";
+  if (d.accountLabel) return `${d.accountLabel} statement`;
+  return d.kind === "CARD_STATEMENT" ? "Card statement" : "Statement";
+}
+
+const mv = (minor: number): MoneyView => ({ minor, currency: "AED", text: aedText(minor) });
+const aedText = (minor: number) =>
+  `AED ${(minor / 100).toLocaleString("en-US", { minimumFractionDigits: minor % 100 ? 2 : 0, maximumFractionDigits: 2 })}`;
+
+/** The mockup's gold figures in the core's shape, shown (labelled as sample) until the core answers. */
+export const sampleGold: Gold = {
+  value: mv(sample.gold.valueMinor),
+  paid: mv(sample.gold.paidMinor),
+  grams: sample.gold.totalGrams.map((g) => ({ purity: g.purity, grams: String(g.grams), value: mv(0) })),
+  byGoal: [],
+  holdings: sample.gold.purchases.map((p) => ({
+    id: p.id, description: p.what, grams: String(p.grams), purity: p.purity, paid: mv(p.paidMinor), boughtOn: "", seller: p.shop,
+    bucket: "GOALS", goalId: null, goalName: p.goal, jewellery: p.belowPaid, value: mv(p.valueMinor), belowPaid: p.belowPaid,
+  })),
+  prices: (["24K", "22K", "21K"] as const).map((p) => ({
+    purity: p, perGram: mv(sample.gold.price[p]), asOf: "", source: sample.gold.priceSource, seeded: true, typedByFamily: false,
+  })),
+  priceAsOf: "",
+  priceSource: sample.gold.priceSource,
+  priceIsSample: true,
+  makingNote: sample.gold.makingNote,
+};

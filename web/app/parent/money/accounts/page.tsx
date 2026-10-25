@@ -4,16 +4,16 @@ import { useState } from "react";
 import { aed } from "@/lib/api";
 import Link from "next/link";
 import { call } from "@/lib/api";
-import { Account, fromAccount, useLive } from "@/lib/live";
-import { AccountKind, accounts as sampleAccounts, gold, statementUpload } from "@/lib/sample";
-import { AccountPicker, SampleNote, TRUST } from "../../../ui";
+import { Account, core, Doc, docName, docs, fromAccount, goldApi, sampleGold, useLive } from "@/lib/live";
+import { AccountKind, accounts as sampleAccounts } from "@/lib/sample";
+import { SampleNote, TRUST } from "../../../ui";
 import { useSession } from "../../../use-session";
 import { MoneyHeader } from "../money-tabs";
 
 // Accounts and cards: the bank accounts, credit cards and cash the parents typed in by hand.
 // Every payment records which one it came from, so the engine can forecast each card's next bill
-// against the free cash on its due date. Nothing links to a real bank. From GET /api/accounts;
-// gold and the statement upload are still sample figures.
+// against the free cash on its due date. Nothing links to a real bank. From GET /api/accounts, the gold
+// total from GET /api/gold and the latest statement from GET /api/documents.
 const GROUPS: { kind: AccountKind; title: string }[] = [
   { kind: "BANK", title: "Bank accounts" },
   { kind: "CREDIT_CARD", title: "Credit cards" },
@@ -33,11 +33,28 @@ export default function AccountsPage() {
   const [label, setLabel] = useState("");
   const [form, setForm] = useState({ last4: "", balance: "", limit: "", statementDay: "", dueDay: "" });
   const [added, setAdded] = useState<string | null>(null);
-  const [statementAccount, setStatementAccount] = useState(statementUpload.accountId);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [balance, setBalance] = useState("");
   const { data: accounts, live, reload } = useLive(async () => (await call<Account[]>("/api/accounts")).map(fromAccount),
     sampleAccounts, !!me);
+  const { data: gold } = useLive(goldApi.get, sampleGold, !!me);
+  const { data: statement } = useLive(async () => (await docs.list()).find((d) => d.kind.endsWith("STATEMENT")) ?? null,
+    null as Doc | null, !!me);
   if (!me) return <p className="muted">Loading…</p>;
   const field = (k: keyof typeof form) => ({ value: form[k], onChange: (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value }) });
+
+  async function saveBalance(e: React.FormEvent, id: string) {
+    e.preventDefault();
+    try {
+      await core.setBalance(id, balance);
+      setAdded("Balance updated. It's dated today.");
+      setEditing(null);
+      setBalance("");
+      reload();
+    } catch (err) {
+      setAdded((err as Error).message);
+    }
+  }
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -114,6 +131,20 @@ export default function AccountsPage() {
                   <p className="est">Estimated · as of {a.asOf}</p>
                 </div>
               )}
+              {live && (editing === a.id ? (
+                <form onSubmit={(e) => saveBalance(e, a.id)} style={{ display: "flex", gap: 8, alignItems: "end" }}>
+                  <label style={{ flex: 1 }}>
+                    {a.kind === "CREDIT_CARD" ? "Spent on it today, AED" : "Balance today, AED"}
+                    <input inputMode="decimal" value={balance} onChange={(e) => setBalance(e.target.value)} placeholder="2,500" required autoFocus />
+                  </label>
+                  <button type="submit">Save</button>
+                </form>
+              ) : (
+                <button type="button" className="link" style={{ justifySelf: "start", background: "none", border: 0, padding: 0, minHeight: 0 }}
+                  onClick={() => { setEditing(a.id); setBalance(""); }}>
+                  Update {a.kind === "CREDIT_CARD" ? "what's on the card" : "the balance"}
+                </button>
+              ))}
             </article>
           ))}
         </section>
@@ -127,20 +158,27 @@ export default function AccountsPage() {
             <span aria-hidden="true">›</span>
           </div>
           <div>
-            <p style={{ fontSize: 24, fontWeight: 300, fontVariantNumeric: "tabular-nums" }}>{aed(gold.valueMinor)}</p>
-            <p className="est">{gold.totalGrams.map((g) => `${g.grams} g ${g.purity}`).join(" + ")} · at today's price, {gold.priceAsOf}</p>
+            <p style={{ fontSize: 24, fontWeight: 300, fontVariantNumeric: "tabular-nums" }}>{gold.value.text}</p>
+            <p className="est">{gold.grams.length ? gold.grams.map((g) => `${g.grams} g ${g.purity}`).join(" + ") : "Nothing logged yet"} · at today's price</p>
           </div>
         </Link>
       </section>
 
       <section className="card" style={{ display: "grid", gap: 10 }}>
         <p className="card-title">Latest statement upload</p>
-        <div className="matched">
-          <span>{statementUpload.name} · {statementUpload.lines} lines</span>
-          <span className="confirmed">Matched</span>
-        </div>
-        <p className="muted">Matched by its {statementUpload.matchedBy}. Change it if that's wrong.</p>
-        <AccountPicker label="This statement is for" value={statementAccount} onChange={setStatementAccount} accounts={accounts} />
+        {statement ? (
+          <>
+            <Link href={`/parent/money/document?id=${statement.id}`} className="matched" style={{ color: "inherit", textDecoration: "none" }}>
+              <span>{docName(statement)} · {statement.counts.lines} lines</span>
+              <span className="confirmed">{statement.status === "CONFIRMED" ? "Confirmed" : statement.accountId ? "Matched" : "Pick the account"}</span>
+            </Link>
+            <p className="muted">{statement.matchReason ? `${statement.matchReason}. ` : ""}Open it to change the account if that's wrong.</p>
+          </>
+        ) : (
+          <p className="muted">
+            No statement yet. Upload one in <Link href="/parent/money#uploads" className="link">Money, Uploads</Link>: it's matched to the right card by its last 4 digits.
+          </p>
+        )}
       </section>
 
       {adding ? (
