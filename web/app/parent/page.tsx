@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { aed, api, MemberView, plain } from "@/lib/api";
 import { advice as adviceApi, BudgetMonth, CardCheck, core, dayLongMonth, Goal, useAccounts, useLive, useMoney, WaysToSave } from "@/lib/live";
-import { advice, familyGoal, kids, waysToSave } from "@/lib/sample";
+import { advice, familyGoal, waysToSave } from "@/lib/sample";
 import { Chit } from "../chit";
 import { BellLink } from "../live-ui";
 import { notifyApi, WeekPlan } from "@/lib/push";
@@ -12,10 +12,10 @@ import { useLiveEvents } from "@/lib/live-stream";
 import { CardWarning, Icon, Loading, Masthead, PayFrom, Progress, SampleNote, TRUST, WhySheet } from "../ui";
 import { useSession } from "../use-session";
 
-// Today: only what needs a parent, in this order: what is free this month (with the three quick actions),
-// bills and alerts in one list, waiting requests, this week's plan, the family goal, one piece of advice,
-// ways to save, then what was decided (the last three, the rest one tap away).
-// A bill that is covered stays neutral; colour only marks what is short or over.
+// Today answers one question: does anything need me? In this order: what is free this month (with the three
+// quick actions), Needs you (waiting requests, then only the alerts that need a look), the next three bills,
+// one way to save at a time, the family goal in one line, and what was decided (folded until asked for).
+// A covered bill stays in Coming up; colour only marks what is short or over.
 // The Waiting list updates live: when a kid asks on their phone, it lands here without a reload (week 5).
 // Requests, bills, cards, free cash and the family goal come from the core's money engine.
 // Overspend alerts come from the budget engine, and "Ways to save" from the engine with the Planner's words.
@@ -25,11 +25,12 @@ export default function TodayPage() {
   const [members, setMembers] = useState<MemberView[]>([]);
   const [justDecided, setJustDecided] = useState<string | null>(null);
   const [adviceState, setAdviceState] = useState<"open" | "accepted" | "later">("open");
-  const [why, setWhy] = useState(false);
   // Ways to save: each tip can be dismissed or snoozed to next month. Live, the core keeps that for the family.
+  // The advice and the tips show one at a time; Next idea moves along.
   const [tipState, setTipState] = useState<Record<string, "dismissed" | "snoozed">>({});
   const [snoozed, setSnoozed] = useState(false);
-  const [tipWhy, setTipWhy] = useState<string | null>(null);
+  const [ideaAt, setIdeaAt] = useState(0);
+  const [ideaWhy, setIdeaWhy] = useState<Idea | null>(null);
   // Which account a parent would pay a request from. Sample default until requests carry it.
   const [payFrom, setPayFrom] = useState<Record<string, string>>({});
   const [allDecided, setAllDecided] = useState(false);
@@ -81,6 +82,11 @@ export default function TodayPage() {
     : waysToSave.tips.map((t) => ({ key: t.id, title: t.title, text: t.text, why: t.why }))
   ).filter((t) => !tipState[t.key]);
   const tipMonth = waysLive && ways ? ways.monthLabel : waysToSave.month;
+  const ideas: Idea[] = [
+    ...(adviceState === "open" ? [{ key: "advice", title: advice.title, text: advice.text, why: advice.why, advice: true }] : []),
+    ...tips.map((t) => ({ key: t.key, title: t.title, text: t.text, why: t.why })),
+  ];
+  const idea = ideas.length ? ideas[ideaAt % ideas.length] : null;
   const pending = requests.filter((r) => r.status === "PENDING");
   const decided = requests.filter((r) => r.status !== "PENDING" && r.id !== justDecided);
   const fresh = requests.find((r) => r.id === justDecided);
@@ -88,33 +94,27 @@ export default function TodayPage() {
   const tightCard = accounts.find((a) => a.bill && !a.bill.ok);
   const goal = goals?.find((g) => g.tier === "GOOD_LIFE");
   const defaultCard = accounts.find((a) => a.kind === "CREDIT_CARD")?.id ?? "visa";
-  const shownDecided = allDecided ? decided : decided.slice(0, 3);
 
-  // Bills and alerts, in one list. A covered bill is calm; short, over or heading over gets colour.
-  const attention: { key: string; href: string; tone: "calm" | "warn" | "bad"; icon: "calendar" | "card" | "warn"; title: string; text?: string }[] = [];
-  if (nextBill) {
-    const short = moneyLive && nextBill.state === "short";
-    attention.push({
-      key: "bill", href: "/parent/money#bills", tone: short ? "bad" : "calm", icon: "calendar",
-      title: moneyLive
-        ? `${nextBill.name} due ${nextBill.daysLeft === 1 ? "tomorrow" : `in ${nextBill.daysLeft} days`}`
-        : `${nextBill.name} due in ${nextBill.daysLeft} days`,
-      text: moneyLive
-        ? `${aed(nextBill.amountMinor)}${short ? " short: the reserve won't be full by then." : ", planned for this month."}`
-        : "AED 850 reserved, enough to cover it.",
+  // Only what needs a look: a bill the reserve won't cover, a card bill that won't be covered, budget alerts.
+  const alerts: { key: string; href: string; tone: "warn" | "bad"; icon: "calendar" | "card" | "warn"; title: string; text?: string }[] = [];
+  if (moneyLive && nextBill?.state === "short") {
+    alerts.push({
+      key: "bill", href: "/parent/money#bills", tone: "bad", icon: "calendar",
+      title: `${nextBill.name} due ${nextBill.daysLeft === 1 ? "tomorrow" : `in ${nextBill.daysLeft} days`}`,
+      text: `${aed(nextBill.amountMinor)} short: the reserve won't be full by then.`,
     });
   }
   if (tightCard?.bill) {
-    attention.push({
+    alerts.push({
       key: "card", href: "/parent/money/accounts", tone: "bad", icon: "card",
       title: `${tightCard.label} bill due ${tightCard.bill.due}`,
       text: `${aed(tightCard.bill.soFarMinor)} so far, ${aed(tightCard.bill.freeByDueMinor)} free by then.`,
     });
   }
-  budgetMonth?.alerts.forEach((b) => attention.push({
+  budgetMonth?.alerts.forEach((b) => alerts.push({
     key: b.category, href: "/parent/money/budgets", tone: b.state === "OVER" ? "bad" : "warn", icon: "warn", title: b.alert ?? b.label,
   }));
-  const needsLook = attention.filter((a) => a.tone !== "calm").length;
+  const needsYou = pending.length + alerts.length;
 
   return (
     <div className="stack">
@@ -134,22 +134,45 @@ export default function TodayPage() {
         <p className="hero-label">Free this month, after commitments</p>
         <p className="hero-amount"><span className="cur">AED</span>{plain(monthly.freeMinor)}</p>
         <p className="hero-sub">{aed(monthly.freeUntilPaydayMinor)} free until pay day on {monthly.payday}.</p>
-        <p className="hero-trust">{TRUST}</p>
         <nav className="quick" aria-label="Quick actions">
           <Link href="/parent/money/add"><Icon name="plus" />Add spending</Link>
-          <Link href="/parent/money#uploads"><Icon name="upload" />Upload a receipt</Link>
-          <Link href="/parent/ask"><Icon name="ask" />Ask the accountant</Link>
+          <Link href="/parent/money#uploads"><Icon name="upload" />Upload receipt</Link>
+          <Link href="/parent/ask"><Icon name="ask" />Ask</Link>
         </nav>
       </section>
 
-      {attention.length > 0 && (
-        <section>
-          <h2 className="first section-head">
-            Bills and alerts
-            {needsLook > 0 && <span className="count" aria-label={`${needsLook} need a look`}>{needsLook}</span>}
-          </h2>
+      <section>
+        <h2 className="first section-head">
+          Needs you
+          {needsYou > 0 && <span className="count">{needsYou}</span>}
+        </h2>
+        {fresh && <Chit request={fresh} from={`${nameOf(fresh.requesterId)} asked`} landed />}
+        {needsYou === 0 && <p className="empty">Nothing needs you right now. When one of the kids asks for something, it lands here.</p>}
+        {pending.map((r) => {
+          const from = payFrom[r.id] ?? defaultCard;
+          return (
+            <Chit key={r.id} request={r} from={`${nameOf(r.requesterId)} asks`} stamp={false}
+              corner={<Link href={`/parent/why?id=${r.id}`} className="link">Why this?</Link>}>
+              {r.requesterId !== me.memberId ? (
+                <>
+                  <PayFrom value={from} accounts={accounts} onChange={(id) => setPayFrom((p) => ({ ...p, [r.id]: id }))} />
+                  {accountsLive
+                    ? <LiveCardWarning accountId={from} amountMinor={r.amountMinor} isCard={accounts.find((a) => a.id === from)?.kind === "CREDIT_CARD"} />
+                    : <CardWarning accountId={from} compact />}
+                  <div className="chit-actions">
+                    <button onClick={() => decide(r.id, "approve")}>Approve</button>
+                    <button className="decline" onClick={() => decide(r.id, "reject")}>Decline</button>
+                  </div>
+                </>
+              ) : (
+                <p className="chit-note">You asked for this, so the other parent decides.</p>
+              )}
+            </Chit>
+          );
+        })}
+        {alerts.length > 0 && (
           <div className="list">
-            {attention.map((a) => (
+            {alerts.map((a) => (
               <Link key={a.key} href={a.href} className={`list-item tone-${a.tone}`}>
                 <span className="dot-icon" aria-hidden="true"><Icon name={a.icon} size={18} /></span>
                 <span className="body">
@@ -160,163 +183,119 @@ export default function TodayPage() {
               </Link>
             ))}
           </div>
-        </section>
-      )}
-
-      <section>
-        <h2 className="first section-head">
-          Waiting for you
-          {pending.length > 0 && <span className="count">{pending.length}</span>}
-        </h2>
-        {fresh && <Chit request={fresh} from={`${nameOf(fresh.requesterId)} asked`} landed />}
-        {pending.length === 0 && <p className="empty">Nothing waiting. When one of the kids asks for something, it lands here.</p>}
-        {pending.map((r) => {
-          const from = payFrom[r.id] ?? defaultCard;
-          return (
-            <Chit key={r.id} request={r} from={`${nameOf(r.requesterId)} asks`} stamp={false}>
-              {r.requesterId !== me.memberId ? (
-                <>
-                  <PayFrom value={from} accounts={accounts} onChange={(id) => setPayFrom((p) => ({ ...p, [r.id]: id }))} />
-                  <div style={{ marginTop: 8 }}>
-                    {accountsLive
-                      ? <LiveCardWarning accountId={from} amountMinor={r.amountMinor} isCard={accounts.find((a) => a.id === from)?.kind === "CREDIT_CARD"} />
-                      : <CardWarning accountId={from} />}
-                  </div>
-                  <div className="chit-actions">
-                    <button onClick={() => decide(r.id, "approve")}>Approve</button>
-                    <button className="decline" onClick={() => decide(r.id, "reject")}>Decline</button>
-                  </div>
-                </>
-              ) : (
-                <p className="chit-note">You asked for this, so the other parent decides.</p>
-              )}
-              <Link href={`/parent/why?id=${r.id}`} className="link" style={{ marginTop: 4 }}>Why this?</Link>
-            </Chit>
-          );
-        })}
+        )}
       </section>
 
-      {week && (
-        <section className="card" style={{ display: "grid", gap: 8 }}>
-          <div className="row" style={{ padding: 0 }}>
-            <span className="card-title">This week</span>
-            <span className="muted">{week.label}</span>
-          </div>
-          <p style={{ fontSize: 15 }}>{week.headline}</p>
-          {(week.bills.length > 0 || week.slowDown.length > 0) && (
+      <section className="card" style={{ display: "grid", gap: 6 }}>
+        <div className="row" style={{ padding: 0 }}>
+          <span className="card-title">Coming up</span>
+          {week && <span className="muted">{week.label}</span>}
+        </div>
+        {week && <p style={{ fontSize: 15 }}>{week.headline}</p>}
+        <div className="rows">
+          {bills.slice(0, 3).map((b) => (
+            <div className="row" key={b.name + b.due}>
+              <span>{b.name}<span className="muted" style={{ display: "block" }}>{b.due}</span></span>
+              <span style={{ textAlign: "right" }}>
+                <b>{aed(b.amountMinor, { cents: b.amountMinor % 100 !== 0 })}</b>
+                <span className={`muted${b.state === "short" ? " over" : ""}`} style={{ display: "block" }}>{b.state === "short" ? "Short" : "Reserved"}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+        {week && week.slowDown.length > 0 && (
+          <>
+            <p className="label" style={{ margin: "6px 0 0" }}>Go easy on, this week</p>
             <div className="rows">
-              {week.bills.map((b) => (
-                <div className="row" key={`bill-${b.label}`}>
-                  <span>{b.label}<br /><span className="muted">{b.note}</span></span>
-                  <b>{b.amount.text}</b>
-                </div>
-              ))}
               {week.slowDown.map((b) => (
                 <div className="row" key={`slow-${b.label}`}>
-                  <span>{b.label}<br /><span className="muted">{b.note}</span></span>
+                  <span>{b.label}<span className="muted" style={{ display: "block" }}>{b.note}</span></span>
                   <b>{b.amount.minor === 0 ? "Pause" : b.amount.text}</b>
                 </div>
               ))}
             </div>
-          )}
-          <p className="trust">{TRUST} Sent to your phone every Sunday morning.</p>
-        </section>
-      )}
-
-      <section className="card" style={{ display: "grid", gap: 8 }}>
-        <div className="row" style={{ padding: 0 }}>
-          <span className="card-title">{goal?.name ?? familyGoal.name}</span>
-          <span className="muted">Family goal</span>
-        </div>
-        <Progress percent={goal?.percent ?? familyGoal.percent} label={`${goal?.percent ?? familyGoal.percent} percent saved`} />
-        <p style={{ fontSize: 14 }}>
-          {goal
-            ? <>{goal.saved.text} of {goal.target.text.replace("AED ", "")} saved · {goal.percent}%{goal.fullBy ? ` · full by ${goal.fullBy}` : ""}</>
-            : <>AED 3,600 of 12,000 saved · {familyGoal.percent}% · on track for {familyGoal.onTrackFor}</>}
-        </p>
-        <p className="muted">
-          Own goals: Layla {kids.Layla.percent}% · Adam {kids.Adam.percent}%
-        </p>
+          </>
+        )}
+        <Link href="/parent/money#bills" className="link">All bills</Link>
       </section>
 
-      {adviceState !== "later" && (
-        <section className="card strong" style={{ display: "grid", gap: 10 }}>
-          <p className="label">{advice.title}</p>
-          {adviceState === "accepted" ? (
-            <p role="status">Done. Entertainment is AED 600 a month for November and December. You can change it in Money, Budgets.</p>
-          ) : (
-            <>
-              <p>{advice.text}</p>
-              <div className="actions" style={{ marginTop: 0 }}>
-                <button onClick={() => setAdviceState("accepted")}>Accept</button>
-                <button className="quiet" onClick={() => setAdviceState("later")}>Not now</button>
-              </div>
-            </>
-          )}
-          <button type="button" className="text" style={{ justifySelf: "start", padding: 0 }} onClick={() => setWhy(true)}>
-            Why this?
-          </button>
-        </section>
-      )}
-
-      {tips.length > 0 && (
-        <section className="card" style={{ display: "grid", gap: 10 }}>
+      {(idea || adviceState === "accepted") && (
+        <section className="card idea" aria-live="polite">
           <div className="row" style={{ padding: 0 }}>
             <span className="card-title">Ways to save</span>
-            <span className="muted">{tipMonth}</span>
+            <span className="muted">{ideas.length > 1 ? `${(ideaAt % ideas.length) + 1} of ${ideas.length}` : tipMonth}</span>
           </div>
-          {tips.map((t) => (
-            <div key={t.key} className="tip">
-              <p className="label">{t.title}</p>
-              <p style={{ fontSize: 15 }}>{t.text}</p>
+          {adviceState === "accepted" && (
+            <p className="done-line" role="status">Done. Entertainment is AED 600 a month for November and December. You can change it in Money, Budgets.</p>
+          )}
+          {snoozed && <p className="muted" role="status">Snoozed tips come back next month.</p>}
+          {idea && (
+            <>
+              <p className="label" style={{ margin: 0 }}>{idea.title}</p>
+              <p>{idea.text}</p>
+              {idea.advice ? (
+                <div className="actions" style={{ marginTop: 2 }}>
+                  <button onClick={() => setAdviceState("accepted")}>Accept</button>
+                  <button className="quiet" onClick={() => setAdviceState("later")}>Not now</button>
+                </div>
+              ) : null}
               <div className="tip-actions">
-                <button type="button" className="text" onClick={() => setTipWhy(t.key)}>Why this?</button>
-                <button type="button" className="text" onClick={() => tip(t.key, "snoozed")}>Snooze a month</button>
-                <button type="button" className="text" onClick={() => tip(t.key, "dismissed")}>Dismiss</button>
+                <button type="button" className="text" onClick={() => setIdeaWhy(idea)}>Why this?</button>
+                {!idea.advice && <button type="button" className="text" onClick={() => tip(idea.key, "snoozed")}>Snooze a month</button>}
+                {!idea.advice && <button type="button" className="text" onClick={() => tip(idea.key, "dismissed")}>Dismiss</button>}
+                {ideas.length > 1 && <button type="button" className="text" onClick={() => setIdeaAt((i) => i + 1)}>Next idea</button>}
               </div>
-            </div>
-          ))}
-          <p className="trust">{TRUST} Information only, not financial advice.</p>
+              <p className="trust">Information only, not financial advice.</p>
+            </>
+          )}
         </section>
       )}
-      {snoozed && <p className="muted" role="status">Snoozed tips come back next month.</p>}
+
+      <Link href="/parent/plan" className="card" style={{ display: "grid", gap: 8 }}>
+        <div className="row" style={{ padding: 0 }}>
+          <span className="card-title">{goal?.name ?? familyGoal.name}</span>
+          <b>{goal?.percent ?? familyGoal.percent}% ›</b>
+        </div>
+        <Progress percent={goal?.percent ?? familyGoal.percent} label={`${goal?.percent ?? familyGoal.percent} percent saved`} />
+        <span className="muted">
+          {goal
+            ? <>{goal.saved.text} of {goal.target.text.replace("AED ", "")} saved{goal.fullBy ? `, full by ${goal.fullBy}` : ""}</>
+            : <>AED 3,600 of 12,000 saved, on track for {familyGoal.onTrackFor}</>}
+        </span>
+      </Link>
+
+      {decided.length > 0 && (
+        <section>
+          <button type="button" className="disclosure" aria-expanded={allDecided} onClick={() => setAllDecided((v) => !v)}>
+            <span className="section-head">Decided <span className="count calm">{decided.length}</span></span>
+            <span className="muted">{allDecided ? "Hide" : "Show"}</span>
+          </button>
+          {allDecided && (
+            <div style={{ marginTop: 12 }}>
+              {decided.map((r) => (
+                <Chit key={r.id} request={r} from={nameOf(r.requesterId)} small />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       <Link href="/parent/summary" className="link">See October&apos;s family summary</Link>
+      <p className="trust">{TRUST}</p>
       <SampleNote live={false} />
 
-      <section>
-        <h2 className="first section-head">
-          Decided
-          {decided.length > 0 && <span className="count calm">{decided.length}</span>}
-        </h2>
-        {decided.length === 0 && <p className="empty">Approved and declined requests will collect here.</p>}
-        {shownDecided.map((r) => (
-          <Chit key={r.id} request={r} from={nameOf(r.requesterId)} small />
-        ))}
-        {decided.length > shownDecided.length && (
-          <button type="button" className="quiet" style={{ width: "100%" }} onClick={() => setAllDecided(true)}>
-            Show all {decided.length}
-          </button>
-        )}
-      </section>
-
-      {why && (
+      {ideaWhy && (
         <WhySheet
-          title="Why I suggested this"
-          groups={[{ heading: "The numbers behind it", rows: advice.why }]}
-          onClose={() => setWhy(false)}
-        />
-      )}
-      {tipWhy && (
-        <WhySheet
-          title="Why this tip"
-          groups={[{ heading: "The numbers behind it", rows: tips.find((t) => t.key === tipWhy)?.why ?? [] }]}
-          onClose={() => setTipWhy(null)}
+          title={ideaWhy.advice ? "Why I suggested this" : "Why this tip"}
+          groups={[{ heading: "The numbers behind it", rows: ideaWhy.why }]}
+          onClose={() => setIdeaWhy(null)}
         />
       )}
     </div>
   );
 }
+
+type Idea = { key: string; title: string; text: string; why: { label: string; value: string }[]; advice?: boolean };
 
 // The engine's card check for one request on one card: shown only when the bill would not be covered.
 function LiveCardWarning({ accountId, amountMinor, isCard }: { accountId: string; amountMinor: number; isCard: boolean }) {
@@ -327,7 +306,7 @@ function LiveCardWarning({ accountId, amountMinor, isCard }: { accountId: string
     core.cardCheck(accountId, (amountMinor / 100).toFixed(2)).then(setCheck).catch(() => setCheck(null));
   }, [accountId, amountMinor, isCard]);
   return (
-    <CardWarning accountId={accountId} live={check && {
+    <CardWarning accountId={accountId} compact live={check && {
       card: check.card, due: dayLongMonth(check.dueOn), withMinor: check.billWith.minor, freeByDueMinor: check.freeByDue.minor, fits: check.fits,
     }} />
   );

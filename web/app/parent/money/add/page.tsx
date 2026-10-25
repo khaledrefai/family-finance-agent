@@ -81,7 +81,7 @@ export default function AddSpendingPage() {
       <Masthead title="Add spending" sub="Anything the family paid for, with or without a receipt" />
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        <Link href="/parent/money/receipt" className="card" style={{ display: "grid", gap: 6, textDecoration: "none", color: "var(--ink)" }}>
+        <Link href="/parent/money#uploads" className="card" style={{ display: "grid", gap: 6, textDecoration: "none", color: "var(--ink)" }}>
           <Icon name="receipt" size={24} />
           <b>Upload a receipt</b>
           <span className="muted">Photo or PDF. I read the lines for you.</span>

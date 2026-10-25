@@ -189,6 +189,28 @@ input:focus-visible { outline: none; }
 .payfrom b { font-weight: 600; }
 .payfrom button.text { min-height: 36px; }
 .payfrom-pick { display: grid; gap: var(--space-2); margin-top: var(--space-3); }
+/* The card check, folded to one line on a slip */
+.warn-line { display: flex; gap: 8px; align-items: flex-start; margin-top: var(--space-2); padding: 8px 12px; border-radius: var(--radius-field); background: var(--waiting-wash); color: var(--waiting); font-size: 14px; line-height: 1.4; }
+.warn-line svg { flex: none; margin-top: 1px; }
+
+/* A section that stays folded until asked for ("Decided 3  Show") */
+button.disclosure {
+  display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 52px; padding: 0 16px;
+  background: var(--chit); color: var(--ink); border: 1px solid var(--card-line); border-radius: var(--radius-card);
+  font-size: var(--step-1); font-weight: 600; text-align: left;
+}
+button.disclosure:hover { background: var(--chit); border-color: var(--field); }
+.idea { display: grid; gap: 8px; }
+/* Detail one tap away ("Show every line") */
+details.more > summary {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; cursor: pointer; list-style: none;
+  font-size: 14px; font-weight: 500; text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px;
+}
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::after { content: "›"; display: inline-block; transform: rotate(90deg); text-decoration: none; }
+details.more[open] > summary::after { transform: rotate(-90deg); }
+details.more[open] > summary { margin-bottom: 4px; }
+.done-line { padding: 8px 12px; border-radius: var(--radius-field); background: var(--approved-wash); color: var(--approved); font-size: 14px; }
 
 /* The stamp: the decision, inked onto the chit's corner. */
 .stamp {
@@ -301,7 +323,7 @@ main.with-tabs { padding-bottom: 112px; }
 .stack { display: grid; gap: var(--space-4); }
 .card { background: var(--chit); border: 1px solid var(--card-line); border-radius: var(--radius-card); padding: var(--space-4); }
 .card.strong { border-color: var(--ink); box-shadow: inset 0 0 0 0.5px var(--ink); }
-a.card { transition: border-color 120ms; }
+a.card { color: inherit; text-decoration: none; transition: border-color 120ms; }
 a.card:hover { border-color: var(--field); }
 .label { margin: 0 0 6px; font-size: var(--step--1); font-weight: 500; color: var(--ink-soft); }
 .card-title { font-weight: 600; font-size: 16px; }
@@ -639,3 +661,7 @@ body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
 @media (prefers-reduced-motion: reduce) {
   .toast, .wallet.changed { animation: none; }
 }
+
+/* "Why this?" in the top corner of a waiting slip, where the stamp will land */
+.chit-corner { position: absolute; top: 14px; right: var(--space-4); }
+.chit-corner .link { min-height: 32px; }

@@ -133,10 +133,6 @@ export default function PlanPage() {
       {saved && <p role="status" className="muted">{saved}</p>}
       <p className="trust" style={{ textAlign: "center" }}>{TRUST}</p>
 
-      <section className="card" style={{ display: "grid", gap: 6 }}>
-        <p className="card-title">Also in Plan</p>
-        <p className="muted">Weekly dinners and a shopping list, big purchases and the long-term calculator are coming soon.</p>
-      </section>
       <SampleNote live={live && bucketsLive} />
 
       {why && (

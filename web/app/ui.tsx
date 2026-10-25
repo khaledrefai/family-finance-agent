@@ -508,8 +508,9 @@ export function PayFrom({ value, onChange, accounts }: {
 
 // The card bill warning, in the stamp style. Every figure is the engine's card bill forecast.
 // Pass `live` (the core's card check for this amount) to show the family's own; otherwise the sample is used.
-export function CardWarning({ accountId, hint = true, live }: {
-  accountId: string; hint?: boolean; live?: { card: string; due: string; withMinor: number; freeByDueMinor: number; fits: boolean } | null;
+// `compact` is one line, for the request slips on Today, where Change (pay from a bank) is the way out.
+export function CardWarning({ accountId, hint = true, compact = false, live }: {
+  accountId: string; hint?: boolean; compact?: boolean; live?: { card: string; due: string; withMinor: number; freeByDueMinor: number; fits: boolean } | null;
 }) {
   const sample = cardCheck[accountId];
   const acct = sampleAccounts.find((a) => a.id === accountId);
@@ -517,6 +518,14 @@ export function CardWarning({ accountId, hint = true, live }: {
     ? (live && !live.fits ? live : null)
     : sample && acct ? { card: acct.label, due: sample.due, withMinor: sample.withMinor, freeByDueMinor: sample.freeByDueMinor } : null;
   if (!check) return null;
+  if (compact) {
+    return (
+      <p className="warn-line" role="note">
+        <Icon name="warn" size={16} />
+        <span>The card bill on {check.due} would be {aed(check.withMinor)}, with only {aed(check.freeByDueMinor)} free by then.</span>
+      </p>
+    );
+  }
   return (
     <div className="card-warn" role="note">
       <span className="warn-stamp">Card check</span>

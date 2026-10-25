@@ -30,13 +30,15 @@ export function Amount({ minor, currency }: { minor: number; currency: string })
   );
 }
 
-// A request shown as a tear-off slip. The stamp in the corner is the decision.
+// A request shown as a tear-off slip. The stamp in the corner is the decision; until there is one,
+// the corner can hold a link ("Why this?" on Today).
 export function Chit({
   request,
   from,
   small = false,
   landed = false,
   stamp = true,
+  corner,
   children,
 }: {
   request: SpendingRequest;
@@ -44,6 +46,7 @@ export function Chit({
   small?: boolean;
   landed?: boolean;
   stamp?: boolean;
+  corner?: React.ReactNode;
   children?: React.ReactNode;
 }) {
   return (
@@ -52,6 +55,7 @@ export function Chit({
       <p className="chit-title">{request.title}</p>
       <Amount minor={request.amountMinor} currency={request.currency} />
       {stamp && <Stamp status={request.status} landed={landed} />}
+      {!stamp && corner && <span className="chit-corner">{corner}</span>}
       {request.agentSummary && <p className="chit-summary">{request.agentSummary}</p>}
       {children}
     </article>
