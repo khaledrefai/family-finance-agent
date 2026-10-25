@@ -21,6 +21,9 @@ export default function ComparePage() {
   const [found, setFound] = useState<{ comparison: Comparison | null; reply: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [added, setAdded] = useState<string | null>(null);
+  // While a payment is being added the buttons wait, and an offer already added can't be added again
+  const [paying, setPaying] = useState(false);
+  const [boughtKeys, setBoughtKeys] = useState<Record<string, string>>({});
 
   // Start on the first card once the family's own accounts load
   useEffect(() => {
@@ -36,6 +39,7 @@ export default function ComparePage() {
     setWant(text);
     setFinding(true);
     setAdded(null);
+    setBoughtKeys({});
     try {
       setFound(await findPrices(text, live ? account : undefined));
       setError(null);
@@ -47,15 +51,20 @@ export default function ComparePage() {
   }
 
   async function bought(o: Offer) {
+    if (paying || boughtKeys[o.key]) return;
+    setPaying(true);
     try {
       const paid = await core.pay({
         amount: (o.total.minor / 100).toFixed(2), description: o.title.slice(0, 200), merchant: o.store,
         category: "SHOPPING", paidFromAccountId: paidFrom,
       });
       setAdded(`Added: ${paid.amount.text} at ${o.store}, paid from ${paid.paidFrom}. It counts toward this month's budget.`);
+      setBoughtKeys((m) => ({ ...m, [o.key]: "Added ✓" }));
       setError(null);
     } catch (err) {
       setError((err as Error).message);
+    } finally {
+      setPaying(false);
     }
   }
 
@@ -110,11 +119,13 @@ export default function ComparePage() {
               {a.card?.fits && <p className="muted">Card check: the bill on {dayLongMonth(a.card.dueOn)} would be {a.card.billWith.text}, and that is covered.</p>}
             </div>
           )}
-          <PriceResults comparison={c} action={live ? "I bought it" : undefined} onPick={live ? bought : undefined} showLinks />
+          {added && <div className="sent-note" role="status">{added}</div>}
+          {error && <p className="error" role="alert">{error}</p>}
+          <PriceResults comparison={c} action={live ? (paying ? "Adding…" : "I bought it") : undefined} onPick={live ? bought : undefined}
+            busy={paying} done={boughtKeys} showLinks />
         </>
       )}
-      {error && <p className="error" role="alert">{error}</p>}
-      {added && <p className="muted" role="status">{added}</p>}
+      {!c && error && <p className="error" role="alert">{error}</p>}
     </div>
   );
 }

@@ -91,6 +91,7 @@ strong { font-weight: 600; }
 
 .muted { color: var(--ink-soft); font-size: var(--step--1); }
 .error { color: var(--declined); font-size: var(--step--1); }
+.sent-note { background: var(--approved-wash); color: var(--approved); border: 1px solid var(--approved); border-radius: 10px; padding: 10px 12px; font-weight: 600; }
 .fine { color: var(--ink-soft); font-size: var(--step--1); text-align: center; margin-top: var(--space-6); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
