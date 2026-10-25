@@ -98,13 +98,16 @@ class SpendLoggingIntegrationTest extends PostgresIntegrationTest {
         assertThat(s.get("displayName").asText()).isEqualTo("Layla");
         assertThat(s.get("total").get("text").asText()).startsWith("AED ");
         assertThat(s.get("goals").get(0).get("name").asText()).isEqualTo("Headphones");
-        // the comparison month is always covered by the seed (about 10 weeks of data)
-        assertThat(s.get("previous").get("total").get("minor").asLong()).isPositive();
-        assertThat(s.get("categories").get(0).get("category").asText()).isIn("SCHOOL_CANTEEN", "EATING_OUT",
+        // This month can still be empty (the seed logs nothing today, so on the 1st there is nothing yet), and early
+        // in the month its comparison is only a day or two. Last month and the one before are always covered by
+        // the seed (about 10 weeks of data).
+        String lastMonth = s.get("previous").get("from").asText().substring(0, 7);
+        JsonNode last = getJson(omar, "/api/spend/summary?memberId=" + DemoFamily.LAYLA + "&month=" + lastMonth);
+        assertThat(last.get("previous").get("total").get("minor").asLong()).isPositive();
+        assertThat(last.get("categories").get(0).get("category").asText()).isIn("SCHOOL_CANTEEN", "EATING_OUT",
                 "CLOTHES_AND_ACCESSORIES", "GIFTS_AND_CHARITY", "SNACKS", "BOOKS_AND_STATIONERY", "TRANSPORT");
 
-        JsonNode adam = getJson(omar, "/api/spend/summary?memberId=" + DemoFamily.ADAM + "&month="
-                + s.get("previous").get("from").asText().substring(0, 7));
+        JsonNode adam = getJson(omar, "/api/spend/summary?memberId=" + DemoFamily.ADAM + "&month=" + lastMonth);
         assertThat(adam.get("monthToDate").asBoolean()).isFalse();
         assertThat(adam.get("purchaseCount").asInt()).isPositive();
     }
