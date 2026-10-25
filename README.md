@@ -12,7 +12,6 @@ An agentic family accountant and money coach. Prototype for the Dubai Chambers "
 | `core/` | The core backend: families, members, roles, login, requests and approvals, and (coming) ledger, budgets, rules, demo wallet and the money engine. All money maths lives here. | Java 21, Spring Boot 3.5, Spring Security JWT, Flyway, PostgreSQL |
 | `agents/` | The AI agents: an orchestrator that routes each message to Bookkeeper, Gatekeeper, Shopper, Coach or Planner. Talks to `core` only through its typed API. | Python 3.13, FastAPI, LangGraph |
 | `web/` | The phone web app (installable PWA) with a parent view and a child view. | Next.js 16, TypeScript |
-| `extension/` | Chrome extension that pauses checkout (demo only, week 8, first to cut). | Chrome MV3 |
 | `deploy.sh` + `docker-compose.yml` | The one deploy script. | Docker Compose |
 
 ## Run it
@@ -49,7 +48,9 @@ Every commit on `main` that passes CI is deployed to the VPS by `.github/workflo
 | `VPS_SSH_KEY` | secret | Private key whose public half is in the VPS user's `~/.ssh/authorized_keys`. |
 | `POSTGRES_PASSWORD` | secret | Set once. The database keeps the first password, so don't change it later. |
 | `ANTHROPIC_API_KEY` | secret | Optional. Empty means the rule-based answers. |
-| `SERPAPI_KEY` | secret | Optional. Web search for live prices; passed to core and agents, not read by any code yet. |
+| `SERPAPI_KEY` | secret | Optional. Live UAE shop prices (SerpApi Google Shopping) for price search. Without it: the cache, then the saved price list. |
+| `SEARCH_LIVE` | variable | Optional. `live` (default), `cache` (for recording, after a pre-warm) or `off` (saved price list only). |
+| `PRICE_VERIFY_TOP` | variable | Optional. How many top offers each comparison re-checks (default 3; `0` saves searches). |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `MAIL_FROM` | variable or secret | Optional. Email alerts to parents. Empty `SMTP_HOST` = no email. Port 587 (STARTTLS) by default. |
 | `SMTP_PASSWORD` | secret | Optional. The SMTP password (for Gmail, an app password). |
 | `PUSH_CONTACT` | variable or secret | Optional. `mailto:you@example.com`, given to the browsers' push services. |
@@ -168,9 +169,41 @@ npm install && npm run dev       # forwards /api/* to http://localhost:8080
 | GET | `/api/budgets` | parents: this month's budgets, spent so far, and the overspend alerts |
 | GET | `/api/ways-to-save`, POST `/api/ways-to-save/words` | parents: up to 3 tips; the Planner saves this month's words |
 | POST | `/api/ways-to-save/{key}/dismiss`, `/snooze` | a parent in the app (an agent run is refused) |
+| POST | `/api/pricing/compare` | any member: `{intent, requesterId?, paidFromAccountId?}`; the shops' offers ranked by payable total, and the best one checked like a request (a child: own wallet side, no shop links) |
+| GET | `/api/pricing/status` | parents: SEARCH_LIVE, whether a SerpApi key is set, how many items the saved price list has |
+| POST | `/api/requests` with `comparisonId` + `offerKey` | any member: ask for one offer; the core takes title, total and shop from the saved comparison |
 
-Agent service (the web app reaches it at `/agent/...`): `POST /chat`, `GET /nudge`, `POST /documents/{id}/read`
-and `POST /ways-to-save`.
+Agent service (the web app reaches it at `/agent/...`): `POST /chat`, `GET /nudge`, `POST /documents/{id}/read`,
+`POST /ways-to-save` and `POST /prices` (`{text}`: the Shopper reads the words, the core compares).
+
+## Price search (week 6)
+
+Nobody pastes a link. A kid (Ask, "Something you want") or a parent (Money, Add spending, Compare prices) just says
+what it is: "wireless headphones", "Sony WH-CH720N headphones", "air fryer". Then:
+
+1. The **Shopper** agent (`agents/app/shopper.py`) turns the words into a `PurchaseIntent`: what to search for, and the
+   brand and model code only if the person wrote them. Claude reads the words when it is on; a rule-based reader
+   otherwise. That is all the agent does.
+2. The **core** (`core/.../pricing/`) searches: a search from the last 24 hours in `price_search_cache`, otherwise a
+   live SerpApi Google Shopping search for the UAE (`gl=ae`, 6 s at most), otherwise an older cached one, otherwise
+   the saved price list (`core/src/main/resources/pricing/catalogue.json`, 90 items typed in by hand). The screen
+   always says which: live, checked at a time, or "saved prices, not live".
+3. `PriceEngine` (pure Java) leaves out parts and add-ons ("case for..."), converts each shop's price text to fils,
+   works out the **payable total** = price + delivery + fees (delivery the shop doesn't list stays "not listed",
+   never guessed), counts the same listing once, drops offers priced under half the usual price, and ranks by total.
+   With a model code, only that exact item is ranked and other models are shown apart as "similar, not the same model".
+4. The top 3 are **re-checked** with a narrower search (that item at that shop). Only a re-checked offer can be
+   "Best price", so the promise is: the lowest re-checked total among the shops searched.
+5. The best offer goes through the same check as any request: the kid's wallet and the family rules (Adam's peanut
+   butter cups are still blocked), or the family's free cash and the card bill for a parent.
+6. "Ask for this one" makes a request from the saved comparison, so the price on it is the core's, and the parent's
+   "Why this?" shows which shop and how many offers were compared. Kids never see links to shop pages.
+
+**Before recording the demo:** with `SEARCH_LIVE=live` and `AGENTS_LLM=off`, run `./deploy.sh prewarm` (or
+`ops/prewarm-prices.sh https://family-finance-coach.com`) to cache the demo's searches, then set `SEARCH_LIVE=cache`
+so the recording makes no live search. Check that the headphones' best total is still above the free cash on
+Omar's Visa (about AED 258), or the card warning won't show. Each new search costs up to 4 SerpApi searches.
+Tests replay recorded SerpApi answers (`core/src/test/resources/pricing/serpapi/`) and never call SerpApi.
 
 ## Family rules, overspend alerts and ways to save (week 4)
 

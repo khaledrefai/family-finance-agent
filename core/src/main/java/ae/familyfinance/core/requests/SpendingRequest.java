@@ -12,6 +12,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -61,6 +62,11 @@ public class SpendingRequest {
     @Column(name = "decided_at")
     private OffsetDateTime decidedAt;
 
+    /** The price comparison offer this request was made from (shop, price, delivery, total, when checked), or null. */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "offer", columnDefinition = "jsonb")
+    private Map<String, Object> offer;
+
     protected SpendingRequest() {
     }
 
@@ -76,6 +82,10 @@ public class SpendingRequest {
         this.productUrl = productUrl;
         this.status = RequestStatus.PENDING;
         this.createdAt = OffsetDateTime.now();
+    }
+
+    void fromOffer(Map<String, Object> offer) {
+        this.offer = offer;
     }
 
     void decide(Decision decision) {
@@ -103,4 +113,5 @@ public class SpendingRequest {
     public String getAgentSummary() { return agentSummary; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public OffsetDateTime getDecidedAt() { return decidedAt; }
+    public Map<String, Object> getOffer() { return offer; }
 }

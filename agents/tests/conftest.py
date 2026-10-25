@@ -47,6 +47,9 @@ class FakeCore:
         self.rule_headers: list[str] = []
         self.ways = load("ways_to_save.json")
         self.tip_words: list[dict] = []
+        self.compare_fixture = "compare_sony.json"
+        self.compare_bodies: list[dict] = []
+        self.compare_headers: list[str] = []
 
     def handler(self, request: httpx.Request) -> httpx.Response:
         path = request.url.path
@@ -97,6 +100,10 @@ class FakeCore:
         if path == "/api/requests/assess":
             self.assess_bodies.append(json.loads(request.content))
             return httpx.Response(200, json=load(self.assess_fixture))
+        if path == "/api/pricing/compare":
+            self.compare_bodies.append(json.loads(request.content))
+            self.compare_headers.append(request.headers.get("X-Agent-Run-Id", ""))
+            return httpx.Response(200, json=load(self.compare_fixture))
         if path == "/api/rules/drafts":
             body = json.loads(request.content)
             self.rule_drafts.append(body)

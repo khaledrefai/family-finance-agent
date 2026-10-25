@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -39,11 +40,17 @@ public class RequestController {
         this.families = families;
     }
 
+    /**
+     * A request is typed in (title and amount), or made from a price comparison offer ({@code comparisonId} and
+     * {@code offerKey}): then the core takes the title, the payable total and the shop from the saved comparison
+     * and ignores the typed ones. Nobody pastes product links; the shop's page comes from the comparison.
+     */
     public record CreateRequest(@NotNull RequestKind kind,
                                 @NotBlank @Size(max = 200) String title,
                                 @PositiveOrZero long amountMinor,
                                 @Size(max = 40) String category,
-                                @Size(max = 1000) String productUrl) {
+                                UUID comparisonId,
+                                @Size(max = 10) String offerKey) {
     }
 
     /**
@@ -59,20 +66,24 @@ public class RequestController {
 
     public record RequestView(UUID id, UUID requesterId, RequestKind kind, String title, long amountMinor,
                               String currency, String category, String productUrl, RequestStatus status,
-                              String agentSummary, OffsetDateTime createdAt, OffsetDateTime decidedAt) {
+                              String agentSummary, OffsetDateTime createdAt, OffsetDateTime decidedAt,
+                              Map<String, Object> offer) {
 
         static RequestView of(SpendingRequest r) {
             return new RequestView(r.getId(), r.getRequesterId(), r.getKind(), r.getTitle(), r.getAmountMinor(),
                     r.getCurrency(), r.getCategory(), r.getProductUrl(), r.getStatus(), r.getAgentSummary(),
-                    r.getCreatedAt(), r.getDecidedAt());
+                    r.getCreatedAt(), r.getDecidedAt(), r.getOffer());
         }
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RequestView create(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody CreateRequest body) {
-        return RequestView.of(service.create(CurrentMember.from(jwt), body.kind(), body.title(),
-                body.amountMinor(), body.category(), body.productUrl()));
+        CurrentMember me = CurrentMember.from(jwt);
+        if (body.comparisonId() != null) {
+            return RequestView.of(service.createFromOffer(me, body.comparisonId(), body.offerKey()));
+        }
+        return RequestView.of(service.create(me, body.kind(), body.title(), body.amountMinor(), body.category(), null));
     }
 
     /** "Can we afford it, and is it allowed?" before asking: free cash, the wallet, the family rules and the card bill. */

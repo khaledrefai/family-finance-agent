@@ -63,7 +63,7 @@ class SpendingRequest(BaseModel):
     amountMinor: int  # fils: 30000 = AED 300.00
     currency: str
     category: str | None = None
-    productUrl: str | None = None
+    productUrl: str | None = None  # the shop's page, set by the core from a price comparison (never pasted)
     status: RequestStatus
     agentSummary: str | None = None
     createdAt: datetime
@@ -75,7 +75,9 @@ class NewRequest(BaseModel):
     title: str
     amountMinor: int
     category: str | None = None
-    productUrl: str | None = None
+    # Made from a price comparison offer: the core takes the title, price and shop from it
+    comparisonId: UUID | None = None
+    offerKey: str | None = None
 
 
 class Member(BaseModel):
@@ -354,6 +356,41 @@ class Assessment(BaseModel):
     facts: list[str]  # every number the agent may say is in here
 
 
+# ---------------------------------------------------------------- price search (mirrors core/.../pricing/)
+
+class PurchaseIntent(BaseModel):
+    """What someone wants to buy, as the Shopper read it. The core searches, converts prices and ranks."""
+    query: str                    # plain search words, e.g. "wireless headphones"
+    brand: str | None = None
+    model: str | None = None      # a model code they wrote, e.g. "WH-CH720N": then other models are substitutes
+    gtin: str | None = None
+    category: SpendCategory | None = None
+    said: str | None = None       # the words as typed
+
+
+class Offer(BaseModel):
+    key: str
+    store: str
+    title: str
+    price: MoneyView
+    delivery: MoneyView | None = None   # None = the shop doesn't list delivery
+    deliveryKnown: bool
+    total: MoneyView
+    source: str                         # LIVE, CACHE or SEEDED (our saved price list)
+    verified: bool
+
+
+class PriceComparison(BaseModel):
+    id: UUID
+    source: str
+    exact: bool
+    offers: list[Offer]
+    substitutes: list[Offer]
+    best: Offer | None = None
+    assessment: Assessment | None = None
+    facts: list[str]                    # every number the agent may say is in here
+
+
 # ---------------------------------------------------------------- family rules (mirrors core/.../rules/)
 
 class RuleKind(str, Enum):
@@ -545,6 +582,17 @@ class CoreClient:
         resp = self._http.post("/api/requests/assess", json={k: v for k, v in body.items() if v})
         _raise_for_core(resp)
         return Assessment.model_validate(resp.json())
+
+    def compare(self, intent: PurchaseIntent, requester_id: UUID | None = None,
+                paid_from: UUID | None = None) -> dict:
+        """The core's price comparison as it sent it (the web app draws the offers from it); see PriceComparison."""
+        body = {"intent": intent.model_dump(exclude_none=True, mode="json"),
+                "requesterId": str(requester_id) if requester_id else None,
+                "paidFromAccountId": str(paid_from) if paid_from else None}
+        resp = self._http.post("/api/pricing/compare", json={k: v for k, v in body.items() if v},
+                               timeout=30.0)  # a live search plus three re-checks
+        _raise_for_core(resp)
+        return resp.json()
 
     # ------------------------------------------------------------ family rules and ways to save
 

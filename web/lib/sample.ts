@@ -218,7 +218,7 @@ export const badges: { art: "camel" | "quarter" | "half" | "threequarter" | "tro
 export const headphones = {
   title: "Wireless over-ear headphones",
   priceMinor: 30_000,
-  source: "From the noon page · no food or age rules apply",
+  source: "Best price the app found · no food or age rules apply",
   intro: "Good pick. You have AED 120 saved, so you need AED 180 more. This month is a tight one for the family, so let's bring Dad a plan instead of just a price. Two ways:",
   options: [
     {
@@ -241,7 +241,7 @@ export const headphones = {
   // The parent's "Why this?" view of the same assessment.
   readLine: "Worth a yes with the plan. Layla has AED 120 saved. AED 20 a week for 4 weeks plus 2 chores covers the rest by 20 November, and the family plan stays on track.",
   kidSide: [
-    { label: "Price on the noon page", value: "AED 300.00" },
+    { label: "Best price found", value: "AED 300.00" },
     { label: "Saved in the demo wallet", value: "AED 120.00" },
     { label: "4 weeks at AED 20", value: "AED 80.00" },
     { label: "2 chores at AED 50", value: "AED 100.00" },

@@ -13,6 +13,8 @@ and answers "any duplicate charges?" from the core's findings.
 Week 4: the Gatekeeper turns a parent's plain words into a family rule draft (rules.py) and checks a child's
 "can I buy...?" against the family rules too; the Planner writes the monthly Ways to save card (ways_to_save.py,
 called from the parent's Today screen).
+Week 6: the Shopper compares prices (shopper.py): it reads what someone wants from their words into a PurchaseIntent
+and the core searches the shops, ranks the offers by payable total and checks the best one like any request.
 Later weeks replace route_message() with an LLM classifier and fill in each agent with tools
 that call the core API (core_client.py). Agents never calculate money themselves.
 """
@@ -24,7 +26,7 @@ from typing import TypedDict
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
-from . import bookkeeper, documents, gatekeeper, planner, rules
+from . import bookkeeper, documents, gatekeeper, planner, rules, shopper
 from .spend_parser import looks_like_spend
 
 
@@ -58,7 +60,8 @@ _PLACEHOLDER = {
     Agent.BOOKKEEPER: "Upload a receipt or a statement in Money, Uploads. I'll read it and show you a draft to confirm.",
     Agent.GATEKEEPER: "Tell me what it costs, like \"can I buy headphones for AED 300?\", and I'll check it. "
                       "Parents can also write a family rule, like \"no peanuts for Adam\".",
-    Agent.SHOPPER: "I can't compare prices or plan meals yet. That's coming soon.",
+    Agent.SHOPPER: "Tell me what you'd like to buy, like \"wireless headphones\" or \"Sony WH-CH720N\", "
+                   "and I'll compare the shops' prices.",
     Agent.COACH: "Savings challenges and lessons aren't ready yet. They're coming soon.",
     Agent.PLANNER: "Long-term what-ifs, like gold or renting against buying, are coming soon. Ask me to make this month's plan.",
 }
@@ -81,6 +84,8 @@ def route_message(state: ChatState) -> ChatState:
         return {"agent": Agent.GATEKEEPER}
     if gatekeeper.amount_in(text) and _ASKING.search(text) or "afford" in text:
         return {"agent": Agent.GATEKEEPER}
+    if shopper.is_price_question(text):
+        return {"agent": Agent.SHOPPER}
     if state.get("role") == "PARENT" and planner.is_plan_question(text):
         return {"agent": Agent.PLANNER}
     for agent, words in _KEYWORDS:
@@ -116,6 +121,9 @@ def gatekeeper_node(state: ChatState, config: RunnableConfig) -> ChatState:
     if core is not None and me is not None and me.role.value == "PARENT" and rules.is_rule_text(message):
         return {"reply": rules.handle(core, me, message, ctx.get("llm"))}
     reply = gatekeeper.handle(core, me, message) if core is not None and me is not None else None
+    if reply is None and core is not None and me is not None and shopper.is_want(message):
+        # "I want wireless headphones" has no price yet: find the shops' prices first
+        reply = shopper.handle(core, me, message, ctx.get("llm"))
     return {"reply": reply or _PLACEHOLDER[Agent.GATEKEEPER]}
 
 
@@ -128,7 +136,16 @@ def planner_node(state: ChatState, config: RunnableConfig) -> ChatState:
     return {"reply": _PLACEHOLDER[Agent.PLANNER]}
 
 
-_NODES = {Agent.BOOKKEEPER: bookkeeper_node, Agent.GATEKEEPER: gatekeeper_node, Agent.PLANNER: planner_node}
+def shopper_node(state: ChatState, config: RunnableConfig) -> ChatState:
+    ctx = config.get("configurable", {})
+    core, me = ctx.get("core"), ctx.get("me")
+    if core is not None and me is not None:
+        return {"reply": shopper.handle(core, me, state.get("message", ""), ctx.get("llm"))}
+    return {"reply": _PLACEHOLDER[Agent.SHOPPER]}
+
+
+_NODES = {Agent.BOOKKEEPER: bookkeeper_node, Agent.GATEKEEPER: gatekeeper_node, Agent.PLANNER: planner_node,
+          Agent.SHOPPER: shopper_node}
 
 
 def build_graph():

@@ -665,3 +665,11 @@ body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
 /* "Why this?" in the top corner of a waiting slip, where the stamp will land */
 .chit-corner { position: absolute; top: 14px; right: var(--space-4); }
 .chit-corner .link { min-height: 32px; }
+
+/* Price search (week 6): one shop's offer, total first */
+.offer { display: grid; gap: 4px; }
+.offer.best { border: 2px solid var(--ink); padding: calc(var(--space-4) - 1px); }
+.offer-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.offer-total { font-size: 18px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.offer-title { margin: 0; font-size: 14px; line-height: 1.35; }
+.offer-parts { margin: 0 0 4px; font-size: 13px; }

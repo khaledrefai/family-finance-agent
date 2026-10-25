@@ -3,6 +3,7 @@
 #
 #   ./deploy.sh          build and start everything (db, core, agents, web)
 #   ./deploy.sh reseed   reset the demo family to its starting state (run before every recording)
+#   ./deploy.sh prewarm  fill the price search cache for the demo's searches (see ops/prewarm-prices.sh)
 #   ./deploy.sh test     run all tests (core needs Docker running for its test database)
 #   ./deploy.sh logs     follow logs
 #   ./deploy.sh down     stop everything (data is kept)
@@ -24,8 +25,12 @@ case "${1:-up}" in
     [[ -z "$domain" ]] || echo "With DNS set up it is also on https://$domain"
     ;;
   reseed)
-    docker compose exec -T db psql -v ON_ERROR_STOP=1 -U ffa -d ffa < core/src/main/resources/db/seed/R__demo_family.sql
+    # "Today" in the seed is the UAE day, like the core's clock
+    docker compose exec -T -e PGTZ=Asia/Dubai db psql -v ON_ERROR_STOP=1 -U ffa -d ffa < core/src/main/resources/db/seed/R__demo_family.sql
     echo "Demo family reset."
+    ;;
+  prewarm)
+    bash ops/prewarm-prices.sh "${2:-http://localhost:${WEB_PORT:-3000}}"
     ;;
   test)
     (cd core && mvn -B test)
@@ -39,7 +44,7 @@ case "${1:-up}" in
     docker compose down
     ;;
   *)
-    echo "Usage: $0 [up|reseed|test|logs|down]" >&2
+    echo "Usage: $0 [up|reseed|prewarm|test|logs|down]" >&2
     exit 1
     ;;
 esac

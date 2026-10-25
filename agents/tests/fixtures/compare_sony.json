@@ -1,0 +1,214 @@
+{
+ "id": "33333333-3333-3333-3333-333333333333",
+ "intent": {
+  "query": "Sony WH-CH720N",
+  "brand": "Sony",
+  "model": "WH-CH720N"
+ },
+ "searchedFor": "Sony WH-CH720N",
+ "source": "LIVE",
+ "mode": "LIVE",
+ "checkedAt": "2026-10-25T21:30:00+04:00",
+ "exact": true,
+ "offers": [
+  {
+   "key": "o1",
+   "store": "Amazon.ae",
+   "title": "Sony WH-CH720N Wireless Noise Cancelling Headphones",
+   "price": {
+    "minor": 28900,
+    "currency": "AED",
+    "text": "AED 289"
+   },
+   "delivery": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "deliveryKnown": true,
+   "fees": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "total": {
+    "minor": 28900,
+    "currency": "AED",
+    "text": "AED 289"
+   },
+   "source": "LIVE",
+   "verified": true,
+   "checkedAt": "2026-10-25T21:30:00+04:00",
+   "link": null
+  },
+  {
+   "key": "o2",
+   "store": "noon",
+   "title": "Sony WH-CH720N Noise Cancelling Wireless Headphones - Blue",
+   "price": {
+    "minor": 29500,
+    "currency": "AED",
+    "text": "AED 295"
+   },
+   "delivery": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "deliveryKnown": true,
+   "fees": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "total": {
+    "minor": 29500,
+    "currency": "AED",
+    "text": "AED 295"
+   },
+   "source": "LIVE",
+   "verified": true,
+   "checkedAt": "2026-10-25T21:30:00+04:00",
+   "link": null
+  },
+  {
+   "key": "o3",
+   "store": "Sharaf DG",
+   "title": "Sony WH-CH720N Wireless Headphones",
+   "price": {
+    "minor": 32900,
+    "currency": "AED",
+    "text": "AED 329"
+   },
+   "delivery": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "deliveryKnown": true,
+   "fees": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "total": {
+    "minor": 32900,
+    "currency": "AED",
+    "text": "AED 329"
+   },
+   "source": "LIVE",
+   "verified": false,
+   "checkedAt": "2026-10-25T21:30:00+04:00",
+   "link": null
+  }
+ ],
+ "substitutes": [
+  {
+   "key": "s1",
+   "store": "Amazon.ae",
+   "title": "Sony WH-CH520 Wireless On-Ear Headphones",
+   "price": {
+    "minor": 16900,
+    "currency": "AED",
+    "text": "AED 169"
+   },
+   "delivery": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "deliveryKnown": true,
+   "fees": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "total": {
+    "minor": 16900,
+    "currency": "AED",
+    "text": "AED 169"
+   },
+   "source": "LIVE",
+   "verified": false,
+   "checkedAt": "2026-10-25T21:30:00+04:00",
+   "link": null
+  }
+ ],
+ "best": {
+  "key": "o1",
+  "store": "Amazon.ae",
+  "title": "Sony WH-CH720N Wireless Noise Cancelling Headphones",
+  "price": {
+   "minor": 28900,
+   "currency": "AED",
+   "text": "AED 289"
+  },
+  "delivery": {
+   "minor": 0,
+   "currency": "AED",
+   "text": "AED 0"
+  },
+  "deliveryKnown": true,
+  "fees": {
+   "minor": 0,
+   "currency": "AED",
+   "text": "AED 0"
+  },
+  "total": {
+   "minor": 28900,
+   "currency": "AED",
+   "text": "AED 289"
+  },
+  "source": "LIVE",
+  "verified": true,
+  "checkedAt": "2026-10-25T21:30:00+04:00",
+  "link": null
+ },
+ "shopsChecked": 3,
+ "dropped": 1,
+ "assessment": {
+  "version": 2,
+  "amount": {
+   "minor": 28900,
+   "currency": "AED",
+   "text": "AED 289"
+  },
+  "verdict": "DOES_NOT_FIT",
+  "needsParent": true,
+  "blocked": false,
+  "kid": {
+   "memberId": "00000000-0000-0000-0000-0000000000c1",
+   "name": "Layla",
+   "wallet": {
+    "minor": 30900,
+    "currency": "AED",
+    "text": "AED 309"
+   },
+   "walletCovers": true,
+   "walletAfter": {
+    "minor": 2000,
+    "currency": "AED",
+    "text": "AED 20"
+   }
+  },
+  "rules": {
+   "outcome": "NEEDS_PARENT",
+   "hits": []
+  },
+  "card": null,
+  "facts": [
+   "It costs AED 289.",
+   "Layla's wallet has AED 309, enough for this.",
+   "A parent says yes to anything over AED 50."
+  ]
+ },
+ "facts": [
+  "I compared 3 offers from 3 shops for \"Sony WH-CH720N\" (live prices, checked at 21:30 on 25 Oct).",
+  "Best re-checked total: AED 289 at Amazon.ae (AED 289 + free delivery).",
+  "Next: AED 295 at noon.",
+  "A different model, not the same item: Sony WH-CH520 Wireless On-Ear Headphones, AED 169 at Amazon.ae.",
+  "I left out 1 offer priced at less than half the usual price, which is too good to trust.",
+  "Layla's wallet has AED 309, enough for this.",
+  "A parent says yes to anything over AED 50."
+ ]
+}
