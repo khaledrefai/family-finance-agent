@@ -9,6 +9,8 @@ from .core_client import CoreClient
 from .documents import read_document
 from .graph import orchestrator
 from .spend_story import nudge
+from .core_client import CoreError, WaysToSave
+from .ways_to_save import write as write_ways_to_save
 
 app = FastAPI(title="Family Finance Agent - agent service", version="0.1.0")
 
@@ -67,3 +69,12 @@ def get_nudge(core: CoreClient = Depends(core_for_caller)) -> NudgeOut:
     if core.me().role.value != "CHILD":
         return NudgeOut(nudge=None)
     return NudgeOut(nudge=nudge(core.spend_status()))
+
+
+@app.post("/ways-to-save", response_model=WaysToSave)
+def ways_to_save(core: CoreClient = Depends(core_for_caller)) -> WaysToSave:
+    """This month's Ways to save card for a parent. The Planner writes its words once a month; later calls just read it."""
+    try:
+        return write_ways_to_save(core, core.me())
+    except CoreError as e:
+        raise HTTPException(status_code=e.status, detail=e.detail)

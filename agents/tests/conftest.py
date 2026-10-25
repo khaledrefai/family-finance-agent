@@ -41,6 +41,12 @@ class FakeCore:
         self.failures: list[str] = []
         self.doc_headers: list[str] = []
         self.found: list[dict] = []
+        self.assess_fixture = "assess_layla.json"
+        self.assess_bodies: list[dict] = []
+        self.rule_drafts: list[dict] = []
+        self.rule_headers: list[str] = []
+        self.ways = load("ways_to_save.json")
+        self.tip_words: list[dict] = []
 
     def handler(self, request: httpx.Request) -> httpx.Response:
         path = request.url.path
@@ -89,7 +95,28 @@ class FakeCore:
             self.bucket_drafts.append(json.loads(request.content))
             return httpx.Response(200, json=load("buckets.json"))
         if path == "/api/requests/assess":
-            return httpx.Response(200, json=load("assess_layla.json"))
+            self.assess_bodies.append(json.loads(request.content))
+            return httpx.Response(200, json=load(self.assess_fixture))
+        if path == "/api/rules/drafts":
+            body = json.loads(request.content)
+            self.rule_drafts.append(body)
+            self.rule_headers.append(request.headers.get("X-Agent-Run-Id", ""))
+            if body["kind"] not in ("BLOCK_CATEGORY", "BLOCK_ALLERGEN", "APPROVAL_LIMIT", "CATEGORY_LIMIT", "MONTHLY_CAP"):
+                return httpx.Response(400, json={"detail": "Say what kind of rule it is"})
+            label = body["said"][0].upper() + body["said"][1:]
+            return httpx.Response(201, json={"id": "22222222-2222-2222-2222-%012d" % len(self.rule_drafts),
+                                             "kind": body["kind"], "status": "DRAFT", "label": label,
+                                             "chips": ["Typed", "All the kids"], "replaces": []})
+        if path == "/api/ways-to-save" and request.method == "GET":
+            return httpx.Response(200, json=self.ways)
+        if path == "/api/ways-to-save/words":
+            words = json.loads(request.content)["tips"]
+            self.tip_words.extend(words)
+            byKey = {w["key"]: w for w in words}
+            tips = [{**t, "text": byKey[t["key"]]["text"], "writtenBy": byKey[t["key"]]["writtenBy"]}
+                    if t["key"] in byKey else t for t in self.ways["tips"]]
+            self.ways = {**self.ways, "tips": tips, "needsWords": False}
+            return httpx.Response(200, json=self.ways)
         return httpx.Response(404, json={"detail": "not found"})
 
     def documents(self, request: httpx.Request, path: str) -> httpx.Response:

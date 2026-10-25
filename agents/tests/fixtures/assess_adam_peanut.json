@@ -1,0 +1,35 @@
+{
+    "version": 2,
+    "amount": {"minor": 800, "currency": "AED", "text": "AED 8"},
+    "verdict": "FITS",
+    "freeUntilPay": null,
+    "nextIncomeOn": null,
+    "freeAfter": null,
+    "nextCommitment": null,
+    "needsParent": false,
+    "blocked": true,
+    "approvalLimit": {"minor": 5000, "currency": "AED", "text": "AED 50"},
+    "kid": {
+        "memberId": "00000000-0000-0000-0000-0000000000c2",
+        "name": "Adam",
+        "wallet": {"minor": 9700, "currency": "AED", "text": "AED 97"},
+        "walletCovers": true,
+        "walletAfter": {"minor": 8900, "currency": "AED", "text": "AED 89"}
+    },
+    "rules": {
+        "outcome": "BLOCKED",
+        "hits": [
+            {"ruleId": "00000000-0000-0000-0000-00000000e001", "kind": "BLOCK_ALLERGEN", "rule": "No peanuts for Adam",
+             "outcome": "BLOCKED", "detail": "The name says \"peanut\", and Adam must not have peanuts. Check the pack label for anything else."},
+            {"ruleId": "00000000-0000-0000-0000-00000000e002", "kind": "APPROVAL_LIMIT", "rule": "Anything over AED 50 needs a parent",
+             "outcome": "OK", "detail": "Within AED 50."}
+        ]
+    },
+    "card": null,
+    "facts": [
+        "It costs AED 8.",
+        "Adam's wallet has AED 97, enough for this.",
+        "A parent says yes to anything over AED 50.",
+        "Family rule: No peanuts for Adam. The name says \"peanut\", and Adam must not have peanuts. Check the pack label for anything else."
+    ]
+}

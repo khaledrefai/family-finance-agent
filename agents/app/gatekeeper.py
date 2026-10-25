@@ -1,14 +1,16 @@
-"""Gatekeeper agent, first part: "can I afford it?"
+"""Gatekeeper agent, first part: "can I afford it, and is it allowed?"
 
-The core's money engine does the check (POST /api/requests/assess): the child's wallet, the family's
-free cash until pay day, the approval limit and, for a parent paying by card, the card bill.
-This agent only picks the amount out of the message and says the facts the core sent back.
-Sending the request to a parent and checking family rules and allergens come next.
+The core does the check (POST /api/requests/assess): the money engine for the child's wallet, the family's
+free cash until pay day and, for a parent paying by card, the card bill; the Java RuleEngine for the family
+rules (blocked kinds of thing, allergens, the approval limit, limits and the monthly cap).
+This agent only picks the amount and the kind of thing out of the message and says the facts the core sent
+back. Writing new rules from a parent's words is the second part, in rules.py.
 """
 
 import re
 
-from .core_client import CoreClient, CoreError, Me, Role
+from .core_client import CoreClient, CoreError, Me, Role, SpendCategory
+from .spend_parser import guess_category
 
 _AMOUNT = re.compile(r"(?:aed|dhs?|dirhams?)\s*(\d[\d,]*(?:\.\d{1,2})?)|(\d[\d,]*(?:\.\d{1,2})?)\s*(?:aed|dhs?|dirhams?)\b",
                      re.I)
@@ -26,14 +28,19 @@ def handle(core: CoreClient, me: Me, message: str) -> str | None:
     if amount is None:
         return None
     run_id = core.open_run("GATEKEEPER", message)
+    # The kind of thing, from the same word list as spend logging. The core checks the rules against it and the words.
+    category = guess_category(message)
     try:
-        a = core.in_run(run_id).assess(amount)
+        a = core.in_run(run_id).assess(amount, title=message[:300],
+                                       category=None if category is SpendCategory.OTHER else category)
     except CoreError as e:
         core.finish_run(run_id, False, e.detail, None, False, "rule-based", None, None, None)
         return f"I couldn't check that. {e.detail}."
     reply = " ".join(a.facts)
     if me.role is Role.CHILD:
-        if a.kid and not a.kid.walletCovers:
+        if a.blocked:
+            reply += " That one isn't allowed, so I won't send it to a parent."
+        elif a.kid and not a.kid.walletCovers:
             reply += " Keep saving, or ask a parent."
         elif a.needsParent:
             reply += " I'll need a parent to say yes."
