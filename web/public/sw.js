@@ -6,7 +6,7 @@ self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim(
 self.addEventListener("fetch", () => {});
 
 self.addEventListener("push", (event) => {
-  let note = { title: "Family Finance", body: "Something new is waiting for you.", link: "/", id: undefined };
+  let note = { title: "Family Finance Coach", body: "Something new is waiting for you.", link: "/", id: undefined };
   try {
     note = { ...note, ...event.data.json() };
   } catch {

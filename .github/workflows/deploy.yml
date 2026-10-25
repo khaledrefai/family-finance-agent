@@ -67,12 +67,19 @@ jobs:
           PUSH_CONTACT: ${{ secrets.PUSH_CONTACT || vars.PUSH_CONTACT }}
           VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY || vars.VAPID_PUBLIC_KEY }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
-          APP_PUBLIC_URL: ${{ vars.APP_PUBLIC_URL || format('http://{0}:{1}', env.VPS_HOST, vars.WEB_PORT || '3000') }}
+          # The public web address. Caddy serves it over HTTPS; set the DOMAIN variable to "none" to turn that off.
+          DOMAIN: ${{ vars.DOMAIN || 'family-finance-coach.com' }}
+          APP_PUBLIC_URL: ${{ vars.APP_PUBLIC_URL }}
+          FALLBACK_URL: ${{ format('http://{0}:{1}', env.VPS_HOST, vars.WEB_PORT || '3000') }}
           APP_JWT_SECRET: ${{ secrets.APP_JWT_SECRET }}
           WEB_PORT: ${{ vars.WEB_PORT || '3000' }}
           AGENTS_LLM: ${{ vars.AGENTS_LLM || 'auto' }}
         run: |
           if [ -z "$POSTGRES_PASSWORD" ]; then echo "::error::POSTGRES_PASSWORD is not set in the production environment"; exit 1; fi
+          if [ "$DOMAIN" = "none" ]; then DOMAIN=""; fi
+          if [ -z "$APP_PUBLIC_URL" ]; then
+            if [ -n "$DOMAIN" ]; then APP_PUBLIC_URL="https://$DOMAIN"; else APP_PUBLIC_URL="$FALLBACK_URL"; fi
+          fi
           {
             echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD"
             echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY"
@@ -81,6 +88,8 @@ jobs:
               echo "$v=${!v}"
             done
             echo "WEB_PORT=$WEB_PORT"
+            echo "DOMAIN=$DOMAIN"
+            if [ -n "$DOMAIN" ]; then echo "COMPOSE_PROFILES=https"; else echo "COMPOSE_PROFILES="; fi
             echo "AGENTS_LLM=$AGENTS_LLM"
             if [ -n "$APP_JWT_SECRET" ]; then echo "APP_JWT_SECRET=$APP_JWT_SECRET"; fi
           } | ssh vps "umask 077 && mkdir -p ~/ffa/shared && cat > ~/ffa/shared/incoming.env"
@@ -101,4 +110,21 @@ jobs:
           done
           ssh vps "cd ~/ffa/current && COMPOSE_PROJECT_NAME=ffa docker compose logs --tail=80"
           echo "::error::The web app did not answer on port $port"
+          exit 1
+
+      # Only a warning: the certificate can take a few minutes, and needs DNS to point at the VPS first.
+      - name: Check HTTPS on the domain
+        continue-on-error: true
+        run: |
+          domain="$(ssh vps "grep '^DOMAIN=' ~/ffa/shared/.env | cut -d= -f2-")"
+          if [ -z "$domain" ]; then echo "No DOMAIN set, skipping."; exit 0; fi
+          for i in $(seq 1 12); do
+            if curl -fsS -o /dev/null --max-time 10 "https://$domain/"; then
+              echo "HTTPS works: https://$domain" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::warning::https://$domain did not answer yet. Check that DNS points at the VPS and ports 80 and 443 are open."
+          ssh vps "cd ~/ffa/current && COMPOSE_PROJECT_NAME=ffa docker compose logs --tail=40 caddy" || true
           exit 1

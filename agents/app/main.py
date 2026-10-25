@@ -12,7 +12,7 @@ from .spend_story import nudge
 from .core_client import CoreError, WaysToSave
 from .ways_to_save import write as write_ways_to_save
 
-app = FastAPI(title="Family Finance Agent - agent service", version="0.1.0")
+app = FastAPI(title="Family Finance Coach - agent service", version="0.1.0")
 
 
 class ChatIn(BaseModel):

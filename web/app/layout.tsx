@@ -9,7 +9,7 @@ const readex = Readex_Pro({ subsets: ["latin", "arabic"], weight: ["300", "400",
 const baloo = Baloo_Bhaijaan_2({ subsets: ["latin", "arabic"], weight: ["500", "600", "700"], variable: "--font-kid" });
 
 export const metadata: Metadata = {
-  title: "Family Finance",
+  title: "Family Finance Coach",
   description: "Family accountant and money coach (prototype)",
   manifest: "/manifest.webmanifest",
   icons: { icon: "/icon.svg" },

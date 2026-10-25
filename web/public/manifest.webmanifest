@@ -1,6 +1,6 @@
 {
-  "name": "Family Finance Agent",
-  "short_name": "FamilyFinance",
+  "name": "Family Finance Coach",
+  "short_name": "Family Coach",
   "description": "Family accountant and money coach (prototype, demo money only)",
   "start_url": "/",
   "display": "standalone",

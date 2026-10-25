@@ -64,5 +64,26 @@ services:
       - core
       - agents
 
+  # HTTPS on the real domain. Only runs with COMPOSE_PROFILES=https and DOMAIN set in .env (the VPS deploy
+  # does this); on your own computer it stays off and the app is on http://localhost:3000 as before.
+  caddy:
+    image: caddy:2.8-alpine
+    profiles: ["https"]
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:-}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./ops/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data          # the certificates; kept so every deploy doesn't ask Let's Encrypt again
+      - caddyconfig:/config
+    depends_on:
+      - web
+
 volumes:
   dbdata:
+  caddydata:
+  caddyconfig:

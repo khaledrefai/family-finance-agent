@@ -46,7 +46,7 @@ export default function LoginPage() {
             <path d="M262 298l20 20 40-40" fill="none" stroke="var(--approved)" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
           </g>
         </svg>
-        <h1>Family Finance</h1>
+        <h1>Family Finance Coach</h1>
       </div>
       <p className="lede">Where the family's money goes, and who said yes to what.</p>
 
