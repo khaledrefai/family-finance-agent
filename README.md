@@ -1,4 +1,6 @@
-# Family Finance Agent
+# Family Finance Coach
+
+Live at https://family-finance-coach.com (test server).
 
 An agentic family accountant and money coach. Prototype for the Dubai Chambers "Create AI Agents" championship.
 **No real money moves. No live bank connections. The wallet holds clearly labelled demo money only.**
@@ -48,12 +50,20 @@ Every commit on `main` that passes CI is deployed to the VPS by `.github/workflo
 | `SMTP_PASSWORD` | secret | Optional. The SMTP password (for Gmail, an app password). |
 | `PUSH_CONTACT` | variable or secret | Optional. `mailto:you@example.com`, given to the browsers' push services. |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | secret | Optional. Web push keys; leave unset and the core makes them once and keeps them in the database. |
-| `APP_PUBLIC_URL` | variable | Optional. The app's address for links in emails (default `http://VPS_HOST:WEB_PORT`). |
+| `DOMAIN` | variable | Optional. The domain Caddy serves over HTTPS (default `family-finance-coach.com`; `none` turns HTTPS off). |
+| `APP_PUBLIC_URL` | variable | Optional. The app's address for links in emails (default `https://DOMAIN`). |
 | `WEB_PORT`, `AGENTS_LLM` | variable | Optional (3000, auto). |
 
 The VPS needs Docker with the compose plugin, and the user must be allowed to run `docker`.
 Releases live in `~/ffa/releases/<commit>`, `~/ffa/current` points at the running one,
 and `~/ffa/shared/.env` holds the settings (the JWT secret is generated there once).
+
+**HTTPS.** On the VPS a Caddy container sits in front of the web app on ports 80 and 443
+(`ops/caddy/Caddyfile`, started by `COMPOSE_PROFILES=https`). It gets and renews the Let's Encrypt
+certificate by itself and sends `www.` to the plain domain. It needs two DNS records at the registrar,
+`A @` and `A www`, both pointing at the VPS IP, and ports 80 and 443 open in any firewall
+(`sudo ufw allow 80,443/tcp` if `ufw` is on). `http://VPS_HOST:3000` keeps working too.
+
 To reset the demo family on the server: `ssh` in, then `cd ~/ffa/current && COMPOSE_PROJECT_NAME=ffa ./deploy.sh reseed`.
 
 ## Live updates and notifications (week 5)
@@ -64,8 +74,8 @@ transaction as the change. The core reads new rows every 2 seconds and sends the
 - **Open screens** get a ping over `GET /api/live` (Server-Sent Events) and reload that part: the parent's
   Waiting list, the kid's requests and wallet. About 2 seconds from tap to screen.
 - **Phones** get a web push (Family > Notifications > Turn on for this phone). Browsers only allow this on
-  `https://` or `localhost`, and iPhones only from the Home Screen app. On the plain `http://VPS_HOST:3000`
-  address the live screens work but phone notifications can't be turned on.
+  `https://` or `localhost`, and iPhones only from the Home Screen app, so use https://family-finance-coach.com.
+  On the plain `http://VPS_HOST:3000` address the live screens work but phone notifications can't be turned on.
 - **Parents' email** for the core's own alerts, when SMTP is set up.
 - **The bell** (Today, top right) keeps the last 30.
 

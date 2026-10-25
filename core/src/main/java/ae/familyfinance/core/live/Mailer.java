@@ -45,7 +45,7 @@ public class Mailer {
         m.setTo(to);
         m.setSubject(title);
         m.setText(body + "\n\n" + (appUrl.isBlank() ? "" : "Open the app: " + appUrl + link + "\n\n")
-                + "Family Finance Agent (demo). You get this because email alerts are on in Family, Notifications.\n");
+                + "Family Finance Coach (demo). You get this because email alerts are on in Family, Notifications.\n");
         try {
             mail.send(m);
             return true;
