@@ -11,6 +11,10 @@ spring:
       ddl-auto: validate      # Flyway owns the schema; Hibernate only checks the entities match it
   flyway:
     locations: classpath:db/migration
+  servlet:
+    multipart:
+      max-file-size: 5MB      # receipts and statements (DocumentService.MAX_BYTES)
+      max-request-size: 6MB
 
 app:
   jwt:

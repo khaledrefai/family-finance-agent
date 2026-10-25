@@ -16,7 +16,11 @@ DELETE FROM approval a USING spending_request r
  WHERE a.request_id = r.id AND r.family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM demo_wallet_entry e USING demo_wallet w
  WHERE e.wallet_id = w.id AND w.family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM source_document   WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM agent_run         WHERE family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM finding_decision  WHERE family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM gold_holding      WHERE family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM gold_price        WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM ledger_transaction WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM spending_request  WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM commitment        WHERE family_id = '00000000-0000-0000-0000-00000000f001';
@@ -134,13 +138,38 @@ INSERT INTO points_entry (family_id, member_id, points, reason) VALUES
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1', 40, 'Finished lesson: needs vs wants'),
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 25, 'Saved pocket money 2 weeks in a row');
 
--- A few parent payments, each tagged with what paid it (documents and duplicates arrive in week 3).
--- They happened before the cards' balances were typed in, so the card balances already include them.
+-- A few parent payments, each tagged with what paid it. They happened before the cards' balances were typed in,
+-- so the card balances already include them. The Visa statement demo file (documents/DemoSamples.java) has the
+-- fuel and the dinner on it too: uploading it shows them as "already in your spending", not counted twice.
 INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, merchant, category, direction, amount_minor,
                                 duplicate_hash, source, paid_from_account_id) VALUES
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', current_date - 5, 'Weekly groceries', 'Carrefour',        'GROCERIES',  'DEBIT', 61250, encode(digest('seed-1', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e4'),
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', current_date - 3, 'Fuel',             'ENOC',             'TRANSPORT',  'DEBIT', 18000, encode(digest('seed-2', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e3'),
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', current_date - 2, 'Dinner out',       'Local restaurant', 'EATING_OUT', 'DEBIT', 23500, encode(digest('seed-3', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e3');
+
+-- Two earlier months of a streaming subscription on the Visa, read from earlier statements. Nobody put it on the
+-- commitments list. Uploading this month's Visa statement adds the third, and the Bookkeeper finds it.
+INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, merchant, category, direction, amount_minor,
+                                duplicate_hash, source, paid_from_account_id) VALUES
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', current_date - 71, 'SHAHID VIP', 'SHAHID VIP', 'ENTERTAINMENT', 'DEBIT', 3500, encode(digest('seed-4', 'sha256'), 'hex'), 'DOCUMENT', '00000000-0000-0000-0000-0000000000e3'),
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', current_date - 40, 'SHAHID VIP', 'SHAHID VIP', 'ENTERTAINMENT', 'DEBIT', 3500, encode(digest('seed-5', 'sha256'), 'hex'), 'DOCUMENT', '00000000-0000-0000-0000-0000000000e3');
+
+-- ---------------------------------------------------------------- saving in gold (week 3)
+-- Gold the family already holds (from the app mockups): 40 g of 24K for the home deposit and a 22K bangle for the
+-- emergency buffer. Valued at today's sample price below: 40 g x AED 320 + 10 g x AED 296.50 = AED 15,765.
+-- The bangle is worth less than was paid (making charges), so the screen shows the jewellery note.
+INSERT INTO gold_holding (family_id, description, grams_mg, purity, paid_minor, bought_on, seller, bucket, goal_id,
+                          is_jewellery, created_by) VALUES
+ ('00000000-0000-0000-0000-00000000f001', 'Gold bar',            20000, '24K', 580000, current_date - 229, 'Gold Souk, Deira',     'GOALS', '00000000-0000-0000-0000-0000000003f3', FALSE, '00000000-0000-0000-0000-0000000000a2'),
+ ('00000000-0000-0000-0000-00000000f001', 'Gold coins, 4 x 5 g', 20000, '24K', 620000, current_date - 115, 'Mall of the Emirates', 'GOALS', '00000000-0000-0000-0000-0000000003f3', FALSE, '00000000-0000-0000-0000-0000000000a1'),
+ ('00000000-0000-0000-0000-00000000f001', 'Bangle',              10000, '22K', 340000, current_date - 40,  'Gold Souk, Deira',     'GOALS', '00000000-0000-0000-0000-0000000003f1', TRUE,  '00000000-0000-0000-0000-0000000000a1');
+
+-- Today's price for the demo, so the "as of" time is always this morning. A sample, not a real rate.
+INSERT INTO gold_price (family_id, purity, per_gram_minor, as_of, source, seeded) VALUES
+ ('00000000-0000-0000-0000-00000000f001', '24K', 32000, least(now(), date_trunc('day', now() AT TIME ZONE 'Asia/Dubai') AT TIME ZONE 'Asia/Dubai' + interval '10 hours'), 'Sample Dubai retail rate (demo)', TRUE),
+ ('00000000-0000-0000-0000-00000000f001', '22K', 29650, least(now(), date_trunc('day', now() AT TIME ZONE 'Asia/Dubai') AT TIME ZONE 'Asia/Dubai' + interval '10 hours'), 'Sample Dubai retail rate (demo)', TRUE),
+ ('00000000-0000-0000-0000-00000000f001', '21K', 28300, least(now(), date_trunc('day', now() AT TIME ZONE 'Asia/Dubai') AT TIME ZONE 'Asia/Dubai' + interval '10 hours'), 'Sample Dubai retail rate (demo)', TRUE),
+ ('00000000-0000-0000-0000-00000000f001', '18K', 24250, least(now(), date_trunc('day', now() AT TIME ZONE 'Asia/Dubai') AT TIME ZONE 'Asia/Dubai' + interval '10 hours'), 'Sample Dubai retail rate (demo)', TRUE);
 
 -- ---------------------------------------------------------------- kids' logged spending (chat logging)
 -- About 10 weeks of what Layla and Adam told the agent they bought, so "where did Layla's money go this month?"
