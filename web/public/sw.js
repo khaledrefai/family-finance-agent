@@ -6,7 +6,7 @@ self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim(
 self.addEventListener("fetch", () => {});
 
 self.addEventListener("push", (event) => {
-  let note = { title: "Family Finance Coach", body: "Something new is waiting for you.", link: "/", id: undefined };
+  let note = { title: "Family Finance Coach", body: "Something new is waiting for you.", link: "/login", id: undefined };
   try {
     note = { ...note, ...event.data.json() };
   } catch {
@@ -26,7 +26,7 @@ self.addEventListener("push", (event) => {
 // Tapping a notification opens the app on its page, reusing an open tab when there is one.
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const link = (event.notification.data && event.notification.data.link) || "/";
+  const link = (event.notification.data && event.notification.data.link) || "/login";
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((tabs) => {
       for (const tab of tabs) {

@@ -6,7 +6,7 @@ import { api, ApiError, Me, Role, setToken, SpendingRequest } from "@/lib/api";
 import { stopLive, useLiveEvents } from "@/lib/live-stream";
 
 // Shared by the parent and child pages: loads who I am and my visible requests,
-// and sends me back to login if the token is missing, expired, or the wrong role.
+// and sends me to /login if the token is missing or expired, or to my own screens if it is the wrong role.
 // The requests reload by themselves when one is asked for, blocked or decided (the live stream, week 5).
 export function useSession(expectedRole: Role) {
   const router = useRouter();
@@ -24,7 +24,7 @@ export function useSession(expectedRole: Role) {
       setMe(who);
       setRequests(await api.requests());
     } catch (err) {
-      if (err instanceof ApiError && err.status === 401) router.replace("/");
+      if (err instanceof ApiError && err.status === 401) router.replace("/login");
       else setError((err as Error).message);
     }
   }, [expectedRole, router]);
@@ -40,7 +40,7 @@ export function useSession(expectedRole: Role) {
   const logout = () => {
     stopLive();
     setToken(null);
-    router.replace("/");
+    router.replace("/login");
   };
 
   return { me, requests, error, setError, reload, logout };

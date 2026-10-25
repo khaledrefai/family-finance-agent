@@ -23,6 +23,10 @@ cp .env.example .env      # then edit the two secrets
 open http://localhost:3000
 ```
 
+`/` is the landing page (what the app does, with the coach); the app itself starts at `/login`, which is also
+where the installed phone app opens. The landing page's demo family tiles open `/login?as=sara` and so on, with that
+person filled in.
+
 Demo logins (password `demo1234` for all):
 
 | Login | Who | Role |

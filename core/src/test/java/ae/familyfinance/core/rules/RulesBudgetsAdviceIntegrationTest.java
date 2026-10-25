@@ -87,20 +87,34 @@ class RulesBudgetsAdviceIntegrationTest extends PostgresIntegrationTest {
         assertThat(draft.get("chips").toString()).contains("AED 100", "All the kids");
         String id = draft.get("id").asText();
 
-        // While it is a draft, the old AED 50 limit still decides
-        JsonNode before = read(postJson("/api/requests/assess", login("layla"), "{\"amount\":\"60\",\"title\":\"Book\"}"));
-        assertThat(before.get("needsParent").asBoolean()).isTrue();
+        // Other tests spend Layla's demo money (her AED 300 headphones), and a wallet that can't cover the book sends it to
+        // a parent whatever the limit, so the AED 60 is in her wallet for this test and taken back out at the end
+        laylaWallet(6000, "Test top-up (demo money)");
+        try {
+            // While it is a draft, the old AED 50 limit still decides
+            JsonNode before = read(postJson("/api/requests/assess", login("layla"), "{\"amount\":\"60\",\"title\":\"Book\"}"));
+            assertThat(before.get("needsParent").asBoolean()).isTrue();
 
-        postJson("/api/rules/" + id + "/confirm", omar, run, "").andExpect(status().isForbidden());
-        postJson("/api/rules/" + id + "/confirm", login("layla"), "").andExpect(status().isForbidden());
-        JsonNode on = read(postJson("/api/rules/" + id + "/confirm", omar, "").andExpect(status().isOk()));
-        assertThat(on.get("status").asText()).isEqualTo("ACTIVE");
-        assertThat(on.get("replaces").toString()).contains(SEED_LIMIT);
+            postJson("/api/rules/" + id + "/confirm", omar, run, "").andExpect(status().isForbidden());
+            postJson("/api/rules/" + id + "/confirm", login("layla"), "").andExpect(status().isForbidden());
+            JsonNode on = read(postJson("/api/rules/" + id + "/confirm", omar, "").andExpect(status().isOk()));
+            assertThat(on.get("status").asText()).isEqualTo("ACTIVE");
+            assertThat(on.get("replaces").toString()).contains(SEED_LIMIT);
 
-        JsonNode after = read(postJson("/api/requests/assess", login("layla"),
-                "{\"amount\":\"60\",\"title\":\"Book\",\"category\":\"BOOKS_AND_STATIONERY\"}"));
-        assertThat(after.get("approvalLimit").get("text").asText()).isEqualTo("AED 100");
-        assertThat(after.get("needsParent").asBoolean()).isFalse();
+            JsonNode after = read(postJson("/api/requests/assess", login("layla"),
+                    "{\"amount\":\"60\",\"title\":\"Book\",\"category\":\"BOOKS_AND_STATIONERY\"}"));
+            assertThat(after.get("approvalLimit").get("text").asText()).isEqualTo("AED 100");
+            assertThat(after.get("needsParent").asBoolean()).isFalse();
+        } finally {
+            laylaWallet(-6000, "Test top-up taken back (demo money)");
+        }
+    }
+
+    private void laylaWallet(long amountMinor, String description) {
+        jdbc.update("""
+                INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description)
+                SELECT id, 'ADJUSTMENT', ?, ? FROM demo_wallet WHERE member_id = ?
+                """, amountMinor, description, DemoFamily.LAYLA);
     }
 
     @Test
