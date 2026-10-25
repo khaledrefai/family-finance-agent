@@ -1,0 +1,115 @@
+{
+    "goalId": "00000000-0000-0000-0000-0000000003f2",
+    "goalName": "Summer trip",
+    "tier": "GOOD_LIFE",
+    "target": {
+        "minor": 1200000,
+        "currency": "AED",
+        "text": "AED 12,000"
+    },
+    "saved": {
+        "minor": 360000,
+        "currency": "AED",
+        "text": "AED 3,600"
+    },
+    "remaining": {
+        "minor": 840000,
+        "currency": "AED",
+        "text": "AED 8,400"
+    },
+    "targetDate": "2027-06-30",
+    "currentMonthly": {
+        "minor": 150000,
+        "currency": "AED",
+        "text": "AED 1,500"
+    },
+    "options": [
+        {
+            "id": "relaxed",
+            "name": "Relaxed",
+            "monthly": {
+                "minor": 70000,
+                "currency": "AED",
+                "text": "AED 700"
+            },
+            "months": 12,
+            "readyBy": "2027-09-30",
+            "readyMonth": "September 2027",
+            "meetsDate": false,
+            "fits": true,
+            "tightestMonth": "November",
+            "spareInTightest": {
+                "minor": 414767,
+                "currency": "AED",
+                "text": "AED 4,147.67"
+            }
+        },
+        {
+            "id": "steady",
+            "name": "Steady",
+            "monthly": {
+                "minor": 95000,
+                "currency": "AED",
+                "text": "AED 950"
+            },
+            "months": 9,
+            "readyBy": "2027-06-30",
+            "readyMonth": "June 2027",
+            "meetsDate": true,
+            "fits": true,
+            "tightestMonth": "November",
+            "spareInTightest": {
+                "minor": 389767,
+                "currency": "AED",
+                "text": "AED 3,897.67"
+            }
+        },
+        {
+            "id": "faster",
+            "name": "Faster",
+            "monthly": {
+                "minor": 120000,
+                "currency": "AED",
+                "text": "AED 1,200"
+            },
+            "months": 7,
+            "readyBy": "2027-04-30",
+            "readyMonth": "April 2027",
+            "meetsDate": true,
+            "fits": true,
+            "tightestMonth": "November",
+            "spareInTightest": {
+                "minor": 364767,
+                "currency": "AED",
+                "text": "AED 3,647.67"
+            }
+        }
+    ],
+    "recommended": "steady",
+    "recommendedReason": "Meets the date and fits every month.",
+    "why": [
+        {
+            "label": "Left to save",
+            "amount": {
+                "minor": 840000,
+                "currency": "AED",
+                "text": "AED 8,400"
+            },
+            "note": null
+        },
+        {
+            "label": "Spare a month without this goal, October",
+            "amount": {
+                "minor": 739767,
+                "currency": "AED",
+                "text": "AED 7,397.67"
+            },
+            "note": null
+        },
+        {
+            "label": "Months to the target date",
+            "amount": null,
+            "note": "9"
+        }
+    ]
+}

@@ -5,6 +5,9 @@ Week 1 is a skeleton:
   * each agent node only says what it will do and in which week it arrives.
 Spend-logging spike: the Bookkeeper really works for two things, a child saying what they bought
 ("12 dirhams shawarma") and a parent asking where a child's money went (see bookkeeper.py).
+Week 2: the Planner makes this month's plan and a draft bucket split for a parent (planner.py, the first
+step that uses Claude, with a rule-based fallback), and the Gatekeeper answers "can I afford AED X?" with
+the core's affordability check (gatekeeper.py).
 Later weeks replace route_message() with an LLM classifier and fill in each agent with tools
 that call the core API (core_client.py). Agents never calculate money themselves.
 """
@@ -16,7 +19,7 @@ from typing import TypedDict
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
-from . import bookkeeper
+from . import bookkeeper, gatekeeper, planner
 from .spend_parser import looks_like_spend
 
 
@@ -25,7 +28,7 @@ class Agent(str, Enum):
     GATEKEEPER = "gatekeeper"  # spending requests, ask-to-buy, rules and allergens, approvals
     SHOPPER = "shopper"        # better purchases, meal plan, shopping list
     COACH = "coach"            # kids' challenges, lessons, points, family savings plan
-    PLANNER = "planner"        # long-term calculators, insurance guide (information only)
+    PLANNER = "planner"        # this month's plan, money buckets, goal paces; later long-term what-ifs
 
 
 class ChatState(TypedDict, total=False):
@@ -48,10 +51,10 @@ _KEYWORDS: list[tuple[Agent, tuple[str, ...]]] = [
 # Shown until each agent is built. No week numbers: these lines can appear in the demo video.
 _PLACEHOLDER = {
     Agent.BOOKKEEPER: "I can't sort receipts and statements yet. That's coming soon, along with spotting duplicate charges.",
-    Agent.GATEKEEPER: "I can't check requests yet. Soon I'll look at the family's money, upcoming bills and rules, then ask a parent.",
+    Agent.GATEKEEPER: "Tell me what it costs, like \"can I buy headphones for AED 300?\", and I'll check it.",
     Agent.SHOPPER: "I can't compare prices or plan meals yet. That's coming soon.",
     Agent.COACH: "Savings challenges and lessons aren't ready yet. They're coming soon.",
-    Agent.PLANNER: "Planning isn't ready yet. When it is, it will show 1, 5 and 10 year what-ifs. Information only, not financial advice.",
+    Agent.PLANNER: "Long-term what-ifs, like gold or renting against buying, are coming soon. Ask me to make this month's plan.",
 }
 
 
@@ -68,6 +71,10 @@ def route_message(state: ChatState) -> ChatState:
     text = state.get("message", "").lower()
     if bookkeeper.is_spend_question(text) or is_spend_log(state):
         return {"agent": Agent.BOOKKEEPER}
+    if gatekeeper.amount_in(text) and _ASKING.search(text) or "afford" in text:
+        return {"agent": Agent.GATEKEEPER}
+    if state.get("role") == "PARENT" and planner.is_plan_question(text):
+        return {"agent": Agent.PLANNER}
     for agent, words in _KEYWORDS:
         if any(w in text for w in words):
             return {"agent": agent}
@@ -89,11 +96,30 @@ def bookkeeper_node(state: ChatState, config: RunnableConfig) -> ChatState:
     return {"reply": _PLACEHOLDER[Agent.BOOKKEEPER]}
 
 
+def gatekeeper_node(state: ChatState, config: RunnableConfig) -> ChatState:
+    ctx = config.get("configurable", {})
+    core, me = ctx.get("core"), ctx.get("me")
+    reply = gatekeeper.handle(core, me, state.get("message", "")) if core is not None and me is not None else None
+    return {"reply": reply or _PLACEHOLDER[Agent.GATEKEEPER]}
+
+
+def planner_node(state: ChatState, config: RunnableConfig) -> ChatState:
+    ctx = config.get("configurable", {})
+    core, me = ctx.get("core"), ctx.get("me")
+    message = state.get("message", "")
+    if core is not None and me is not None and planner.is_plan_question(message):
+        return {"reply": planner.handle(core, me, message, ctx.get("llm"))}
+    return {"reply": _PLACEHOLDER[Agent.PLANNER]}
+
+
+_NODES = {Agent.BOOKKEEPER: bookkeeper_node, Agent.GATEKEEPER: gatekeeper_node, Agent.PLANNER: planner_node}
+
+
 def build_graph():
     graph = StateGraph(ChatState)
     graph.add_node("router", route_message)
     for agent in Agent:
-        graph.add_node(agent.value, bookkeeper_node if agent is Agent.BOOKKEEPER else _agent_node(agent))
+        graph.add_node(agent.value, _NODES.get(agent) or _agent_node(agent))
         graph.add_edge(agent.value, END)
     graph.add_edge(START, "router")
     graph.add_conditional_edges("router", lambda s: s["agent"].value, {a.value: a.value for a in Agent})

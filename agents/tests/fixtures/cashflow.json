@@ -1,0 +1,1068 @@
+{
+    "currency": "AED",
+    "today": "2026-10-25",
+    "monthLabel": "October",
+    "income": {
+        "total": {
+            "minor": 3450000,
+            "currency": "AED",
+            "text": "AED 34,500"
+        },
+        "lines": [
+            {
+                "label": "Omar salary",
+                "amount": {
+                    "minor": 2800000,
+                    "currency": "AED",
+                    "text": "AED 28,000"
+                },
+                "note": "Take-home pay"
+            },
+            {
+                "label": "Sara commission",
+                "amount": {
+                    "minor": 650000,
+                    "currency": "AED",
+                    "text": "AED 6,500"
+                },
+                "note": "Planned on a cautious base: the 3 lowest of the last 6 months"
+            }
+        ]
+    },
+    "commitments": {
+        "total": {
+            "minor": 1470900,
+            "currency": "AED",
+            "text": "AED 14,709"
+        },
+        "lines": [
+            {
+                "label": "Apartment rent reserve",
+                "amount": {
+                    "minor": 1000000,
+                    "currency": "AED",
+                    "text": "AED 10,000"
+                },
+                "note": "Reserve for 4 payments in the next 12 months"
+            },
+            {
+                "label": "School fees reserve",
+                "amount": {
+                    "minor": 375000,
+                    "currency": "AED",
+                    "text": "AED 3,750"
+                },
+                "note": "Reserve for 3 payments in the next 12 months"
+            },
+            {
+                "label": "DEWA electricity and water",
+                "amount": {
+                    "minor": 90000,
+                    "currency": "AED",
+                    "text": "AED 900"
+                },
+                "note": "About, it changes"
+            },
+            {
+                "label": "Streaming bundle",
+                "amount": {
+                    "minor": 5900,
+                    "currency": "AED",
+                    "text": "AED 59"
+                },
+                "note": "Subscription"
+            }
+        ]
+    },
+    "everyday": {
+        "total": {
+            "minor": 739333,
+            "currency": "AED",
+            "text": "AED 7,393.33"
+        },
+        "lines": [
+            {
+                "label": "Groceries",
+                "amount": {
+                    "minor": 300000,
+                    "currency": "AED",
+                    "text": "AED 3,000"
+                },
+                "note": null
+            },
+            {
+                "label": "Eating out",
+                "amount": {
+                    "minor": 150000,
+                    "currency": "AED",
+                    "text": "AED 1,500"
+                },
+                "note": null
+            },
+            {
+                "label": "Entertainment",
+                "amount": {
+                    "minor": 120000,
+                    "currency": "AED",
+                    "text": "AED 1,200"
+                },
+                "note": null
+            },
+            {
+                "label": "Transport",
+                "amount": {
+                    "minor": 100000,
+                    "currency": "AED",
+                    "text": "AED 1,000"
+                },
+                "note": null
+            },
+            {
+                "label": "Pocket money, Layla",
+                "amount": {
+                    "minor": 43333,
+                    "currency": "AED",
+                    "text": "AED 433.33"
+                },
+                "note": "Weekly budget, as a month"
+            },
+            {
+                "label": "Pocket money, Adam",
+                "amount": {
+                    "minor": 26000,
+                    "currency": "AED",
+                    "text": "AED 260"
+                },
+                "note": "Weekly budget, as a month"
+            }
+        ]
+    },
+    "free": {
+        "minor": 1239767,
+        "currency": "AED",
+        "text": "AED 12,397.67"
+    },
+    "saving": {
+        "total": {
+            "minor": 650000,
+            "currency": "AED",
+            "text": "AED 6,500"
+        },
+        "lines": [
+            {
+                "label": "Emergency buffer",
+                "amount": {
+                    "minor": 500000,
+                    "currency": "AED",
+                    "text": "AED 5,000"
+                },
+                "note": "Full in December"
+            },
+            {
+                "label": "Summer trip",
+                "amount": {
+                    "minor": 150000,
+                    "currency": "AED",
+                    "text": "AED 1,500"
+                },
+                "note": "Full in March"
+            }
+        ]
+    },
+    "spare": {
+        "minor": 589767,
+        "currency": "AED",
+        "text": "AED 5,897.67"
+    },
+    "steps": [
+        {
+            "label": "Income to plan on",
+            "amount": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "fromBp": 0,
+            "toBp": 10000,
+            "kind": "total"
+        },
+        {
+            "label": "Commitments and reserves",
+            "amount": {
+                "minor": -1470900,
+                "currency": "AED",
+                "text": "-AED 14,709"
+            },
+            "fromBp": 5737,
+            "toBp": 10000,
+            "kind": "s1"
+        },
+        {
+            "label": "Everyday spending",
+            "amount": {
+                "minor": -739333,
+                "currency": "AED",
+                "text": "-AED 7,393.33"
+            },
+            "fromBp": 3594,
+            "toBp": 5737,
+            "kind": "s2"
+        },
+        {
+            "label": "Free cash",
+            "amount": {
+                "minor": 1239767,
+                "currency": "AED",
+                "text": "AED 12,397.67"
+            },
+            "fromBp": 0,
+            "toBp": 3594,
+            "kind": "total"
+        },
+        {
+            "label": "Saving for goals",
+            "amount": {
+                "minor": -650000,
+                "currency": "AED",
+                "text": "-AED 6,500"
+            },
+            "fromBp": 1709,
+            "toBp": 3594,
+            "kind": "s3"
+        },
+        {
+            "label": "Spare",
+            "amount": {
+                "minor": 589767,
+                "currency": "AED",
+                "text": "AED 5,897.67"
+            },
+            "fromBp": 0,
+            "toBp": 1709,
+            "kind": "total"
+        }
+    ],
+    "untilNextIncome": {
+        "nextIncomeOn": "2026-11-14",
+        "nextIncomeLabel": "Omar salary",
+        "free": {
+            "minor": 25800,
+            "currency": "AED",
+            "text": "AED 258"
+        },
+        "why": [
+            {
+                "label": "In current accounts and cash today",
+                "amount": {
+                    "minor": 1230000,
+                    "currency": "AED",
+                    "text": "AED 12,300"
+                },
+                "note": null
+            },
+            {
+                "label": "Bills due by then",
+                "amount": {
+                    "minor": -140900,
+                    "currency": "AED",
+                    "text": "-AED 1,409"
+                },
+                "note": null
+            },
+            {
+                "label": "Other card bills due by then",
+                "amount": {
+                    "minor": -595000,
+                    "currency": "AED",
+                    "text": "-AED 5,950"
+                },
+                "note": null
+            },
+            {
+                "label": "Everyday budget for 19 days",
+                "amount": {
+                    "minor": -468300,
+                    "currency": "AED",
+                    "text": "-AED 4,683"
+                },
+                "note": null
+            }
+        ]
+    },
+    "nextCommitment": {
+        "commitmentId": "00000000-0000-0000-0000-0000000002c4",
+        "name": "DEWA electricity and water",
+        "kind": "UTILITY",
+        "kindLabel": "Utilities",
+        "dueOn": "2026-10-26",
+        "daysLeft": 1,
+        "amount": {
+            "minor": 90000,
+            "currency": "AED",
+            "text": "AED 900"
+        },
+        "estimate": true,
+        "state": "FROM_PAY",
+        "shortBy": {
+            "minor": 0,
+            "currency": "AED",
+            "text": "AED 0"
+        },
+        "label": null
+    },
+    "upcoming": [
+        {
+            "commitmentId": "00000000-0000-0000-0000-0000000002c4",
+            "name": "DEWA electricity and water",
+            "kind": "UTILITY",
+            "kindLabel": "Utilities",
+            "dueOn": "2026-10-26",
+            "daysLeft": 1,
+            "amount": {
+                "minor": 90000,
+                "currency": "AED",
+                "text": "AED 900"
+            },
+            "estimate": true,
+            "state": "FROM_PAY",
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "label": null
+        },
+        {
+            "commitmentId": "00000000-0000-0000-0000-0000000002c6",
+            "name": "Streaming bundle",
+            "kind": "SUBSCRIPTION",
+            "kindLabel": "Subscription",
+            "dueOn": "2026-10-28",
+            "daysLeft": 3,
+            "amount": {
+                "minor": 5900,
+                "currency": "AED",
+                "text": "AED 59"
+            },
+            "estimate": false,
+            "state": "FROM_PAY",
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "label": null
+        },
+        {
+            "commitmentId": "00000000-0000-0000-0000-0000000002c5",
+            "name": "du home and mobile",
+            "kind": "TELECOM",
+            "kindLabel": "Phone and internet",
+            "dueOn": "2026-11-01",
+            "daysLeft": 7,
+            "amount": {
+                "minor": 45000,
+                "currency": "AED",
+                "text": "AED 450"
+            },
+            "estimate": false,
+            "state": "FROM_PAY",
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "label": null
+        },
+        {
+            "commitmentId": null,
+            "name": "Omar's Visa, full balance",
+            "kind": "CREDIT_CARD",
+            "kindLabel": "Credit card",
+            "dueOn": "2026-11-13",
+            "daysLeft": 19,
+            "amount": {
+                "minor": 595000,
+                "currency": "AED",
+                "text": "AED 5,950"
+            },
+            "estimate": false,
+            "state": "FROM_PAY",
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "label": null
+        },
+        {
+            "commitmentId": "00000000-0000-0000-0000-0000000002c3",
+            "name": "Car loan",
+            "kind": "LOAN",
+            "kindLabel": "Loan",
+            "dueOn": "2026-11-16",
+            "daysLeft": 22,
+            "amount": {
+                "minor": 210000,
+                "currency": "AED",
+                "text": "AED 2,100"
+            },
+            "estimate": false,
+            "state": "FROM_PAY",
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "label": null
+        },
+        {
+            "commitmentId": null,
+            "name": "Sara's Mastercard, full balance",
+            "kind": "CREDIT_CARD",
+            "kindLabel": "Credit card",
+            "dueOn": "2026-11-22",
+            "daysLeft": 28,
+            "amount": {
+                "minor": 135000,
+                "currency": "AED",
+                "text": "AED 1,350"
+            },
+            "estimate": false,
+            "state": "FROM_PAY",
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "label": null
+        },
+        {
+            "commitmentId": "00000000-0000-0000-0000-0000000002c4",
+            "name": "DEWA electricity and water",
+            "kind": "UTILITY",
+            "kindLabel": "Utilities",
+            "dueOn": "2026-11-26",
+            "daysLeft": 32,
+            "amount": {
+                "minor": 90000,
+                "currency": "AED",
+                "text": "AED 900"
+            },
+            "estimate": true,
+            "state": "FROM_PAY",
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "label": null
+        },
+        {
+            "commitmentId": "00000000-0000-0000-0000-0000000002c6",
+            "name": "Streaming bundle",
+            "kind": "SUBSCRIPTION",
+            "kindLabel": "Subscription",
+            "dueOn": "2026-11-28",
+            "daysLeft": 34,
+            "amount": {
+                "minor": 5900,
+                "currency": "AED",
+                "text": "AED 59"
+            },
+            "estimate": false,
+            "state": "FROM_PAY",
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "label": null
+        },
+        {
+            "commitmentId": "00000000-0000-0000-0000-0000000002c1",
+            "name": "Apartment rent",
+            "kind": "RENT",
+            "kindLabel": "Rent",
+            "dueOn": "2027-01-01",
+            "daysLeft": 68,
+            "amount": {
+                "minor": 3000000,
+                "currency": "AED",
+                "text": "AED 30,000"
+            },
+            "estimate": false,
+            "state": "RESERVED",
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "label": "Cheque 2 of 4"
+        },
+        {
+            "commitmentId": "00000000-0000-0000-0000-0000000002c2",
+            "name": "School fees",
+            "kind": "SCHOOL_FEES",
+            "kindLabel": "School fees",
+            "dueOn": "2027-01-05",
+            "daysLeft": 72,
+            "amount": {
+                "minor": 1500000,
+                "currency": "AED",
+                "text": "AED 15,000"
+            },
+            "estimate": false,
+            "state": "RESERVED",
+            "shortBy": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "label": "Term 2"
+        },
+        {
+            "commitmentId": "00000000-0000-0000-0000-0000000002c2",
+            "name": "School fees",
+            "kind": "SCHOOL_FEES",
+            "kindLabel": "School fees",
+            "dueOn": "2027-04-05",
+            "daysLeft": 162,
+            "amount": {
+                "minor": 1500000,
+                "currency": "AED",
+                "text": "AED 15,000"
+            },
+            "estimate": false,
+            "state": "SHORT",
+            "shortBy": {
+                "minor": 375000,
+                "currency": "AED",
+                "text": "AED 3,750"
+            },
+            "label": "Term 3"
+        }
+    ],
+    "months": [
+        {
+            "month": "2026-10",
+            "label": "Oct",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1470900,
+                "currency": "AED",
+                "text": "AED 14,709"
+            },
+            "reserveShortfall": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 1239767,
+                "currency": "AED",
+                "text": "AED 12,397.67"
+            },
+            "saving": {
+                "minor": 650000,
+                "currency": "AED",
+                "text": "AED 6,500"
+            },
+            "spare": {
+                "minor": 589767,
+                "currency": "AED",
+                "text": "AED 5,897.67"
+            },
+            "shareOfMax": 100,
+            "tight": false,
+            "negative": false
+        },
+        {
+            "month": "2026-11",
+            "label": "Nov",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1725900,
+                "currency": "AED",
+                "text": "AED 17,259"
+            },
+            "reserveShortfall": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 984767,
+                "currency": "AED",
+                "text": "AED 9,847.67"
+            },
+            "saving": {
+                "minor": 650000,
+                "currency": "AED",
+                "text": "AED 6,500"
+            },
+            "spare": {
+                "minor": 334767,
+                "currency": "AED",
+                "text": "AED 3,347.67"
+            },
+            "shareOfMax": 79,
+            "tight": false,
+            "negative": false
+        },
+        {
+            "month": "2026-12",
+            "label": "Dec",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1725900,
+                "currency": "AED",
+                "text": "AED 17,259"
+            },
+            "reserveShortfall": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 984767,
+                "currency": "AED",
+                "text": "AED 9,847.67"
+            },
+            "saving": {
+                "minor": 650000,
+                "currency": "AED",
+                "text": "AED 6,500"
+            },
+            "spare": {
+                "minor": 334767,
+                "currency": "AED",
+                "text": "AED 3,347.67"
+            },
+            "shareOfMax": 79,
+            "tight": false,
+            "negative": false
+        },
+        {
+            "month": "2027-01",
+            "label": "Jan",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1725900,
+                "currency": "AED",
+                "text": "AED 17,259"
+            },
+            "reserveShortfall": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 984767,
+                "currency": "AED",
+                "text": "AED 9,847.67"
+            },
+            "saving": {
+                "minor": 150000,
+                "currency": "AED",
+                "text": "AED 1,500"
+            },
+            "spare": {
+                "minor": 834767,
+                "currency": "AED",
+                "text": "AED 8,347.67"
+            },
+            "shareOfMax": 79,
+            "tight": false,
+            "negative": false
+        },
+        {
+            "month": "2027-02",
+            "label": "Feb",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1725900,
+                "currency": "AED",
+                "text": "AED 17,259"
+            },
+            "reserveShortfall": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 984767,
+                "currency": "AED",
+                "text": "AED 9,847.67"
+            },
+            "saving": {
+                "minor": 150000,
+                "currency": "AED",
+                "text": "AED 1,500"
+            },
+            "spare": {
+                "minor": 834767,
+                "currency": "AED",
+                "text": "AED 8,347.67"
+            },
+            "shareOfMax": 79,
+            "tight": false,
+            "negative": false
+        },
+        {
+            "month": "2027-03",
+            "label": "Mar",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1725900,
+                "currency": "AED",
+                "text": "AED 17,259"
+            },
+            "reserveShortfall": {
+                "minor": 375000,
+                "currency": "AED",
+                "text": "AED 3,750"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 609767,
+                "currency": "AED",
+                "text": "AED 6,097.67"
+            },
+            "saving": {
+                "minor": 90000,
+                "currency": "AED",
+                "text": "AED 900"
+            },
+            "spare": {
+                "minor": 519767,
+                "currency": "AED",
+                "text": "AED 5,197.67"
+            },
+            "shareOfMax": 49,
+            "tight": true,
+            "negative": false
+        },
+        {
+            "month": "2027-04",
+            "label": "Apr",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1725900,
+                "currency": "AED",
+                "text": "AED 17,259"
+            },
+            "reserveShortfall": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 984767,
+                "currency": "AED",
+                "text": "AED 9,847.67"
+            },
+            "saving": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "spare": {
+                "minor": 984767,
+                "currency": "AED",
+                "text": "AED 9,847.67"
+            },
+            "shareOfMax": 79,
+            "tight": false,
+            "negative": false
+        },
+        {
+            "month": "2027-05",
+            "label": "May",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1725900,
+                "currency": "AED",
+                "text": "AED 17,259"
+            },
+            "reserveShortfall": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 984767,
+                "currency": "AED",
+                "text": "AED 9,847.67"
+            },
+            "saving": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "spare": {
+                "minor": 984767,
+                "currency": "AED",
+                "text": "AED 9,847.67"
+            },
+            "shareOfMax": 79,
+            "tight": false,
+            "negative": false
+        },
+        {
+            "month": "2027-06",
+            "label": "Jun",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1775900,
+                "currency": "AED",
+                "text": "AED 17,759"
+            },
+            "reserveShortfall": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 934767,
+                "currency": "AED",
+                "text": "AED 9,347.67"
+            },
+            "saving": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "spare": {
+                "minor": 934767,
+                "currency": "AED",
+                "text": "AED 9,347.67"
+            },
+            "shareOfMax": 75,
+            "tight": false,
+            "negative": false
+        },
+        {
+            "month": "2027-07",
+            "label": "Jul",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1775900,
+                "currency": "AED",
+                "text": "AED 17,759"
+            },
+            "reserveShortfall": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 934767,
+                "currency": "AED",
+                "text": "AED 9,347.67"
+            },
+            "saving": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "spare": {
+                "minor": 934767,
+                "currency": "AED",
+                "text": "AED 9,347.67"
+            },
+            "shareOfMax": 75,
+            "tight": false,
+            "negative": false
+        },
+        {
+            "month": "2027-08",
+            "label": "Aug",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1775900,
+                "currency": "AED",
+                "text": "AED 17,759"
+            },
+            "reserveShortfall": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 934767,
+                "currency": "AED",
+                "text": "AED 9,347.67"
+            },
+            "saving": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "spare": {
+                "minor": 934767,
+                "currency": "AED",
+                "text": "AED 9,347.67"
+            },
+            "shareOfMax": 75,
+            "tight": false,
+            "negative": false
+        },
+        {
+            "month": "2027-09",
+            "label": "Sep",
+            "income": {
+                "minor": 3450000,
+                "currency": "AED",
+                "text": "AED 34,500"
+            },
+            "commitments": {
+                "minor": 1775900,
+                "currency": "AED",
+                "text": "AED 17,759"
+            },
+            "reserveShortfall": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "everyday": {
+                "minor": 739333,
+                "currency": "AED",
+                "text": "AED 7,393.33"
+            },
+            "free": {
+                "minor": 934767,
+                "currency": "AED",
+                "text": "AED 9,347.67"
+            },
+            "saving": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "spare": {
+                "minor": 934767,
+                "currency": "AED",
+                "text": "AED 9,347.67"
+            },
+            "shareOfMax": 75,
+            "tight": false,
+            "negative": false
+        }
+    ],
+    "health": {
+        "debtSharePercent": 6,
+        "variableIncomePercent": 19,
+        "negativeMonths": [],
+        "tightestMonth": "March",
+        "tightestFree": {
+            "minor": 609767,
+            "currency": "AED",
+            "text": "AED 6,097.67"
+        }
+    },
+    "notes": [
+        "School fees, term 3 on 5 Apr: the reserve will have AED 11,250 of AED 15,000. The other AED 3,750 comes out of March's free cash.",
+        "Sara commission is planned on a cautious base of AED 6,500 a month: the average of the 3 lowest of the last 6 months.",
+        "DEWA electricity and water is about AED 1,400 a month from June to September."
+    ]
+}

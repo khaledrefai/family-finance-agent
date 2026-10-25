@@ -1,0 +1,40 @@
+{
+    "version": 1,
+    "amount": {
+        "minor": 30000,
+        "currency": "AED",
+        "text": "AED 300"
+    },
+    "verdict": "FITS",
+    "freeUntilPay": null,
+    "nextIncomeOn": null,
+    "freeAfter": null,
+    "nextCommitment": null,
+    "needsParent": true,
+    "approvalLimit": {
+        "minor": 5000,
+        "currency": "AED",
+        "text": "AED 50"
+    },
+    "kid": {
+        "memberId": "00000000-0000-0000-0000-0000000000c1",
+        "name": "Layla",
+        "wallet": {
+            "minor": 38800,
+            "currency": "AED",
+            "text": "AED 388"
+        },
+        "walletCovers": true,
+        "walletAfter": {
+            "minor": 8800,
+            "currency": "AED",
+            "text": "AED 88"
+        }
+    },
+    "card": null,
+    "facts": [
+        "It costs AED 300.",
+        "Layla's wallet has AED 388, enough for this.",
+        "A parent says yes to anything over AED 50."
+    ]
+}
