@@ -1,0 +1,90 @@
+name: Deploy
+
+# Every commit on main that passes CI is deployed to the test VPS.
+# Run it by hand from the Actions tab with "Run workflow" (it deploys the latest main).
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time; a newer commit waits for the running one to finish.
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    env:
+      # Works whether each value was saved as a secret or as a variable in the "production" environment.
+      VPS_HOST: ${{ secrets.VPS_HOST || vars.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER || vars.VPS_USER }}
+      VPS_PORT: ${{ secrets.VPS_PORT || vars.VPS_PORT || '22' }}
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SHA }}
+
+      - name: Set up SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY || vars.VPS_SSH_KEY }}
+        run: |
+          for v in VPS_HOST VPS_USER VPS_SSH_KEY; do
+            if [ -z "${!v}" ]; then echo "::error::$v is not set in the production environment"; exit 1; fi
+          done
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_vps && chmod 600 ~/.ssh/id_vps
+          ssh-keyscan -p "$VPS_PORT" -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          cat > ~/.ssh/config <<EOF
+          Host vps
+            HostName $VPS_HOST
+            User $VPS_USER
+            Port $VPS_PORT
+            IdentityFile ~/.ssh/id_vps
+            ServerAliveInterval 30
+          EOF
+
+      - name: Copy this commit to the VPS
+        run: |
+          git archive --format=tar "$SHA" | ssh vps "mkdir -p ~/ffa/releases/$SHA && tar -x -C ~/ffa/releases/$SHA"
+
+      - name: Send the settings
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD || vars.POSTGRES_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || vars.ANTHROPIC_API_KEY }}
+          APP_JWT_SECRET: ${{ secrets.APP_JWT_SECRET }}
+          WEB_PORT: ${{ vars.WEB_PORT || '3000' }}
+          AGENTS_LLM: ${{ vars.AGENTS_LLM || 'auto' }}
+        run: |
+          if [ -z "$POSTGRES_PASSWORD" ]; then echo "::error::POSTGRES_PASSWORD is not set in the production environment"; exit 1; fi
+          {
+            echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD"
+            echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY"
+            echo "WEB_PORT=$WEB_PORT"
+            echo "AGENTS_LLM=$AGENTS_LLM"
+            if [ -n "$APP_JWT_SECRET" ]; then echo "APP_JWT_SECRET=$APP_JWT_SECRET"; fi
+          } | ssh vps "umask 077 && mkdir -p ~/ffa/shared && cat > ~/ffa/shared/incoming.env"
+
+      - name: Build and start
+        run: ssh vps "bash ~/ffa/releases/$SHA/ops/vps-deploy.sh $SHA"
+
+      - name: Check the app answers
+        run: |
+          port="${{ vars.WEB_PORT || '3000' }}"
+          for i in $(seq 1 30); do
+            if ssh vps "curl -fsS -o /dev/null http://localhost:$port/ || wget -q -O /dev/null http://localhost:$port/"; then
+              echo "Deployed $SHA: http://$VPS_HOST:$port"
+              echo "Deployed \`${SHA::7}\` to http://$VPS_HOST:$port" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 5
+          done
+          ssh vps "cd ~/ffa/current && COMPOSE_PROJECT_NAME=ffa docker compose logs --tail=80"
+          echo "::error::The web app did not answer on port $port"
+          exit 1

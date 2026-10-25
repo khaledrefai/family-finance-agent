@@ -32,6 +32,24 @@ Demo logins (password `demo1234` for all):
 
 Before every demo recording: `./deploy.sh reseed` resets the demo family to its starting state.
 
+## Test server
+
+Every commit on `main` that passes CI is deployed to the VPS by `.github/workflows/deploy.yml`
+(or run it by hand: Actions, Deploy, Run workflow). It reads the GitHub environment `production`:
+
+| Name | Kind | What |
+|---|---|---|
+| `VPS_HOST`, `VPS_USER` | variable or secret | Where to SSH. Optional `VPS_PORT` (default 22). |
+| `VPS_SSH_KEY` | secret | Private key whose public half is in the VPS user's `~/.ssh/authorized_keys`. |
+| `POSTGRES_PASSWORD` | secret | Set once. The database keeps the first password, so don't change it later. |
+| `ANTHROPIC_API_KEY` | secret | Optional. Empty means the rule-based answers. |
+| `WEB_PORT`, `AGENTS_LLM` | variable | Optional (3000, auto). |
+
+The VPS needs Docker with the compose plugin, and the user must be allowed to run `docker`.
+Releases live in `~/ffa/releases/<commit>`, `~/ffa/current` points at the running one,
+and `~/ffa/shared/.env` holds the settings (the JWT secret is generated there once).
+To reset the demo family on the server: `ssh` in, then `cd ~/ffa/current && COMPOSE_PROJECT_NAME=ffa ./deploy.sh reseed`.
+
 ## Tests
 
 ```bash
