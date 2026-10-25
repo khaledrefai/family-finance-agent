@@ -465,3 +465,32 @@ body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
 .tip:first-of-type { border-top: 0; padding-top: 0; }
 .tip-actions { display: flex; flex-wrap: wrap; gap: 4px 16px; }
 .tip-actions .text { min-height: 44px; font-size: 14px; padding: 0; }
+
+/* ---------------------------------------------------------------- live updates (week 5) */
+/* The toast: what the app just told you, while the app is open. Sits above the tab bar. */
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 84px; z-index: 30;
+  width: min(528px, calc(100% - 32px)); display: flex; align-items: flex-start; gap: 4px;
+  background: var(--ink); color: var(--on-ink); border-radius: var(--radius-field);
+  padding: 12px 8px 12px 14px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.22); animation: toast-in 0.25s ease-out;
+}
+.toast a { display: flex; gap: 10px; flex: 1; color: inherit; text-decoration: none; font-size: 14px; line-height: 1.4; }
+.toast button.text { color: var(--on-ink); min-height: 32px; padding: 0 8px; font-size: 20px; line-height: 1; }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+.live-dot { display: inline-flex; align-items: center; gap: 6px; font-size: var(--step--1); color: var(--ink-soft); }
+.live-dot::before { content: ""; width: 8px; height: 8px; border-radius: 99px; background: var(--field); }
+.live-dot.on::before { background: var(--approved); }
+
+.bell { position: relative; display: inline-grid; place-items: center; width: 44px; height: 44px; color: var(--ink); border-radius: 99px; }
+.bell-count {
+  position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px;
+  background: var(--declined); color: #fff; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center;
+}
+
+/* The kid's wallet glows for a moment when a parent's yes takes money out (or pocket money comes in). */
+.wallet.changed { animation: wallet-glow 2.4s ease-out; }
+@keyframes wallet-glow { 0% { box-shadow: 0 0 0 0 var(--approved); } 25% { box-shadow: 0 0 0 6px var(--approved-wash); } 100% { box-shadow: 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) {
+  .toast, .wallet.changed { animation: none; }
+}

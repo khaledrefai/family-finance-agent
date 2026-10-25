@@ -10,6 +10,16 @@
 --   Layla (13)      layla / demo1234   -> wants AED 300 headphones from noon
 --   Adam  (9)       adam / demo1234    -> peanut allergy, tries to buy peanut snacks
 
+-- Phones that said yes to notifications, and email addresses a parent typed in, survive a reseed (the member ids
+-- are fixed), so there is no need to turn notifications on again before every recording.
+DROP TABLE IF EXISTS keep_push;
+DROP TABLE IF EXISTS keep_email;
+CREATE TEMP TABLE keep_push AS
+SELECT p.* FROM push_subscription p JOIN member m ON m.id = p.member_id
+ WHERE m.family_id = '00000000-0000-0000-0000-00000000f001';
+CREATE TEMP TABLE keep_email AS
+SELECT id, email FROM member WHERE family_id = '00000000-0000-0000-0000-00000000f001' AND role = 'PARENT';
+
 -- Delete children before parents. Relying on ON DELETE CASCADE alone fails once a request has been approved
 -- (approval -> member has no cascade, and Postgres can check it before the cascade reaches the approval).
 DELETE FROM approval a USING spending_request r
@@ -40,6 +50,11 @@ INSERT INTO member (id, family_id, display_name, role, age_band, username, passw
  ('00000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-00000000f001', 'Omar',  'PARENT', 'ADULT',      'omar',  crypt('demo1234', gen_salt('bf', 10)), 'omar@demo.local'),
  ('00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-00000000f001', 'Layla', 'CHILD',  'TEEN_13_17', 'layla', crypt('demo1234', gen_salt('bf', 10)), NULL),
  ('00000000-0000-0000-0000-0000000000c2', '00000000-0000-0000-0000-00000000f001', 'Adam',  'CHILD',  'CHILD_6_9',  'adam',  crypt('demo1234', gen_salt('bf', 10)), NULL);
+
+UPDATE member m SET email = k.email FROM keep_email k WHERE m.id = k.id AND k.email IS NOT NULL;
+INSERT INTO push_subscription SELECT * FROM keep_push ON CONFLICT DO NOTHING;
+DROP TABLE keep_push;
+DROP TABLE keep_email;
 
 -- Parental consent for each child account (PDPL)
 INSERT INTO consent (family_id, subject_member_id, granted_by_id, purpose)

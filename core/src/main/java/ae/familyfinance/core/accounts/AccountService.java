@@ -212,6 +212,14 @@ public class AccountService {
                 MoneyView.of(free.free()), fits, MoneyView.of(shortBy), line, free.why());
     }
 
+    /** A card and its next bill, for the core's own "card bill due" alerts. */
+    public record DueCard(UUID accountId, String label, CardBill bill) {
+    }
+
+    public List<DueCard> dueCards(Snapshot s) {
+        return s.accounts().stream().filter(AccountFact::isCard).map(a -> new DueCard(a.id(), a.label(), bill(s, a))).toList();
+    }
+
     public static AccountFact account(Snapshot s, UUID id) {
         return s.accounts().stream().filter(a -> a.id().equals(id)).findFirst()
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Account not found"));

@@ -30,6 +30,8 @@ public abstract class PostgresIntegrationTest {
 
     @DynamicPropertySource
     static void datasource(DynamicPropertyRegistry registry) {
+        // No timers in tests: they call OutboxDispatcher.dispatchPending() and AlertService.check() themselves
+        registry.add("app.live.scheduler", () -> "false");
         if (POSTGRES != null) {
             registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
             registry.add("spring.datasource.username", POSTGRES::getUsername);

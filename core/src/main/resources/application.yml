@@ -11,6 +11,19 @@ spring:
       ddl-auto: validate      # Flyway owns the schema; Hibernate only checks the entities match it
   flyway:
     locations: classpath:db/migration
+  # Parent email alerts (week 5). Off unless SMTP_HOST is set. Port 587 uses STARTTLS; for port 465 set SMTP_SSL=true.
+  mail:
+    host: ${SMTP_HOST:}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.ssl.enable: ${SMTP_SSL:false}
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
   servlet:
     multipart:
       max-file-size: 5MB      # receipts and statements (DocumentService.MAX_BYTES)
@@ -22,8 +35,21 @@ app:
     secret: ${APP_JWT_SECRET:dev-only-secret-change-me-0123456789abcdef}
     issuer: family-finance-core
     ttl: 8h
+  # Where the app is opened, for the link in alert emails, e.g. https://family.example.com (optional)
+  public-url: ${APP_PUBLIC_URL:}
+  mail:
+    from: ${MAIL_FROM:}
+  push:
+    # Optional. Empty = the core makes a key pair on first start and keeps it in the database (app_setting).
+    vapid-public-key: ${VAPID_PUBLIC_KEY:}
+    vapid-private-key: ${VAPID_PRIVATE_KEY:}
+    # How push services can reach whoever runs this server: mailto:you@example.com or an https address
+    subject: ${PUSH_CONTACT:}
 
 management:
+  health:
+    mail:
+      enabled: false   # email is optional; a missing SMTP server must not mark the core as down
   endpoints:
     web:
       exposure:

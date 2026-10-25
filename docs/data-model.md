@@ -24,7 +24,11 @@ Money is always `BIGINT` fils (`*_minor` columns) plus a 3-letter currency. 3000
 | `family_rule` | Rule (category, allergen, limit) | `BLOCK_CATEGORY`, `BLOCK_ALLERGEN`, `APPROVAL_LIMIT`; for one child or all |
 | `spending_request` | Request | `SPEND`, `ASK_TO_BUY`, `CHALLENGE`, `REWARD`; `agent_summary` holds the Gatekeeper's explanation. V3: `assessment` (JSON from the affordability check, stored when the request is made) |
 | `approval` | Approval | One per request. Trigger `approval_guard` blocks self-approval, non-parents and other families |
-| `demo_wallet`, `demo_wallet_entry` | DemoWallet | `is_demo_money` can only be true. Balance = sum of append-only entries |
+| `demo_wallet`, `demo_wallet_entry` | DemoWallet | `is_demo_money` can only be true. Balance = sum of append-only entries. Week 5: approving a child's request adds a `PAYMENT` entry (with `request_id`) when the wallet covers it |
+| `family_event` | (outbox, V6) | One row per thing someone should hear about, written in the same transaction as the change. `dedupe_key` makes the core's own alerts one-off. `processed_at` set by the 2-second poller |
+| `notification` | (the bell, V6) | One row per event and member, with the words shown; `pushed_at`, `emailed_at`, `read_at` |
+| `push_subscription` | (V6) | One phone or browser that turned notifications on: push endpoint (Google, Mozilla, Apple, Microsoft only) and its keys. Kept across reseeds |
+| `app_setting` | (V6) | The core's web push (VAPID) key pair when not given in `.env` |
 | `goal` | Goal | Per child or family-wide. V3: `tier` (`SURVIVAL`, `GOOD_LIFE`, `DREAM`), `monthly_minor` (the pace a parent picked), `priority` (lower is funded first) |
 | `challenge` | Challenge | Can be linked to the request/approval that started it |
 | `points_entry` | Points | Append-only; total = sum |

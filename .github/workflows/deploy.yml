@@ -59,6 +59,15 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD || vars.POSTGRES_PASSWORD }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || vars.ANTHROPIC_API_KEY }}
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY || vars.SERPAPI_KEY }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST || vars.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT || vars.SMTP_PORT || '587' }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME || vars.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM || vars.MAIL_FROM }}
+          PUSH_CONTACT: ${{ secrets.PUSH_CONTACT || vars.PUSH_CONTACT }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY || vars.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          APP_PUBLIC_URL: ${{ vars.APP_PUBLIC_URL || format('http://{0}:{1}', env.VPS_HOST, vars.WEB_PORT || '3000') }}
           APP_JWT_SECRET: ${{ secrets.APP_JWT_SECRET }}
           WEB_PORT: ${{ vars.WEB_PORT || '3000' }}
           AGENTS_LLM: ${{ vars.AGENTS_LLM || 'auto' }}
@@ -68,6 +77,9 @@ jobs:
             echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD"
             echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY"
             echo "SERPAPI_KEY=$SERPAPI_KEY"
+            for v in SMTP_HOST SMTP_PORT SMTP_USERNAME SMTP_PASSWORD MAIL_FROM PUSH_CONTACT VAPID_PUBLIC_KEY VAPID_PRIVATE_KEY APP_PUBLIC_URL; do
+              echo "$v=${!v}"
+            done
             echo "WEB_PORT=$WEB_PORT"
             echo "AGENTS_LLM=$AGENTS_LLM"
             if [ -n "$APP_JWT_SECRET" ]; then echo "APP_JWT_SECRET=$APP_JWT_SECRET"; fi
