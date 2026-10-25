@@ -97,6 +97,12 @@ class RulesBudgetsAdviceIntegrationTest extends PostgresIntegrationTest {
         assertThat(on.get("status").asText()).isEqualTo("ACTIVE");
         assertThat(on.get("replaces").toString()).contains(SEED_LIMIT);
 
+        // A parent is needed anyway when Layla's wallet can't cover the book. Other tests may have paid from it
+        // (an approved AED 300 pair of headphones can leave AED 1), so put the AED 60 in first.
+        jdbc.update("""
+                INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description)
+                SELECT id, 'ADJUSTMENT', 6000, 'Top-up for a test (demo money)' FROM demo_wallet WHERE member_id = ?
+                """, DemoFamily.LAYLA);
         JsonNode after = read(postJson("/api/requests/assess", login("layla"),
                 "{\"amount\":\"60\",\"title\":\"Book\",\"category\":\"BOOKS_AND_STATIONERY\"}"));
         assertThat(after.get("approvalLimit").get("text").asText()).isEqualTo("AED 100");
