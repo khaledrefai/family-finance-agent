@@ -5,6 +5,10 @@
  * stamp inks for each status, and a covered bill or a fine number stays neutral.
  * All text/background pairs below are at least 4.5:1 (AA), borders on inputs at least 3:1.
  */
+/* Readex Pro covers Latin and Arabic, so an Arabic version later keeps the same voice. The kids' screens use the
+   rounder Baloo Bhaijaan 2, which also covers Arabic. Both are loaded in app/layout.tsx. */
+:root { --font-readex: "Readex Pro Variable"; --font-kid: "Baloo Bhaijaan 2 Variable"; }
+
 :root {
   --paper: #eff2f6;        /* page */
   --chit: #ffffff;         /* cards and chits */
