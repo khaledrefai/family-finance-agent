@@ -89,13 +89,15 @@ const CHILD_TABS: Tab[] = [
 ];
 
 // The bottom tab bar. A tab is current for its own page and every page under it,
-// except the two home tabs, which only match themselves (and the request and summary pages for Today).
+// except the two home tabs, which only match themselves (and the request, summary and notifications pages for Today).
 export function TabBar({ who }: { who: "parent" | "child" }) {
   const path = usePathname();
   const tabs = who === "parent" ? PARENT_TABS : CHILD_TABS;
   const home = tabs[0].href;
   const current = (href: string) =>
-    href === home ? path === home || path.startsWith(`${home}/why`) || path.startsWith(`${home}/summary`) : path.startsWith(href);
+    href === home
+      ? path === home || path.startsWith(`${home}/why`) || path.startsWith(`${home}/summary`) || path.startsWith(`${home}/alerts`)
+      : path.startsWith(href);
 
   // Room for the fixed bar at the bottom of the page.
   useEffect(() => {

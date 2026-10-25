@@ -44,12 +44,37 @@ Every commit on `main` that passes CI is deployed to the VPS by `.github/workflo
 | `POSTGRES_PASSWORD` | secret | Set once. The database keeps the first password, so don't change it later. |
 | `ANTHROPIC_API_KEY` | secret | Optional. Empty means the rule-based answers. |
 | `SERPAPI_KEY` | secret | Optional. Web search for live prices; passed to core and agents, not read by any code yet. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `MAIL_FROM` | variable or secret | Optional. Email alerts to parents. Empty `SMTP_HOST` = no email. Port 587 (STARTTLS) by default. |
+| `SMTP_PASSWORD` | secret | Optional. The SMTP password (for Gmail, an app password). |
+| `PUSH_CONTACT` | variable or secret | Optional. `mailto:you@example.com`, given to the browsers' push services. |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | secret | Optional. Web push keys; leave unset and the core makes them once and keeps them in the database. |
+| `APP_PUBLIC_URL` | variable | Optional. The app's address for links in emails (default `http://VPS_HOST:WEB_PORT`). |
 | `WEB_PORT`, `AGENTS_LLM` | variable | Optional (3000, auto). |
 
 The VPS needs Docker with the compose plugin, and the user must be allowed to run `docker`.
 Releases live in `~/ffa/releases/<commit>`, `~/ffa/current` points at the running one,
 and `~/ffa/shared/.env` holds the settings (the JWT secret is generated there once).
 To reset the demo family on the server: `ssh` in, then `cd ~/ffa/current && COMPOSE_PROJECT_NAME=ffa ./deploy.sh reseed`.
+
+## Live updates and notifications (week 5)
+
+Anything a family member should hear about writes a row to the `family_event` table (the outbox) in the same
+transaction as the change. The core reads new rows every 2 seconds and sends them on:
+
+- **Open screens** get a ping over `GET /api/live` (Server-Sent Events) and reload that part: the parent's
+  Waiting list, the kid's requests and wallet. About 2 seconds from tap to screen.
+- **Phones** get a web push (Family > Notifications > Turn on for this phone). Browsers only allow this on
+  `https://` or `localhost`, and iPhones only from the Home Screen app. On the plain `http://VPS_HOST:3000`
+  address the live screens work but phone notifications can't be turned on.
+- **Parents' email** for the core's own alerts, when SMTP is set up.
+- **The bell** (Today, top right) keeps the last 30.
+
+The core's own alerts come from fixed rules, checked every 15 minutes, each sent once: a bill due in the next 3 days,
+a card bill due in 5 days (or in 14 when it won't be covered), a budget over / heading over / above usual, and on
+Sunday from 8 am the plan for the week. "Check bills and budgets now" in Family runs them at once (and sends this
+week's plan on any day, for the demo).
+
+Approving a child's request now pays for it from their demo wallet when it holds enough; otherwise a parent pays.
 
 ## Tests
 

@@ -6,11 +6,15 @@ import { aed, api, MemberView } from "@/lib/api";
 import { advice as adviceApi, BudgetMonth, CardCheck, core, dayLongMonth, Goal, useAccounts, useLive, useMoney, WaysToSave } from "@/lib/live";
 import { advice, familyGoal, kids, waysToSave } from "@/lib/sample";
 import { Chit } from "../chit";
+import { BellLink } from "../live-ui";
+import { notifyApi, WeekPlan } from "@/lib/push";
+import { useLiveEvents } from "@/lib/live-stream";
 import { AccountPicker, BigAmount, CardWarning, Icon, Masthead, Progress, SampleNote, TRUST, WhySheet } from "../ui";
 import { useSession } from "../use-session";
 
 // Today: only what needs a parent, in this order: bills due, ask, waiting requests,
-// what is free this month, the family goal, one piece of advice, ways to save, then what was decided.
+// this week's plan, what is free this month, the family goal, one piece of advice, ways to save, then what was decided.
+// The Waiting list updates live: when a kid asks on their phone, it lands here without a reload (week 5).
 // Requests, bills, cards, free cash and the family goal come from the core's money engine.
 // Overspend alerts come from the budget engine, and "Ways to save" from the engine with the Planner's words.
 // The one piece of advice is still a sample figure.
@@ -32,6 +36,11 @@ export default function TodayPage() {
   const { data: goals } = useLive<Goal[] | null>(() => core.goals(), null, !!me);
   const { data: budgetMonth } = useLive<BudgetMonth | null>(() => adviceApi.budgets(), null, !!me);
   const { data: ways, live: waysLive, setData: setWays } = useLive<WaysToSave | null>(() => adviceApi.waysToSave(), null, !!me);
+  const { data: week, setData: setWeek } = useLive<WeekPlan | null>(() => notifyApi.week(), null, !!me);
+  // A new bill or budget alert, or a wallet payment, can change this week's figures
+  useLiveEvents(["BILL_DUE", "CARD_DUE", "OVERSPEND", "WEEKLY_PLAN", "REQUEST_DECIDED"], () => {
+    notifyApi.week().then(setWeek).catch(() => {});
+  }, !!me);
 
   useEffect(() => {
     if (me) api.members().then(setMembers).catch(() => {});
@@ -82,7 +91,12 @@ export default function TodayPage() {
       <Masthead
         title={`Hi ${me.displayName}`}
         sub={me.familyName}
-        action={<button className="text" onClick={logout}>Log out</button>}
+        action={
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <BellLink />
+            <button className="text" onClick={logout}>Log out</button>
+          </span>
+        }
       />
       {error && <p className="error" role="alert">{error}</p>}
 
@@ -154,6 +168,33 @@ export default function TodayPage() {
           </Chit>
         ))}
       </section>
+
+      {week && (
+        <section className="card" style={{ display: "grid", gap: 8 }}>
+          <div className="row" style={{ padding: 0 }}>
+            <span className="card-title">This week</span>
+            <span className="muted">{week.label}</span>
+          </div>
+          <p style={{ fontSize: 15 }}>{week.headline}</p>
+          {(week.bills.length > 0 || week.slowDown.length > 0) && (
+            <div className="rows">
+              {week.bills.map((b) => (
+                <div className="row" key={`bill-${b.label}`}>
+                  <span>{b.label}<br /><span className="muted">{b.note}</span></span>
+                  <span>{b.amount.text}</span>
+                </div>
+              ))}
+              {week.slowDown.map((b) => (
+                <div className="row" key={`slow-${b.label}`}>
+                  <span>{b.label}<br /><span className="muted">{b.note}</span></span>
+                  <span>{b.amount.minor === 0 ? "Pause" : b.amount.text}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="trust">{TRUST} Sent to your phone every Sunday morning.</p>
+        </section>
+      )}
 
       <section className="card">
         <p className="muted">Free this month, after commitments</p>

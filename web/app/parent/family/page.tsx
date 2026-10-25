@@ -6,10 +6,11 @@ import { aed, api, MemberView, plain } from "@/lib/api";
 import { FamilyRule, rulesApi } from "@/lib/live";
 import { kids } from "@/lib/sample";
 import { AgentChat } from "../../agent-chat";
+import { NotifyCard } from "../../live-ui";
 import { Masthead, Progress, SampleNote } from "../../ui";
 import { useSession } from "../../use-session";
 
-// Family: who is in it, the rules the app checks on every request, and food profiles.
+// Family: who is in it, the rules the app checks on every request, food profiles, and notifications.
 // Members and rules are live. A parent writes a rule in their own words; the agent drafts it, and it only
 // counts once a parent presses Turn on here. Kids' goals are still sample content.
 const AGE: Record<string, string> = { CHILD_6_9: "6 to 9", PRETEEN_10_12: "10 to 12", TEEN_13_17: "13 to 17" };
@@ -124,6 +125,8 @@ export default function FamilyPage() {
           onReply={loadRules}
         />
       </section>
+
+      <NotifyCard parent />
 
       <section className="card" style={{ display: "grid", gap: 6 }}>
         <p className="card-title">Food profiles</p>
