@@ -331,13 +331,89 @@ class CardCheck(BaseModel):
     line: str
 
 
+class RuleHit(BaseModel):
+    rule: str      # the rule in the parent's words, e.g. "No peanuts for Adam"
+    kind: str
+    outcome: str   # OK, NEEDS_PARENT or BLOCKED
+    detail: str    # a whole sentence written by the core
+
+
+class RuleCheck(BaseModel):
+    outcome: str   # the worst of the hits: OK, NEEDS_PARENT or BLOCKED
+    hits: list[RuleHit]
+
+
 class Assessment(BaseModel):
     amount: MoneyView
     verdict: str  # FITS, TIGHT, DOES_NOT_FIT
     needsParent: bool
+    blocked: bool = False  # against a family rule (a blocked kind of thing, an allergen in the name)
     kid: KidSide | None = None
+    rules: RuleCheck | None = None
     card: CardCheck | None = None
     facts: list[str]  # every number the agent may say is in here
+
+
+# ---------------------------------------------------------------- family rules (mirrors core/.../rules/)
+
+class RuleKind(str, Enum):
+    BLOCK_CATEGORY = "BLOCK_CATEGORY"   # a kind of thing a child can't buy
+    BLOCK_ALLERGEN = "BLOCK_ALLERGEN"   # a food a child must not have
+    APPROVAL_LIMIT = "APPROVAL_LIMIT"   # anything over this needs a parent
+    CATEGORY_LIMIT = "CATEGORY_LIMIT"   # at most this a month (or week) on one kind of thing
+    MONTHLY_CAP = "MONTHLY_CAP"         # at most this a month in all
+
+
+class Allergen(str, Enum):
+    PEANUT = "PEANUT"
+    TREE_NUT = "TREE_NUT"
+    MILK = "MILK"
+    EGG = "EGG"
+    WHEAT_GLUTEN = "WHEAT_GLUTEN"
+    SOY = "SOY"
+    FISH = "FISH"
+    SHELLFISH = "SHELLFISH"
+    SESAME = "SESAME"
+
+
+class RuleDraft(BaseModel):
+    """A typed rule for the core to check. It stays a DRAFT until a parent turns it on in the app."""
+    kind: RuleKind
+    forChild: UUID | None = None          # None = every child
+    category: SpendCategory | None = None
+    allergen: Allergen | None = None
+    limit: str | None = None              # the amount as written, e.g. "100"; the core turns it into fils
+    weekly: bool = False
+    said: str                             # the parent's own words
+    draftedBy: str                        # LLM or RULES
+
+
+class Rule(BaseModel):
+    id: UUID
+    kind: RuleKind
+    status: str   # DRAFT, ACTIVE or ARCHIVED
+    label: str
+    forChildName: str | None = None
+    chips: list[str] = []
+    replaces: list[str] = []
+
+
+# ---------------------------------------------------------------- ways to save (mirrors core/.../advice/)
+
+class TipView(BaseModel):
+    key: str
+    title: str
+    text: str
+    writtenBy: str        # LLM, RULES, or ENGINE (the engine's own sentence)
+    facts: list[str]      # the only numbers the words may use
+
+
+class WaysToSave(BaseModel):
+    month: date
+    monthLabel: str
+    tips: list[TipView]
+    hidden: int
+    needsWords: bool
 
 
 # ---------------------------------------------------------------- documents (mirrors core/.../documents/)
@@ -460,12 +536,34 @@ class CoreClient:
         _raise_for_core(resp)
         return Buckets.model_validate(resp.json())
 
-    def assess(self, amount: str, requester_id: UUID | None = None, paid_from: UUID | None = None) -> Assessment:
+    def assess(self, amount: str, requester_id: UUID | None = None, paid_from: UUID | None = None,
+               title: str | None = None, category: SpendCategory | None = None) -> Assessment:
+        """`title` and `category` are what the core checks the family rules against."""
         body = {"amount": amount, "requesterId": str(requester_id) if requester_id else None,
-                "paidFromAccountId": str(paid_from) if paid_from else None}
+                "paidFromAccountId": str(paid_from) if paid_from else None, "title": title,
+                "category": category.value if category else None}
         resp = self._http.post("/api/requests/assess", json={k: v for k, v in body.items() if v})
         _raise_for_core(resp)
         return Assessment.model_validate(resp.json())
+
+    # ------------------------------------------------------------ family rules and ways to save
+
+    def draft_rule(self, draft: RuleDraft) -> Rule:
+        resp = self._http.post("/api/rules/drafts", json=draft.model_dump(exclude_none=True, mode="json"))
+        _raise_for_core(resp)
+        return Rule.model_validate(resp.json())
+
+    def rules(self) -> list[Rule]:
+        return [Rule.model_validate(r) for r in self._get("/api/rules")]
+
+    def ways_to_save(self) -> WaysToSave:
+        return WaysToSave.model_validate(self._get("/api/ways-to-save"))
+
+    def save_tip_words(self, words: list[dict]) -> WaysToSave:
+        """[{key, text, writtenBy}]. The core checks the numbers again and keeps its own sentence if one is wrong."""
+        resp = self._http.post("/api/ways-to-save/words", json={"tips": words})
+        _raise_for_core(resp)
+        return WaysToSave.model_validate(resp.json())
 
     # ------------------------------------------------------------ documents
 

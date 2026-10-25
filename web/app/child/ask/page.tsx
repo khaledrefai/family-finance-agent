@@ -23,9 +23,12 @@ export default function ChildAsk() {
 
   async function send(requestTitle: string, fils: number, url?: string) {
     try {
-      await api.createRequest(requestTitle, fils, url);
+      const saved = await api.createRequest(requestTitle, fils, url);
       setError(null);
-      setSent(`Sent. Your parents can see "${requestTitle}" now, and their answer will show on Home.`);
+      // A family rule can stop a request before it reaches a parent; the core says which rule and why
+      setSent(saved.status === "BLOCKED"
+        ? `Not sent: ${saved.agentSummary ?? "it is against a family rule."} Ask a parent if you think that's wrong.`
+        : `Sent. Your parents can see "${requestTitle}" now, and their answer will show on Home.`);
       await reload();
     } catch (err) {
       setError((err as Error).message);

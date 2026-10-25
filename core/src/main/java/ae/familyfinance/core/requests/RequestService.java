@@ -4,6 +4,8 @@ import ae.familyfinance.core.auth.CurrentMember;
 import ae.familyfinance.core.common.ApiException;
 import ae.familyfinance.core.family.FamilyRepository;
 import ae.familyfinance.core.requests.AffordabilityService.Assessment;
+import ae.familyfinance.core.rules.RuleEngine;
+import ae.familyfinance.core.spend.SpendCategory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -36,7 +38,7 @@ public class RequestService {
 
     /**
      * Any member can ask. The money engine's assessment is stored with the request, so the parent sees the same
-     * facts the asker saw. In week 4 the Gatekeeper agent adds its explanation before a parent sees it.
+     * facts the asker saw. A request against a family rule (a blocked kind of thing, an allergen in its name) is stored as BLOCKED.
      */
     @Transactional
     public SpendingRequest create(CurrentMember me, RequestKind kind, String title, long amountMinor,
@@ -44,14 +46,32 @@ public class RequestService {
         String currency = families.findById(me.familyId()).orElseThrow().getCurrency();
         SpendingRequest saved = requests.saveAndFlush(new SpendingRequest(me.familyId(), me.memberId(), kind, title,
                 amountMinor, currency, category, productUrl));
-        Assessment assessment = affordability.assess(me, me.memberId(), amountMinor, null);
+        Assessment assessment = affordability.assess(me, me.memberId(), amountMinor, null, title, spendCategory(category));
         try {
             db.sql("UPDATE spending_request SET assessment = CAST(? AS jsonb), assessment_version = ? WHERE id = ?")
                     .params(json.writeValueAsString(assessment), AffordabilityService.VERSION, saved.getId()).update();
         } catch (JsonProcessingException e) {
             throw new IllegalStateException(e);
         }
+        if (assessment.blocked()) {
+            // Against a family rule: it never reaches a parent's "Waiting for you", and the child is told why
+            String why = assessment.rules().hits().stream()
+                    .filter(h -> h.outcome() == RuleEngine.Outcome.BLOCKED).map(RuleEngine.Hit::detail)
+                    .findFirst().orElse("It is against a family rule.");
+            saved.block(why);
+        }
         return saved;
+    }
+
+    static SpendCategory spendCategory(String category) {
+        if (category == null || category.isBlank()) {
+            return null;
+        }
+        try {
+            return SpendCategory.valueOf(category);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     /** Parents see the whole family's requests; a child sees only their own. */

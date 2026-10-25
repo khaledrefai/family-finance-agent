@@ -111,7 +111,7 @@ class PlanAndAccountsIntegrationTest extends PostgresIntegrationTest {
         Integer version = jdbc.queryForObject("SELECT assessment_version FROM spending_request WHERE id = ?::uuid",
                 Integer.class, id);
         String stored = jdbc.queryForObject("SELECT assessment::text FROM spending_request WHERE id = ?::uuid", String.class, id);
-        assertThat(version).isEqualTo(1);
+        assertThat(version).isEqualTo(2);
         assertThat(stored).contains("Adam's wallet has");
     }
 

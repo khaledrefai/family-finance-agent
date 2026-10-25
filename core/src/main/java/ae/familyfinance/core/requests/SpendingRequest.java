@@ -83,6 +83,13 @@ public class SpendingRequest {
         this.decidedAt = OffsetDateTime.now();
     }
 
+    /** Against a family rule: decided by the rule, with the core's sentence saying which one. */
+    void block(String why) {
+        this.status = RequestStatus.BLOCKED;
+        this.agentSummary = why;
+        this.decidedAt = OffsetDateTime.now();
+    }
+
     public UUID getId() { return id; }
     public UUID getFamilyId() { return familyId; }
     public UUID getRequesterId() { return requesterId; }

@@ -43,6 +43,7 @@ Every commit on `main` that passes CI is deployed to the VPS by `.github/workflo
 | `VPS_SSH_KEY` | secret | Private key whose public half is in the VPS user's `~/.ssh/authorized_keys`. |
 | `POSTGRES_PASSWORD` | secret | Set once. The database keeps the first password, so don't change it later. |
 | `ANTHROPIC_API_KEY` | secret | Optional. Empty means the rule-based answers. |
+| `SERPAPI_KEY` | secret | Optional. Web search for live prices; passed to core and agents, not read by any code yet. |
 | `WEB_PORT`, `AGENTS_LLM` | variable | Optional (3000, auto). |
 
 The VPS needs Docker with the compose plugin, and the user must be allowed to run `docker`.
@@ -99,7 +100,7 @@ npm install && npm run dev       # forwards /api/* to http://localhost:8080
 | GET | `/api/spend?memberId=&month=` | parents: anyone in the family; children: themselves |
 | GET | `/api/spend/summary?memberId=&month=` | same; every number the agent may use ("where did the money go?") |
 | GET | `/api/spend/status` | my logging today, for the agent's nudge |
-| POST | `/api/requests/assess` | any member: "can I afford it?" (children see only their own wallet side) |
+| POST | `/api/requests/assess` | any member: "can I afford it, and is it allowed?" (children see only their own wallet side and the rules) |
 | GET | `/api/plan/cashflow` | parents: free cash, free until pay day, the 12-month calendar, bills coming up |
 | GET, POST | `/api/plan/income`, `/api/plan/commitments` | parents; through an agent run they are saved as drafts |
 | POST | `/api/plan/income/{id}/receipts` | parents: what a commission income paid this month |
@@ -121,8 +122,36 @@ npm install && npm run dev       # forwards /api/* to http://localhost:8080
 | GET | `/api/findings`, POST `/api/findings/decide` | parents: double charges and unlisted subscriptions; deciding is a parent's tap |
 | GET, POST | `/api/gold`, POST `/api/gold/price`, `/api/gold/{id}/archive` | parents: gold in grams and AED at today's price |
 | GET | `/api/wealth` | parents: bank + cash + gold − cards − loans |
+| GET | `/api/rules` | parents: the family rules; a child: the rules that are on for them |
+| POST | `/api/rules/drafts` | parents (or the Gatekeeper in an agent run): always saved as a draft |
+| POST | `/api/rules/{id}/confirm`, `/api/rules/{id}/off` | a parent in the app (an agent run is refused) |
+| GET | `/api/budgets` | parents: this month's budgets, spent so far, and the overspend alerts |
+| GET | `/api/ways-to-save`, POST `/api/ways-to-save/words` | parents: up to 3 tips; the Planner saves this month's words |
+| POST | `/api/ways-to-save/{key}/dismiss`, `/snooze` | a parent in the app (an agent run is refused) |
 
-Agent service (the web app reaches it at `/agent/...`): `POST /chat`, `GET /nudge` and `POST /documents/{id}/read`.
+Agent service (the web app reaches it at `/agent/...`): `POST /chat`, `GET /nudge`, `POST /documents/{id}/read`
+and `POST /ways-to-save`.
+
+## Family rules, overspend alerts and ways to save (week 4)
+
+**Rules.** A parent writes a rule in their own words in Family ("No peanuts for Adam", "Layla: snacks up to AED 50 a
+month"). The Gatekeeper (`agents/app/rules.py`) types it: Claude with a JSON schema, checked (the child must exist,
+the amount must be one the parent wrote), or the rule-based parser when Claude is off. The core keeps it as a DRAFT;
+only a parent's Turn on makes it ACTIVE, and turning on a rule that answers the same question archives the old one.
+Kinds: approval limit, blocked category, blocked allergen, category limit (a month or a week) and monthly cap.
+
+**The request check.** `RuleEngine` (pure Java, no database) checks every child's request against the active rules:
+OK, NEEDS_PARENT or BLOCKED, with one line per rule. An allergen word in the name ("peanut butter cups") is blocked
+and never reaches a parent. Other food can't be checked from a name, so it goes to a parent with "check the pack
+label". A rule for one child beats the family-wide one. The Why page shows every rule checked.
+
+**Overspend alerts.** `BudgetEngine` compares each family budget with this month's spending: over the limit, heading
+over (from day 7, projected past 115%), or above the usual (125% of the last 3 months). Alerts show on Today and Budgets.
+
+**Ways to save.** `WaysToSaveEngine` ranks recurring costs (subscriptions, outings over budget, rent against income,
+phone and internet) and keeps the top 3, savings the engine can work out first. Once a month the Planner rewrites
+them in warmer words; the core re-checks every number before it keeps them. A parent can dismiss a tip or snooze it
+to next month. Information only, not financial advice.
 
 ## Receipts and statements (week 3)
 

@@ -2,26 +2,36 @@
 
 import Link from "next/link";
 import { aed } from "@/lib/api";
+import { advice, BudgetMonth, useLive } from "@/lib/live";
 import { budgets, food } from "@/lib/sample";
 import { BudgetBar, MonthColumns, SampleNote } from "../../../ui";
 import { useSession } from "../../../use-session";
 import { MoneyHeader } from "../money-tabs";
 
 // Budgets: spent so far against each limit, and six months of everyday spending against the budget.
+// The bars and the overspend alerts are live from the budget engine; the food week and the history are samples.
 export default function BudgetsPage() {
   const { me } = useSession("PARENT");
+  const { data: month, live } = useLive<BudgetMonth | null>(() => advice.budgets(), null, !!me);
   if (!me) return <p className="muted">Loading…</p>;
   const h = budgets.history;
+  const bars = live && month
+    ? month.lines.map((l) => ({ name: l.label, spentMinor: l.spent.minor, limitMinor: l.limit.minor, fill: l.fillBp / 100,
+        past: l.pastBp / 100, overMinor: l.over.minor || undefined }))
+    : budgets.items;
 
   return (
     <div className="stack">
-      <MoneyHeader sub={`October · ${budgets.daysLeft} days to go`} />
+      <MoneyHeader sub={live && month ? `${month.monthLabel} · ${month.daysLeft} days to go` : `October · ${budgets.daysLeft} days to go`} />
 
       <section className="card">
         <p className="card-title">Spent so far against each budget</p>
         <p className="muted" style={{ margin: "2px 0 6px" }}>The dark line is the limit. Red is over it.</p>
-        {budgets.items.map((b) => (
+        {bars.map((b) => (
           <BudgetBar key={b.name} {...b} />
+        ))}
+        {live && month?.alerts.map((b) => (
+          <p key={b.category} className={b.state === "OVER" ? "over" : undefined} style={{ fontSize: 14, margin: "6px 0 0" }}>{b.alert}</p>
         ))}
         <p className="trust" style={{ marginTop: 6 }}>All amounts in AED, from receipts, statements and payments you added.</p>
       </section>

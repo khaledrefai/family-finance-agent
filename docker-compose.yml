@@ -21,6 +21,7 @@ services:
       DB_USER: ffa
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       APP_JWT_SECRET: ${APP_JWT_SECRET:?set APP_JWT_SECRET in .env}
+      SERPAPI_KEY: ${SERPAPI_KEY:-}         # web search for live prices; not read by any code yet
     depends_on:
       db:
         condition: service_healthy
@@ -36,6 +37,7 @@ services:
       AGENTS_LLM: ${AGENTS_LLM:-auto}
       AGENTS_LLM_MODEL: ${AGENTS_LLM_MODEL:-claude-opus-5-5}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SERPAPI_KEY: ${SERPAPI_KEY:-}
     depends_on:
       - core
 

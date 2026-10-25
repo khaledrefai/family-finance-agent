@@ -103,6 +103,12 @@ public class FindingService {
         }
     }
 
+    /** Subscriptions found in the payments that a parent has not answered yet (for "Ways to save"). */
+    @Transactional(readOnly = true)
+    public List<Finding> subscriptionsFound(UUID family) {
+        return find(family).stream().filter(f -> f.kind() == Kind.SUBSCRIPTION).toList();
+    }
+
     private List<Finding> find(UUID family) {
         LocalDate today = LocalDate.now(clock);
         String cur = db.sql("SELECT currency FROM family WHERE id = ?").param(family).query(String.class).single();

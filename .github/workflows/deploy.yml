@@ -58,6 +58,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD || vars.POSTGRES_PASSWORD }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || vars.ANTHROPIC_API_KEY }}
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY || vars.SERPAPI_KEY }}
           APP_JWT_SECRET: ${{ secrets.APP_JWT_SECRET }}
           WEB_PORT: ${{ vars.WEB_PORT || '3000' }}
           AGENTS_LLM: ${{ vars.AGENTS_LLM || 'auto' }}
@@ -66,6 +67,7 @@ jobs:
           {
             echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD"
             echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY"
+            echo "SERPAPI_KEY=$SERPAPI_KEY"
             echo "WEB_PORT=$WEB_PORT"
             echo "AGENTS_LLM=$AGENTS_LLM"
             if [ -n "$APP_JWT_SECRET" ]; then echo "APP_JWT_SECRET=$APP_JWT_SECRET"; fi
