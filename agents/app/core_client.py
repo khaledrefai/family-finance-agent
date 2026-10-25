@@ -340,6 +340,58 @@ class Assessment(BaseModel):
     facts: list[str]  # every number the agent may say is in here
 
 
+# ---------------------------------------------------------------- documents (mirrors core/.../documents/)
+
+class DocLine(BaseModel):
+    """What the agent read from one line. Every amount is the text printed on the document: the core converts it."""
+    date: str | None = None
+    description: str
+    amount: str
+    credit: bool | None = None
+    category: str | None = None
+
+
+class Extraction(BaseModel):
+    """An ExtractedDocument: a typed draft for the core to check. Nothing counts until a parent confirms it."""
+    kind: str  # RECEIPT, INVOICE, BANK_STATEMENT or CARD_STATEMENT
+    merchant: str | None = None
+    date: str | None = None
+    total: str | None = None
+    cardLast4: str | None = None
+    closingBalance: str | None = None
+    category: str | None = None
+    readBy: str  # LLM or RULES
+    note: str | None = None
+    lines: list[DocLine] = []
+
+
+class Counts(BaseModel):
+    lines: int
+    added: int
+    alreadyLogged: int
+    possibleDuplicates: int
+
+
+class Document(BaseModel):
+    id: UUID
+    kind: str
+    fileName: str
+    contentType: str
+    status: str  # UPLOADED, EXTRACTED, CONFIRMED, FAILED
+    accountLabel: str | None = None
+    counts: Counts
+    summary: str  # written by the core; the agent repeats it
+    facts: list[str]
+
+
+class Finding(BaseModel):
+    key: str
+    kind: str  # DUPLICATE or SUBSCRIPTION
+    title: str
+    detail: str
+    amount: MoneyView
+
+
 class CoreError(Exception):
     """The core said no (bad amount, not allowed...). `detail` is a message safe to show the member."""
 
@@ -414,6 +466,30 @@ class CoreClient:
         resp = self._http.post("/api/requests/assess", json={k: v for k, v in body.items() if v})
         _raise_for_core(resp)
         return Assessment.model_validate(resp.json())
+
+    # ------------------------------------------------------------ documents
+
+    def document(self, doc_id: UUID) -> Document:
+        return Document.model_validate(self._get(f"/api/documents/{doc_id}"))
+
+    def document_file(self, doc_id: UUID) -> tuple[bytes, str]:
+        """The uploaded file and its content type."""
+        resp = self._http.get(f"/api/documents/{doc_id}/file")
+        _raise_for_core(resp)
+        return resp.content, resp.headers.get("content-type", "application/octet-stream").split(";")[0].strip()
+
+    def save_extraction(self, doc_id: UUID, draft: Extraction) -> Document:
+        resp = self._http.post(f"/api/documents/{doc_id}/extraction", json=draft.model_dump(exclude_none=True))
+        _raise_for_core(resp)
+        return Document.model_validate(resp.json())
+
+    def mark_failed(self, doc_id: UUID, reason: str) -> Document:
+        resp = self._http.post(f"/api/documents/{doc_id}/failed", json={"reason": reason[:300]})
+        _raise_for_core(resp)
+        return Document.model_validate(resp.json())
+
+    def findings(self) -> list[Finding]:
+        return [Finding.model_validate(f) for f in self._get("/api/findings")]
 
     def me(self) -> Me:
         return Me.model_validate(self._get("/api/me"))

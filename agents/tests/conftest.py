@@ -36,6 +36,11 @@ class FakeCore:
         self.runs: list[dict] = []          # agent runs opened, with what they finished as
         self.run_headers: list[str] = []    # X-Agent-Run-Id seen on plan calls
         self.bucket_drafts: list[dict] = []
+        self.file: tuple[bytes, str] = (b"", "text/plain")  # the uploaded document the Bookkeeper reads
+        self.extractions: list[dict] = []
+        self.failures: list[str] = []
+        self.doc_headers: list[str] = []
+        self.found: list[dict] = []
 
     def handler(self, request: httpx.Request) -> httpx.Response:
         path = request.url.path
@@ -67,6 +72,11 @@ class FakeCore:
             return httpx.Response(204)
         if path.startswith("/api/plan/") or path == "/api/requests/assess":
             self.run_headers.append(request.headers.get("X-Agent-Run-Id", ""))
+        if path.startswith("/api/documents/"):
+            self.doc_headers.append(request.headers.get("X-Agent-Run-Id", ""))
+            return self.documents(request, path)
+        if path == "/api/findings":
+            return httpx.Response(200, json=self.found)
         if path == "/api/plan/cashflow":
             return httpx.Response(200, json=load("cashflow.json"))
         if path == "/api/plan/goals":
@@ -81,6 +91,25 @@ class FakeCore:
         if path == "/api/requests/assess":
             return httpx.Response(200, json=load("assess_layla.json"))
         return httpx.Response(404, json={"detail": "not found"})
+
+    def documents(self, request: httpx.Request, path: str) -> httpx.Response:
+        doc_id = path.split("/")[3]
+        view = {"id": doc_id, "kind": "RECEIPT", "fileName": "upload", "contentType": self.file[1], "status": "UPLOADED",
+                "counts": {"lines": 0, "added": 0, "alreadyLogged": 0, "possibleDuplicates": 0},
+                "summary": "Uploaded. Not read yet.", "facts": []}
+        if path.endswith("/file"):
+            return httpx.Response(200, content=self.file[0], headers={"content-type": self.file[1]})
+        if path.endswith("/extraction"):
+            body = json.loads(request.content)
+            self.extractions.append(body)
+            n = len(body.get("lines", []))
+            return httpx.Response(200, json={**view, "kind": body["kind"], "status": "EXTRACTED",
+                                             "counts": {"lines": n, "added": n, "alreadyLogged": 0, "possibleDuplicates": 0},
+                                             "summary": f"{n} lines read by the core."})
+        if path.endswith("/failed"):
+            self.failures.append(json.loads(request.content)["reason"])
+            return httpx.Response(200, json={**view, "status": "FAILED", "summary": self.failures[-1]})
+        return httpx.Response(200, json=view)
 
     def client(self) -> CoreClient:
         return CoreClient("t0ken", base_url="http://core", transport=httpx.MockTransport(self.handler))

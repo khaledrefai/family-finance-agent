@@ -74,7 +74,8 @@ class Llm:
                                                max_retries=0)
         return self._client
 
-    def ask(self, system: str, user: str, schema: dict, max_tokens: int = 1200) -> LlmResult:
+    def ask(self, system: str, user: str | list, schema: dict, max_tokens: int = 1200) -> LlmResult:
+        """`user` is the text, or a list of content blocks (a receipt photo or PDF plus the question)."""
         if not enabled():
             return LlmResult(None, used=False, fallback_reason="LLM off")
         started = time.monotonic()

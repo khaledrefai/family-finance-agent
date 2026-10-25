@@ -3,7 +3,10 @@
 from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel
 
+from uuid import UUID
+
 from .core_client import CoreClient
+from .documents import read_document
 from .graph import orchestrator
 from .spend_story import nudge
 
@@ -43,6 +46,19 @@ def chat(body: ChatIn, core: CoreClient = Depends(core_for_caller)) -> ChatOut:
     result = orchestrator.invoke({"message": body.message, "role": me.role.value},
                                  config={"configurable": {"core": core, "me": me}})
     return ChatOut(agent=result["agent"].value, reply=result["reply"])
+
+
+class ReadOut(BaseModel):
+    documentId: UUID | None
+    status: str | None
+    reply: str
+
+
+@app.post("/documents/{doc_id}/read", response_model=ReadOut)
+def read(doc_id: UUID, core: CoreClient = Depends(core_for_caller)) -> ReadOut:
+    """The Bookkeeper reads an uploaded receipt or statement into a draft for a parent to confirm."""
+    doc, reply = read_document(core, core.me(), doc_id)
+    return ReadOut(documentId=doc.id if doc else None, status=doc.status if doc else None, reply=reply)
 
 
 @app.get("/nudge", response_model=NudgeOut)
