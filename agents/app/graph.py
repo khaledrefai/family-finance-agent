@@ -8,6 +8,8 @@ Spend-logging spike: the Bookkeeper really works for two things, a child saying 
 Week 2: the Planner makes this month's plan and a draft bucket split for a parent (planner.py, the first
 step that uses Claude, with a rule-based fallback), and the Gatekeeper answers "can I afford AED X?" with
 the core's affordability check (gatekeeper.py).
+Week 3: the Bookkeeper reads uploaded receipts and statements (documents.py, called from Money > Uploads)
+and answers "any duplicate charges?" from the core's findings.
 Later weeks replace route_message() with an LLM classifier and fill in each agent with tools
 that call the core API (core_client.py). Agents never calculate money themselves.
 """
@@ -19,7 +21,7 @@ from typing import TypedDict
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
-from . import bookkeeper, gatekeeper, planner
+from . import bookkeeper, documents, gatekeeper, planner
 from .spend_parser import looks_like_spend
 
 
@@ -50,7 +52,7 @@ _KEYWORDS: list[tuple[Agent, tuple[str, ...]]] = [
 
 # Shown until each agent is built. No week numbers: these lines can appear in the demo video.
 _PLACEHOLDER = {
-    Agent.BOOKKEEPER: "I can't sort receipts and statements yet. That's coming soon, along with spotting duplicate charges.",
+    Agent.BOOKKEEPER: "Upload a receipt or a statement in Money, Uploads. I'll read it and show you a draft to confirm.",
     Agent.GATEKEEPER: "Tell me what it costs, like \"can I buy headphones for AED 300?\", and I'll check it.",
     Agent.SHOPPER: "I can't compare prices or plan meals yet. That's coming soon.",
     Agent.COACH: "Savings challenges and lessons aren't ready yet. They're coming soon.",
@@ -87,12 +89,17 @@ def _agent_node(agent: Agent):
     return run
 
 
+_FINDINGS = re.compile(r"\b(duplicate|double|charged twice|subscriptions?|odd|unusual|found)\b", re.I)
+
+
 def bookkeeper_node(state: ChatState, config: RunnableConfig) -> ChatState:
     ctx = config.get("configurable", {})
     core, me = ctx.get("core"), ctx.get("me")
     message = state.get("message", "")
     if core is not None and me is not None and (bookkeeper.is_spend_question(message) or is_spend_log(state)):
         return {"reply": bookkeeper.handle(core, me, message)}
+    if core is not None and me is not None and me.role.value == "PARENT" and _FINDINGS.search(message):
+        return {"reply": documents.answer_findings(core)}
     return {"reply": _PLACEHOLDER[Agent.BOOKKEEPER]}
 
 

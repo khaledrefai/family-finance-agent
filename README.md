@@ -113,8 +113,34 @@ npm install && npm run dev       # forwards /api/* to http://localhost:8080
 | GET | `/api/accounts/{id}/card-check?amount=` | parents: the card's bill with this purchase, against free cash on its due date |
 | POST | `/api/payments` | parents: a payment typed in; it must say what paid it |
 | POST | `/api/agent-runs`, `/api/agent-runs/{id}/finish`, GET `/api/agent-runs` | the agent service opens and closes runs; parents read the trail |
+| POST | `/api/documents` (multipart `file`, `kind` RECEIPT or STATEMENT, optional `accountId`) | a parent in the app; photo, PDF or CSV up to 5 MB |
+| GET | `/api/documents`, `/api/documents/{id}`, `/api/documents/{id}/file` | parents (the Bookkeeper reads the file with the parent's token) |
+| POST | `/api/documents/{id}/extraction`, `/api/documents/{id}/failed` | the Bookkeeper's typed draft (or why it couldn't read it) |
+| POST | `/api/documents/{id}/confirm`, `/api/documents/{id}/discard` | a parent in the app (an agent run is refused) |
+| GET | `/api/documents/samples/receipt`, `/api/documents/samples/statement` | parents: demo files dated to match the seed |
+| GET | `/api/findings`, POST `/api/findings/decide` | parents: double charges and unlisted subscriptions; deciding is a parent's tap |
+| GET, POST | `/api/gold`, POST `/api/gold/price`, `/api/gold/{id}/archive` | parents: gold in grams and AED at today's price |
+| GET | `/api/wealth` | parents: bank + cash + gold − cards − loans |
 
-Agent service (the web app reaches it at `/agent/...`): `POST /chat` and `GET /nudge`.
+Agent service (the web app reaches it at `/agent/...`): `POST /chat`, `GET /nudge` and `POST /documents/{id}/read`.
+
+## Receipts and statements (week 3)
+
+A parent uploads a file in Money > Uploads. The Bookkeeper (`agents/app/documents.py`) reads it into a typed draft:
+CSV statement exports and text receipts by rules (`doc_parser.py`, exact, works with the AI off), photos and PDFs by
+Claude with a JSON schema. Claude only copies what is printed; it never adds anything up. The core
+(`core/.../documents/`) converts every amount, matches the account by the card's last 4 digits, and compares each
+line with the ledger (same account, same amount, at most 3 days apart), so a receipt, a typed payment and the card
+statement never count the same purchase twice. Nothing counts until a parent presses Confirm. `FindingsEngine` then
+finds double charges and monthly payments missing from the commitments list. With the AI off, a photo is marked
+"couldn't read" with a way forward (upload the CSV or type it in).
+
+## Gold and family wealth (week 3)
+
+Gold is logged in grams (stored as milligrams), purity and price paid, for a goal or for Invest aside. The engine
+values it at the price per gram for its purity: the seeded sample price, or one a parent typed in from the shop.
+There is no live price feed yet (source still to choose); the screen always says which price it used and when.
+The app never suggests buying gold. Family wealth = bank + cash + gold − what is on the cards − loans left.
 
 ## The Planner's Claude step (week 2)
 

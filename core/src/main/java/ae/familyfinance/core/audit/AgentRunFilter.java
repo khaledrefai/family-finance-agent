@@ -51,6 +51,11 @@ public class AgentRunFilter extends OncePerRequestFilter {
         return request.getAttribute(ATTRIBUTE) != null;
     }
 
+    /** The open agent run this request belongs to, or null for a member's own tap in the app. */
+    public static UUID runId(HttpServletRequest request) {
+        return (UUID) request.getAttribute(ATTRIBUTE);
+    }
+
     /** Some steps are a parent's tap in the app, never an agent's call: confirming a draft, picking the plan. */
     public static void refuseAgentCall(HttpServletRequest request, String message) {
         if (isAgentCall(request)) {
@@ -113,8 +118,12 @@ public class AgentRunFilter extends OncePerRequestFilter {
         if (!body.isBlank()) {
             asked.set("body", parse(body));
         }
-        String answer = new String(res.getContentAsByteArray(), StandardCharsets.UTF_8);
         int status = res.getStatus();
+        String type = res.getContentType();
+        // A file (a receipt photo the agent reads) is recorded by its size, not its bytes
+        String answer = type != null && !type.contains("json") && !type.startsWith("text/")
+                ? json.createObjectNode().put("contentType", type).put("bytes", res.getContentSize()).toString()
+                : new String(res.getContentAsByteArray(), StandardCharsets.UTF_8).replace("\0", "");
         String outcome = status < 400 ? "OK" : (status == 401 || status == 403 || status == 404) ? "DENIED" : "ERROR";
         boolean changes = !"GET".equals(req.getMethod()) && !"HEAD".equals(req.getMethod());
         db.sql("""
