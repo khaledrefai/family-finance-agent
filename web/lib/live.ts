@@ -144,9 +144,82 @@ export interface Assessment {
   needsParent: boolean;
   approvalLimit: MoneyView | null;
   kid: { name: string; wallet: MoneyView; walletCovers: boolean; walletAfter: MoneyView } | null;
+  blocked: boolean;
+  rules: RuleCheck | null;
   card: CardCheck | null;
   facts: string[];
 }
+
+// ---------------------------------------------------------------- week 4: family rules, budgets, ways to save
+
+export type RuleOutcome = "OK" | "NEEDS_PARENT" | "BLOCKED";
+
+export interface RuleCheck {
+  outcome: RuleOutcome;
+  hits: { ruleId: string; kind: string; rule: string; outcome: RuleOutcome; detail: string }[];
+}
+
+export interface FamilyRule {
+  id: string;
+  kind: "BLOCK_CATEGORY" | "BLOCK_ALLERGEN" | "APPROVAL_LIMIT" | "CATEGORY_LIMIT" | "MONTHLY_CAP";
+  kindLabel: string;
+  status: "DRAFT" | "ACTIVE" | "ARCHIVED";
+  said: string | null;
+  label: string;
+  forChildName: string | null;
+  limit: MoneyView | null;
+  draftedBy: "LLM" | "RULES" | "PARENT" | null;
+  chips: string[];
+  replaces: string[];
+}
+
+export interface BudgetLine {
+  category: string;
+  label: string;
+  limit: MoneyView;
+  spent: MoneyView;
+  percent: number;
+  left: MoneyView;
+  over: MoneyView;
+  usual: MoneyView | null;
+  state: "OK" | "ABOVE_USUAL" | "HEADING_OVER" | "OVER";
+  alert: string | null;
+  fillBp: number;
+  pastBp: number;
+}
+
+export interface BudgetMonth {
+  monthLabel: string;
+  daysLeft: number;
+  limit: MoneyView;
+  spent: MoneyView;
+  lines: BudgetLine[];
+  alerts: BudgetLine[];
+}
+
+export interface WaysToSave {
+  month: string;
+  monthLabel: string;
+  tips: { key: string; title: string; text: string; writtenBy: "LLM" | "RULES" | "ENGINE"; facts: string[]; why: { label: string; value: string }[] }[];
+  hidden: number;
+  needsWords: boolean;
+}
+
+export const rulesApi = {
+  list: () => call<FamilyRule[]>("/api/rules"),
+  // Turning a rule on or off is a parent's tap here; the core refuses it from an agent.
+  confirm: (id: string) => call<FamilyRule>(`/api/rules/${id}/confirm`, { method: "POST" }),
+  off: (id: string) => call<void>(`/api/rules/${id}/off`, { method: "POST" }),
+};
+
+export const advice = {
+  budgets: () => call<BudgetMonth>("/api/budgets"),
+  // The agent writes this month's words once (Claude, checked against the engine's numbers); if the agent
+  // service can't answer, the core's own card is shown.
+  waysToSave: () => call<WaysToSave>("/agent/ways-to-save", { method: "POST" }).catch(() => call<WaysToSave>("/api/ways-to-save")),
+  dismiss: (key: string) => call<WaysToSave>(`/api/ways-to-save/${key}/dismiss`, { method: "POST" }),
+  snooze: (key: string) => call<WaysToSave>(`/api/ways-to-save/${key}/snooze`, { method: "POST" }),
+};
 
 // ---------------------------------------------------------------- week 3: documents, findings, gold, wealth
 
@@ -313,8 +386,8 @@ export const core = {
     call<Goal>(`/api/plan/goals/${goalId}/pace`, { method: "POST", body: JSON.stringify({ monthly }) }),
   cardCheck: (accountId: string, amount: string) =>
     call<CardCheck>(`/api/accounts/${accountId}/card-check?amount=${encodeURIComponent(amount)}`),
-  assess: (amount: string, requesterId?: string, paidFromAccountId?: string) =>
-    call<Assessment>("/api/requests/assess", { method: "POST", body: JSON.stringify({ amount, requesterId, paidFromAccountId }) }),
+  assess: (amount: string, requesterId?: string, paidFromAccountId?: string, title?: string, category?: string) =>
+    call<Assessment>("/api/requests/assess", { method: "POST", body: JSON.stringify({ amount, requesterId, paidFromAccountId, title, category }) }),
   setBalance: (accountId: string, balance: string) =>
     call<Account>(`/api/accounts/${accountId}/balance`, { method: "POST", body: JSON.stringify({ balance }) }),
   pay: (body: { amount: string; description?: string; merchant?: string; category: string; paidFromAccountId: string; occurredOn?: string }) =>

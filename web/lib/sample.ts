@@ -258,11 +258,6 @@ export const headphones = {
   ],
 };
 
-export const rules = [
-  { said: "No peanuts for Adam", typed: ["Allergen", "Peanuts", "Adam", "Block"], on: true },
-  { said: "Anything over AED 100 needs me", typed: ["Approval limit", "AED 100", "Layla, Adam"], on: true },
-  { said: "No energy drinks for the kids", typed: ["Blocked category", "Energy drinks", "Layla, Adam"], on: false },
-];
 
 export const meals = {
   week: "Sun 26 Oct to Fri 31 Oct",

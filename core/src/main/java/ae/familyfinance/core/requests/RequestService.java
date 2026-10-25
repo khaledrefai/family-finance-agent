@@ -63,7 +63,7 @@ public class RequestService {
         return saved;
     }
 
-    private static SpendCategory spendCategory(String category) {
+    static SpendCategory spendCategory(String category) {
         if (category == null || category.isBlank()) {
             return null;
         }

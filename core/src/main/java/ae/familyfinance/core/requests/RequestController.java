@@ -4,7 +4,6 @@ import ae.familyfinance.core.auth.CurrentMember;
 import ae.familyfinance.core.family.FamilyRepository;
 import ae.familyfinance.core.plan.Amounts;
 import ae.familyfinance.core.requests.AffordabilityService.Assessment;
-import ae.familyfinance.core.spend.SpendCategory;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -47,10 +46,12 @@ public class RequestController {
                                 @Size(max = 1000) String productUrl) {
     }
 
-    /** {@code amount} is the text typed ("45" or "45.50"); the core turns it into fils. */
-    /** {@code title} and {@code category} are what the family rules are checked against (both optional). */
+    /**
+     * {@code amount} is the text typed ("45" or "45.50"); the core turns it into fils. {@code title} and
+     * {@code category} are what the family rules are checked against (both optional; an unknown category counts as none).
+     */
     public record AssessBody(UUID requesterId, @NotBlank @Size(max = 20) String amount, UUID paidFromAccountId,
-                             @Size(max = 300) String title, SpendCategory category) {
+                             @Size(max = 300) String title, @Size(max = 40) String category) {
     }
 
     public record DecideRequest(@Size(max = 500) String note) {
@@ -81,7 +82,7 @@ public class RequestController {
         String currency = families.findById(me.familyId()).orElseThrow().getCurrency();
         Assessment a = affordability.assess(me, body.requesterId(),
                 Amounts.parse(body.amount(), currency, "amount").minor(), body.paidFromAccountId(), body.title(),
-                body.category());
+                RequestService.spendCategory(body.category()));
         return me.isParent() ? a : a.forChild();
     }
 

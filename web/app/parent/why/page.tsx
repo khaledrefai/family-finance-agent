@@ -29,7 +29,7 @@ function Why() {
 
   useEffect(() => {
     if (!live || !r) return;
-    core.assess((r.amountMinor / 100).toFixed(2), r.requesterId, account).then(setAssessment).catch(() => setAssessment(null));
+    core.assess((r.amountMinor / 100).toFixed(2), r.requesterId, account, r.title, r.category).then(setAssessment).catch(() => setAssessment(null));
   }, [live, r, account]);
 
   if (!me) return <p className="muted">Loading…</p>;
@@ -78,9 +78,14 @@ function Why() {
         ...(a.nextCommitment ? [{ label: "Next bill", value: a.nextCommitment }] : []),
       ]
     : headphones.familySide;
+  // Every family rule that applies to this child, with what the rule engine found for it
+  const ruleWord = { OK: "Fine", NEEDS_PARENT: "Sent to you", BLOCKED: "Blocked" } as const;
   const rules = a
-    ? (a.approvalLimit ? [{ label: `Anything over ${a.approvalLimit.text} needs a parent`, value: a.needsParent ? "Sent to you" : "Not needed", good: !a.needsParent }] : [])
+    ? a.rules
+      ? a.rules.hits.map((h) => ({ label: h.rule, value: ruleWord[h.outcome], good: h.outcome === "OK", over: h.outcome === "BLOCKED" }))
+      : []
     : headphones.rules.map((x) => ({ ...x, good: x.value === "Not relevant" }));
+  const ruleNotes = a?.rules?.hits.filter((h) => h.outcome !== "OK").map((h) => h.detail) ?? [];
   const buttons = r.status === "PENDING" && r.requesterId !== me.memberId && (
     <div className="actions">
       <button onClick={() => decide("approve")}>Approve</button>
@@ -101,6 +106,9 @@ function Why() {
           Why this?
         </button>
       )}
+      {ruleNotes.map((n) => (
+        <p key={n} className="trust">{n}</p>
+      ))}
       <SampleNote live={!!a} />
       {open && (
         <WhySheet
