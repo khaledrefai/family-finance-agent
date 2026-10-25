@@ -4,6 +4,8 @@
 // sticker badges, the big star and the Saver of the Month race.
 // They only draw what they are given. Every percent and amount comes from the app, never from here.
 
+import { useShowOnScreen } from "../price-results";
+
 type Art = "headphones" | "blocks" | "gift";
 
 export function artFor(goal: string): Art {
@@ -151,6 +153,25 @@ export function Camel({ size = 60 }: { size?: number }) {
     <svg width={size} height={size} viewBox="0 0 66 62" aria-hidden="true">
       <CamelShape fill="var(--kid-sand)" line="var(--kid-line)" bag="var(--kid-a)" />
     </svg>
+  );
+}
+
+// The kids' waiting screen while the shops are searched: the camel walks over the dunes and says what it is doing.
+const CAMEL_LINES = ["Looking in all the shops…", "Adding up the delivery…", "Checking the price is real…", "Almost there!"];
+
+export function CamelSearching({ step }: { step: number }) {
+  const ref = useShowOnScreen<HTMLElement>();
+  return (
+    <section ref={ref} className="camel-search" aria-live="polite" aria-busy="true">
+      <div className="camel-walk">
+        <Camel size={84} />
+      </div>
+      <svg className="dunes" viewBox="0 0 320 40" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 30q40-22 80-6t80-4 80 2 80-8v26H0z" fill="var(--kid-sand)" opacity="0.55" />
+        <path d="M0 36q50-14 110-2t110-4 100 2v8H0z" fill="var(--kid-sand)" />
+      </svg>
+      <p className="bubble">{CAMEL_LINES[Math.min(step, CAMEL_LINES.length - 1)]}</p>
+    </section>
   );
 }
 

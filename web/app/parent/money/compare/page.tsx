@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { core, dayLongMonth, useAccounts } from "@/lib/live";
 import { Comparison, findPrices, Offer } from "@/lib/prices";
-import { PriceResults } from "../../../price-results";
+import { PriceResults, PriceSearching } from "../../../price-results";
 import { AccountPicker, Back, CardWarning, Loading, Masthead } from "../../../ui";
 import { useSession } from "../../../use-session";
 
@@ -73,7 +73,7 @@ export default function ComparePage() {
 
   return (
     <div className="stack">
-      <Back href="/parent/money/add" label="Add spending" />
+      <Back href="/parent/money" label="Money" />
       <Masthead title="Compare prices" sub="Before a big purchase: the best total, and whether it fits" />
 
       <form
@@ -97,11 +97,12 @@ export default function ComparePage() {
             </button>
           ))}
         </div>
-        {finding && <p className="thinking">Looking in the shops…</p>}
       </form>
 
-      {found && !c && <p className="turn-agent">{found.reply}</p>}
-      {c && (
+      {finding && <PriceSearching what={want} />}
+
+      {!finding && found && !c && <p className="turn-agent">{found.reply}</p>}
+      {!finding && c && (
         <>
           {c.best && a && (
             <div className="stack" style={{ gap: 8 }}>

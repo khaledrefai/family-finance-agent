@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { Comparison, findPrices, Offer } from "@/lib/prices";
 import { AgentChat } from "../../agent-chat";
-import { PriceResults } from "../../price-results";
+import { PriceResults, useSearchStep } from "../../price-results";
 import { Loading } from "../../ui";
 import { useSession } from "../../use-session";
-import { BuddySays } from "../kid-ui";
+import { BuddySays, CamelSearching } from "../kid-ui";
 
 // Kid Ask: tell the agent what I bought, find the best price for something I want and ask a parent for it,
 // or ask for something directly. Nobody pastes links: the kid says what it is and the app searches the shops
@@ -28,6 +28,7 @@ export default function ChildAsk() {
   const [sending, setSending] = useState(false);
   const [sentOffers, setSentOffers] = useState<Record<string, string>>({});
   const notice = useRef<HTMLDivElement>(null);
+  const step = useSearchStep(finding);
 
   // Bring the answer into view on a phone, where it could be below the fold
   useEffect(() => {
@@ -155,8 +156,9 @@ export default function ChildAsk() {
             </button>
           ))}
         </div>
-        {finding && <p className="thinking">Looking in the shops…</p>}
       </section>
+
+      {finding && <CamelSearching step={step} />}
 
       {found && !c && <p className="turn-agent">{found.reply}</p>}
       {c && (

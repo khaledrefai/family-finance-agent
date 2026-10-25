@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { aed } from "@/lib/api";
 import { useMoney, useWealth } from "@/lib/live";
-import { Loading, MonthColumns, SampleNote, TRUST, Waterfall } from "../../ui";
+import { Icon, Loading, MonthColumns, SampleNote, TRUST, Waterfall } from "../../ui";
 import { useSession } from "../../use-session";
 import { MoneyHeader } from "./money-tabs";
 import { Uploads } from "./uploads";
@@ -26,6 +26,14 @@ export default function MoneyPage() {
   return (
     <div className="stack">
       <MoneyHeader sub={`${monthly.month} · from your confirmed income and commitments`} />
+
+      <Link href="/parent/money/compare" className="card compare-entry">
+        <Icon name="tag" size={24} />
+        <span>
+          <b>Buying something big?</b>
+          <span className="muted" style={{ display: "block" }}>Compare the shops&apos; prices, see if it fits this month, then log it.</span>
+        </span>
+      </Link>
 
       <section className="card" style={{ display: "grid", gap: 10 }}>
         <div>

@@ -81,6 +81,12 @@ const ICONS: Record<string, React.ReactNode> = {
     </>
   ),
   back: <path d="M15 5l-7 7 7 7" />,
+  tag: (
+    <>
+      <path d="M3 12.2V4.5A1.5 1.5 0 0 1 4.5 3h7.7l8.3 8.3a1.5 1.5 0 0 1 0 2.1l-7.1 7.1a1.5 1.5 0 0 1-2.1 0z" />
+      <circle cx="8" cy="8" r="1.6" />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 22 }: { name: keyof typeof ICONS; size?: number }) {

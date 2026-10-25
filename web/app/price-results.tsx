@@ -1,6 +1,52 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { Comparison, Offer, sourceLine } from "@/lib/prices";
+
+// What the core does during a search, in order. The steps move on a timer while the answer is on its way (a search
+// takes a few seconds when it is live), so the screen never looks stuck; the last step stays until the answer comes.
+const SEARCH_STEPS = ["Searching the shops", "Adding delivery and fees", "Re-checking the best offers", "Ranking by what you'd pay"];
+
+export function useSearchStep(searching: boolean, every = 1600) {
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    setStep(0);
+    if (!searching) return;
+    const t = setInterval(() => setStep((s) => Math.min(s + 1, SEARCH_STEPS.length - 1)), every);
+    return () => clearInterval(t);
+  }, [searching, every]);
+  return step;
+}
+
+// A waiting screen scrolls itself into view: on a phone the search button is often above it, off the screen
+export function useShowOnScreen<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, []);
+  return ref;
+}
+
+// The parents' waiting screen: calm, the steps ticking off, and the shape of the results to come.
+export function PriceSearching({ what }: { what: string }) {
+  const step = useSearchStep(true);
+  const ref = useShowOnScreen<HTMLElement>();
+  return (
+    <section ref={ref} className="card searching" aria-live="polite" aria-busy="true">
+      <p className="card-title" style={{ margin: 0 }}>Finding the best total for {what ? `"${what}"` : "this"}</p>
+      <ol className="search-steps">
+        {SEARCH_STEPS.map((s, i) => (
+          <li key={s} className={i < step ? "done" : i === step ? "now" : undefined}>
+            {s}{i === step ? "…" : ""}
+          </li>
+        ))}
+      </ol>
+      <span className="skeleton" style={{ height: 64 }} />
+      <span className="skeleton" style={{ height: 64, opacity: 0.6 }} />
+      <p className="muted" style={{ margin: 0 }}>This can take a few seconds when the shops are checked live.</p>
+    </section>
+  );
+}
 
 // The core's price comparison as a list: payable total first, what it is made of, and which offer is the best
 // re-checked one. Used by the kid's Ask screen and the parent's Compare prices screen. Every figure is the core's.
