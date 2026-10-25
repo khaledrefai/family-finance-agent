@@ -2,7 +2,7 @@
 
 import { plain } from "@/lib/api";
 import { useWealth } from "@/lib/live";
-import { Back, BigAmount, Masthead, SampleNote, TRUST, Waterfall } from "../../../ui";
+import { Back, BigAmount, Loading, Masthead, SampleNote, TRUST, Waterfall } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // Family wealth: everything the family owns (bank, cash, gold at today's price) minus what it owes
@@ -10,7 +10,7 @@ import { useSession } from "../../../use-session";
 export default function WealthPage() {
   const { me } = useSession("PARENT");
   const { wealth, live } = useWealth(!!me);
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const own = wealth.steps.filter((s) => s.kind !== "total" && s.amountMinor > 0);
   const owe = wealth.steps.filter((s) => s.kind !== "total" && s.amountMinor < 0);
   const label = `${own.map((s) => `${s.label} ${plain(s.amountMinor)}`).join(", ")} owned. Minus ${owe

@@ -7,7 +7,7 @@ import { FamilyRule, rulesApi } from "@/lib/live";
 import { kids } from "@/lib/sample";
 import { AgentChat } from "../../agent-chat";
 import { NotifyCard } from "../../live-ui";
-import { Masthead, Progress, SampleNote } from "../../ui";
+import { Loading, Masthead, Progress, SampleNote } from "../../ui";
 import { useSession } from "../../use-session";
 
 // Family: who is in it, the rules the app checks on every request, food profiles, and notifications.
@@ -48,7 +48,7 @@ export default function FamilyPage() {
     }
   }
 
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const decidedCount = requests.filter((r) => r.status !== "PENDING").length;
 
   return (

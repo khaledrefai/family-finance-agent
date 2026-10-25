@@ -1,7 +1,7 @@
 "use client";
 
 import { badges, kids, saverOfTheMonth } from "@/lib/sample";
-import { SampleNote } from "../../ui";
+import { Loading, SampleNote } from "../../ui";
 import { useSession } from "../../use-session";
 import { BigStar, BuddySays, Race, SmallStar, StickerArt } from "../kid-ui";
 
@@ -15,7 +15,7 @@ const EARN = [
 
 export default function StarsPage() {
   const { me } = useSession("CHILD");
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const kid = kids[me.displayName];
   const young = me.ageBand === "CHILD_6_9";
 

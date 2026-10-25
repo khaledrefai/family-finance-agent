@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { aed } from "@/lib/api";
 import { core, Goal, PlanOptions, useAccounts, useBuckets, useMoney } from "@/lib/live";
 import { planOptions as samplePlanOptions, planSplit, planSteps as sampleSteps } from "@/lib/sample";
-import { Masthead, SampleNote, StackBar, TRUST, WhySheet } from "../../ui";
+import { Loading, Masthead, SampleNote, StackBar, TRUST, WhySheet } from "../../ui";
 import { useSession } from "../../use-session";
 
 // The family plan: protect commitments, clear the card, build a buffer, then pick the goal's pace.
@@ -50,7 +50,7 @@ export default function PlanPage() {
     })();
   }, [me]);
 
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const live = money.live && plan !== null;
   const options: Option[] = plan ? toOptions(plan) : samplePlanOptions;
   const current = pace ?? options.find((o) => o.pick)?.id ?? options[0].id;
@@ -76,22 +76,15 @@ export default function PlanPage() {
     <div className="stack">
       <Masthead title="Family plan" sub={`Built from ${aed(money.monthly.freeMinor)} free this month`} />
 
-      <section className="card" style={{ paddingTop: 8, paddingBottom: 8 }}>
-        {steps.map((s, i) => (
-          <div key={s.title} style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "8px 0", fontSize: 14 }}>
-            <span
-              aria-hidden="true"
-              style={{
-                flex: "none", width: 24, height: 24, borderRadius: 99, display: "grid", placeItems: "center",
-                fontSize: 12, fontWeight: 600, border: "1.5px solid var(--ink)",
-                background: s.done ? "var(--ink)" : "transparent", color: s.done ? "var(--on-ink)" : "var(--ink)",
-              }}
-            >
-              {i + 1}
-            </span>
-            <span><b>{s.title}</b> {s.text}</span>
-          </div>
-        ))}
+      <section className="card" style={{ paddingTop: 6, paddingBottom: 6 }}>
+        <ol className="steps">
+          {steps.map((s, i) => (
+            <li key={s.title} className={s.done ? "done" : undefined}>
+              <span className="n" aria-hidden="true">{s.done ? "✓" : i + 1}</span>
+              <span><b>{s.title}</b> {s.text}{s.done && <span className="visually-hidden"> Done.</span>}</span>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <Link href="/parent/plan/buckets" className="card bucket-link" style={{ display: "grid", gap: 10, color: "inherit", textDecoration: "none" }}>
@@ -121,7 +114,7 @@ export default function PlanPage() {
             </span>
           </label>
         ))}
-        <button type="button" className="text" style={{ justifySelf: "start", minHeight: 44 }} onClick={() => setWhy(true)}>Why this?</button>
+        <button type="button" className="text" style={{ justifySelf: "start", padding: 0 }} onClick={() => setWhy(true)}>Why this?</button>
       </section>
 
       {!live && <section className="card">

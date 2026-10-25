@@ -8,7 +8,7 @@ import { notifyApi, Wallet } from "@/lib/push";
 import { kids } from "@/lib/sample";
 import { Chit } from "../chit";
 import { NotifyCard } from "../live-ui";
-import { SampleNote, StackBar } from "../ui";
+import { Loading, SampleNote, StackBar } from "../ui";
 import { useSession } from "../use-session";
 import { artFor, Avatar, BuddySays, Camel, GoalArt, GoalJar, SmallStar } from "./kid-ui";
 
@@ -44,7 +44,7 @@ export default function ChildHome() {
     return () => clearTimeout(t);
   }, [changed]);
 
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const kid = kids[me.displayName];
   const young = me.ageBand === "CHILD_6_9";
 

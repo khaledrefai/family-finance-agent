@@ -6,10 +6,10 @@ import { api, setToken } from "@/lib/api";
 
 // The seeded demo family. Tapping a name fills in the form, which keeps the demo video short.
 const DEMO_FAMILY = [
-  { username: "omar", name: "Omar", who: "Parent" },
-  { username: "sara", name: "Sara", who: "Parent" },
-  { username: "layla", name: "Layla", who: "13 years old" },
-  { username: "adam", name: "Adam", who: "9 years old" },
+  { username: "omar", name: "Omar", who: "Parent", kid: false },
+  { username: "sara", name: "Sara", who: "Parent", kid: false },
+  { username: "layla", name: "Layla", who: "13 years old", kid: true },
+  { username: "adam", name: "Adam", who: "9 years old", kid: true },
 ];
 const DEMO_PASSWORD = "demo1234";
 
@@ -64,19 +64,23 @@ export default function LoginPage() {
       </form>
 
       <h2>Try it as the demo family</h2>
+      <p className="muted" style={{ marginTop: -6, marginBottom: 12 }}>Pick someone, then log in.</p>
       <div className="people">
         {DEMO_FAMILY.map((p) => (
           <button
             key={p.username}
             type="button"
-            className="quiet"
+            aria-pressed={username === p.username}
             onClick={() => {
               setUsername(p.username);
               setPassword(DEMO_PASSWORD);
             }}
           >
-            {p.name}
-            <span>{p.who}</span>
+            <span className={`initial${p.kid ? " kid" : ""}`} aria-hidden="true">{p.name[0]}</span>
+            <span className="who">
+              {p.name}
+              <span>{p.who}</span>
+            </span>
           </button>
         ))}
       </div>

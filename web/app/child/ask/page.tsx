@@ -4,7 +4,7 @@ import { useState } from "react";
 import { aed, api } from "@/lib/api";
 import { headphones } from "@/lib/sample";
 import { AgentChat } from "../../agent-chat";
-import { SampleNote } from "../../ui";
+import { Loading, SampleNote } from "../../ui";
 import { useSession } from "../../use-session";
 import { BuddySays, GoalArt } from "../kid-ui";
 
@@ -18,7 +18,7 @@ export default function ChildAsk() {
   const [link, setLink] = useState("");
   const [sent, setSent] = useState<string | null>(null);
 
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const young = me.ageBand === "CHILD_6_9";
 
   async function send(requestTitle: string, fils: number, url?: string) {

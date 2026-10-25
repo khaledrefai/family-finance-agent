@@ -2,18 +2,20 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { aed, api, MemberView } from "@/lib/api";
+import { aed, api, MemberView, plain } from "@/lib/api";
 import { advice as adviceApi, BudgetMonth, CardCheck, core, dayLongMonth, Goal, useAccounts, useLive, useMoney, WaysToSave } from "@/lib/live";
 import { advice, familyGoal, kids, waysToSave } from "@/lib/sample";
 import { Chit } from "../chit";
 import { BellLink } from "../live-ui";
 import { notifyApi, WeekPlan } from "@/lib/push";
 import { useLiveEvents } from "@/lib/live-stream";
-import { AccountPicker, BigAmount, CardWarning, Icon, Masthead, Progress, SampleNote, TRUST, WhySheet } from "../ui";
+import { CardWarning, Icon, Loading, Masthead, PayFrom, Progress, SampleNote, TRUST, WhySheet } from "../ui";
 import { useSession } from "../use-session";
 
-// Today: only what needs a parent, in this order: bills due, ask, waiting requests,
-// this week's plan, what is free this month, the family goal, one piece of advice, ways to save, then what was decided.
+// Today: only what needs a parent, in this order: what is free this month (with the three quick actions),
+// bills and alerts in one list, waiting requests, this week's plan, the family goal, one piece of advice,
+// ways to save, then what was decided (the last three, the rest one tap away).
+// A bill that is covered stays neutral; colour only marks what is short or over.
 // The Waiting list updates live: when a kid asks on their phone, it lands here without a reload (week 5).
 // Requests, bills, cards, free cash and the family goal come from the core's money engine.
 // Overspend alerts come from the budget engine, and "Ways to save" from the engine with the Planner's words.
@@ -30,6 +32,7 @@ export default function TodayPage() {
   const [tipWhy, setTipWhy] = useState<string | null>(null);
   // Which account a parent would pay a request from. Sample default until requests carry it.
   const [payFrom, setPayFrom] = useState<Record<string, string>>({});
+  const [allDecided, setAllDecided] = useState(false);
 
   const { monthly, bills, live: moneyLive } = useMoney(!!me);
   const { accounts, live: accountsLive } = useAccounts(!!me);
@@ -71,7 +74,7 @@ export default function TodayPage() {
     }
   }
 
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
 
   const tips = (waysLive && ways
     ? ways.tips
@@ -85,6 +88,33 @@ export default function TodayPage() {
   const tightCard = accounts.find((a) => a.bill && !a.bill.ok);
   const goal = goals?.find((g) => g.tier === "GOOD_LIFE");
   const defaultCard = accounts.find((a) => a.kind === "CREDIT_CARD")?.id ?? "visa";
+  const shownDecided = allDecided ? decided : decided.slice(0, 3);
+
+  // Bills and alerts, in one list. A covered bill is calm; short, over or heading over gets colour.
+  const attention: { key: string; href: string; tone: "calm" | "warn" | "bad"; icon: "calendar" | "card" | "warn"; title: string; text?: string }[] = [];
+  if (nextBill) {
+    const short = moneyLive && nextBill.state === "short";
+    attention.push({
+      key: "bill", href: "/parent/money#bills", tone: short ? "bad" : "calm", icon: "calendar",
+      title: moneyLive
+        ? `${nextBill.name} due ${nextBill.daysLeft === 1 ? "tomorrow" : `in ${nextBill.daysLeft} days`}`
+        : `${nextBill.name} due in ${nextBill.daysLeft} days`,
+      text: moneyLive
+        ? `${aed(nextBill.amountMinor)}${short ? " short: the reserve won't be full by then." : ", planned for this month."}`
+        : "AED 850 reserved, enough to cover it.",
+    });
+  }
+  if (tightCard?.bill) {
+    attention.push({
+      key: "card", href: "/parent/money/accounts", tone: "bad", icon: "card",
+      title: `${tightCard.label} bill due ${tightCard.bill.due}`,
+      text: `${aed(tightCard.bill.soFarMinor)} so far, ${aed(tightCard.bill.freeByDueMinor)} free by then.`,
+    });
+  }
+  budgetMonth?.alerts.forEach((b) => attention.push({
+    key: b.category, href: "/parent/money/budgets", tone: b.state === "OVER" ? "bad" : "warn", icon: "warn", title: b.alert ?? b.label,
+  }));
+  const needsLook = attention.filter((a) => a.tone !== "calm").length;
 
   return (
     <div className="stack">
@@ -92,7 +122,7 @@ export default function TodayPage() {
         title={`Hi ${me.displayName}`}
         sub={me.familyName}
         action={
-          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <span className="head-actions">
             <BellLink />
             <button className="text" onClick={logout}>Log out</button>
           </span>
@@ -100,73 +130,70 @@ export default function TodayPage() {
       />
       {error && <p className="error" role="alert">{error}</p>}
 
-      <Link href="/parent/money" className="alert">
-        <Icon name="bell" size={20} />
-        <span style={{ flex: 1 }}>
-          {moneyLive ? (
-            <><b>{nextBill.name} due {nextBill.daysLeft === 1 ? "tomorrow" : `in ${nextBill.daysLeft} days`}.</b> {aed(nextBill.amountMinor)}{nextBill.state === "short" ? " short: the reserve won't be full by then." : ", planned for this month."}</>
-          ) : (
-            <><b>{nextBill.name} due in {nextBill.daysLeft} days.</b> AED 850 reserved, enough to cover it.</>
-          )}
-        </span>
-        <span aria-hidden="true">›</span>
-      </Link>
+      <section className="hero" aria-label="This month">
+        <p className="hero-label">Free this month, after commitments</p>
+        <p className="hero-amount"><span className="cur">AED</span>{plain(monthly.freeMinor)}</p>
+        <p className="hero-sub">{aed(monthly.freeUntilPaydayMinor)} free until pay day on {monthly.payday}.</p>
+        <p className="hero-trust">{TRUST}</p>
+        <nav className="quick" aria-label="Quick actions">
+          <Link href="/parent/money/add"><Icon name="plus" />Add spending</Link>
+          <Link href="/parent/money#uploads"><Icon name="upload" />Upload a receipt</Link>
+          <Link href="/parent/ask"><Icon name="ask" />Ask the accountant</Link>
+        </nav>
+      </section>
 
-      {tightCard?.bill && (
-        <Link href="/parent/money/accounts" className="alert short">
-          <Icon name="warn" size={20} />
-          <span style={{ flex: 1 }}>
-            <b>{tightCard.label} bill due {tightCard.bill.due}.</b> {aed(tightCard.bill.soFarMinor)} so far, {aed(tightCard.bill.freeByDueMinor)} free by then.
-          </span>
-          <span aria-hidden="true">›</span>
-        </Link>
-      )}
-
-      {budgetMonth?.alerts.map((b) => (
-        <Link key={b.category} href="/parent/money/budgets" className={`alert${b.state === "OVER" ? " short" : ""}`}>
-          <Icon name="warn" size={20} />
-          <span style={{ flex: 1 }}>{b.alert}</span>
-          <span aria-hidden="true">›</span>
-        </Link>
-      ))}
-
-      <Link href="/parent/ask" className="askbar">
-        <Icon name="ask" size={20} />
-        Ask the accountant anything
-      </Link>
-
-      {fresh && (
+      {attention.length > 0 && (
         <section>
-          <h2 className="first">Just decided</h2>
-          <Chit request={fresh} from={`${nameOf(fresh.requesterId)} asked`} landed />
+          <h2 className="first section-head">
+            Bills and alerts
+            {needsLook > 0 && <span className="count" aria-label={`${needsLook} need a look`}>{needsLook}</span>}
+          </h2>
+          <div className="list">
+            {attention.map((a) => (
+              <Link key={a.key} href={a.href} className={`list-item tone-${a.tone}`}>
+                <span className="dot-icon" aria-hidden="true"><Icon name={a.icon} size={18} /></span>
+                <span className="body">
+                  <b>{a.title}</b>
+                  {a.text && <span className="muted">{a.text}</span>}
+                </span>
+                <span className="chev" aria-hidden="true">›</span>
+              </Link>
+            ))}
+          </div>
         </section>
       )}
 
       <section>
-        <h2 className="first">Waiting for you</h2>
+        <h2 className="first section-head">
+          Waiting for you
+          {pending.length > 0 && <span className="count">{pending.length}</span>}
+        </h2>
+        {fresh && <Chit request={fresh} from={`${nameOf(fresh.requesterId)} asked`} landed />}
         {pending.length === 0 && <p className="empty">Nothing waiting. When one of the kids asks for something, it lands here.</p>}
-        {pending.map((r) => (
-          <Chit key={r.id} request={r} from={`${nameOf(r.requesterId)} asks`} stamp={false}>
-            {r.requesterId !== me.memberId && (
-              <div style={{ display: "grid", gap: 8, padding: "10px 0 8px" }}>
-                <AccountPicker label="Pay from" value={payFrom[r.id] ?? defaultCard} accounts={accounts}
-                  onChange={(id) => setPayFrom((p) => ({ ...p, [r.id]: id }))} />
-                {accountsLive
-                  ? <LiveCardWarning accountId={payFrom[r.id] ?? defaultCard} amountMinor={r.amountMinor} isCard={accounts.find((a) => a.id === (payFrom[r.id] ?? defaultCard))?.kind === "CREDIT_CARD"} />
-                  : <CardWarning accountId={payFrom[r.id] ?? defaultCard} />}
-              </div>
-            )}
-            {r.requesterId !== me.memberId ? (
-              <div className="chit-actions">
-                <button onClick={() => decide(r.id, "approve")}>Approve</button>
-                <button className="decline" onClick={() => decide(r.id, "reject")}>Decline</button>
-              </div>
-            ) : (
-              <p className="chit-note">You asked for this, so the other parent decides.</p>
-            )}
-            <Link href={`/parent/why?id=${r.id}`} className="link">Why this?</Link>
-          </Chit>
-        ))}
+        {pending.map((r) => {
+          const from = payFrom[r.id] ?? defaultCard;
+          return (
+            <Chit key={r.id} request={r} from={`${nameOf(r.requesterId)} asks`} stamp={false}>
+              {r.requesterId !== me.memberId ? (
+                <>
+                  <PayFrom value={from} accounts={accounts} onChange={(id) => setPayFrom((p) => ({ ...p, [r.id]: id }))} />
+                  <div style={{ marginTop: 8 }}>
+                    {accountsLive
+                      ? <LiveCardWarning accountId={from} amountMinor={r.amountMinor} isCard={accounts.find((a) => a.id === from)?.kind === "CREDIT_CARD"} />
+                      : <CardWarning accountId={from} />}
+                  </div>
+                  <div className="chit-actions">
+                    <button onClick={() => decide(r.id, "approve")}>Approve</button>
+                    <button className="decline" onClick={() => decide(r.id, "reject")}>Decline</button>
+                  </div>
+                </>
+              ) : (
+                <p className="chit-note">You asked for this, so the other parent decides.</p>
+              )}
+              <Link href={`/parent/why?id=${r.id}`} className="link" style={{ marginTop: 4 }}>Why this?</Link>
+            </Chit>
+          );
+        })}
       </section>
 
       {week && (
@@ -181,13 +208,13 @@ export default function TodayPage() {
               {week.bills.map((b) => (
                 <div className="row" key={`bill-${b.label}`}>
                   <span>{b.label}<br /><span className="muted">{b.note}</span></span>
-                  <span>{b.amount.text}</span>
+                  <b>{b.amount.text}</b>
                 </div>
               ))}
               {week.slowDown.map((b) => (
                 <div className="row" key={`slow-${b.label}`}>
                   <span>{b.label}<br /><span className="muted">{b.note}</span></span>
-                  <span>{b.amount.minor === 0 ? "Pause" : b.amount.text}</span>
+                  <b>{b.amount.minor === 0 ? "Pause" : b.amount.text}</b>
                 </div>
               ))}
             </div>
@@ -195,13 +222,6 @@ export default function TodayPage() {
           <p className="trust">{TRUST} Sent to your phone every Sunday morning.</p>
         </section>
       )}
-
-      <section className="card">
-        <p className="muted">Free this month, after commitments</p>
-        <BigAmount minor={monthly.freeMinor} />
-        <p style={{ fontSize: 14 }}>{aed(monthly.freeUntilPaydayMinor)} free until pay day on {monthly.payday}.</p>
-        <p className="trust" style={{ marginTop: 4 }}>{TRUST}</p>
-      </section>
 
       <section className="card" style={{ display: "grid", gap: 8 }}>
         <div className="row" style={{ padding: 0 }}>
@@ -221,7 +241,7 @@ export default function TodayPage() {
 
       {adviceState !== "later" && (
         <section className="card strong" style={{ display: "grid", gap: 10 }}>
-          <p className="muted">{advice.title}</p>
+          <p className="label">{advice.title}</p>
           {adviceState === "accepted" ? (
             <p role="status">Done. Entertainment is AED 600 a month for November and December. You can change it in Money, Budgets.</p>
           ) : (
@@ -233,7 +253,7 @@ export default function TodayPage() {
               </div>
             </>
           )}
-          <button type="button" className="text" style={{ justifySelf: "start", minHeight: 44 }} onClick={() => setWhy(true)}>
+          <button type="button" className="text" style={{ justifySelf: "start", padding: 0 }} onClick={() => setWhy(true)}>
             Why this?
           </button>
         </section>
@@ -261,15 +281,23 @@ export default function TodayPage() {
       )}
       {snoozed && <p className="muted" role="status">Snoozed tips come back next month.</p>}
 
-      <Link href="/parent/summary" className="link">See October's family summary</Link>
+      <Link href="/parent/summary" className="link">See October&apos;s family summary</Link>
       <SampleNote live={false} />
 
       <section>
-        <h2 className="first">Decided</h2>
+        <h2 className="first section-head">
+          Decided
+          {decided.length > 0 && <span className="count calm">{decided.length}</span>}
+        </h2>
         {decided.length === 0 && <p className="empty">Approved and declined requests will collect here.</p>}
-        {decided.map((r) => (
+        {shownDecided.map((r) => (
           <Chit key={r.id} request={r} from={nameOf(r.requesterId)} small />
         ))}
+        {decided.length > shownDecided.length && (
+          <button type="button" className="quiet" style={{ width: "100%" }} onClick={() => setAllDecided(true)}>
+            Show all {decided.length}
+          </button>
+        )}
       </section>
 
       {why && (

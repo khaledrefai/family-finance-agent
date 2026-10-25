@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { core, dayMonth, dayTime, Gold, goldApi, Purity, sampleGold, useLive } from "@/lib/live";
-import { Back, Masthead, SampleNote, TRUST } from "../../../ui";
+import { Back, Loading, Masthead, SampleNote, TRUST } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // Saving in gold: the parents log each purchase, and the engine values the grams at today's price for their
@@ -23,7 +23,7 @@ export default function GoldPage() {
   const [price, setPrice] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [said, setSaid] = useState<string | null>(null);
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const field = (k: "description" | "grams" | "paid" | "boughtOn" | "seller") => ({
     value: form[k], onChange: (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value }),
   });

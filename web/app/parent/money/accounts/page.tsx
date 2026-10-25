@@ -6,7 +6,7 @@ import Link from "next/link";
 import { call } from "@/lib/api";
 import { Account, core, Doc, docName, docs, fromAccount, goldApi, sampleGold, useLive } from "@/lib/live";
 import { AccountKind, accounts as sampleAccounts } from "@/lib/sample";
-import { SampleNote, TRUST } from "../../../ui";
+import { Loading, SampleNote, TRUST } from "../../../ui";
 import { useSession } from "../../../use-session";
 import { MoneyHeader } from "../money-tabs";
 
@@ -40,7 +40,7 @@ export default function AccountsPage() {
   const { data: gold } = useLive(goldApi.get, sampleGold, !!me);
   const { data: statement } = useLive(async () => (await docs.list()).find((d) => d.kind.endsWith("STATEMENT")) ?? null,
     null as Doc | null, !!me);
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const field = (k: keyof typeof form) => ({ value: form[k], onChange: (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value }) });
 
   async function saveBalance(e: React.FormEvent, id: string) {
@@ -84,7 +84,7 @@ export default function AccountsPage() {
   return (
     <div className="stack">
       <MoneyHeader sub="What the family pays from" />
-      <p className="muted" style={{ marginTop: -6 }}>
+      <p className="muted">
         You type these in once. The app never connects to your bank, so balances are your own estimate.
       </p>
 

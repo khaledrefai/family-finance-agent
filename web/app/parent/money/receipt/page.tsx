@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { aed } from "@/lib/api";
 import { receipt } from "@/lib/sample";
-import { AccountPicker, Back, Masthead, SampleNote } from "../../../ui";
+import { AccountPicker, Back, Loading, Masthead, SampleNote } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // A receipt the agent has read, shown as a draft to confirm. When the family follows the meal plan,
@@ -12,14 +12,14 @@ export default function ReceiptPage() {
   const { me } = useSession("PARENT");
   const [done, setDone] = useState(false);
   const [paidFrom, setPaidFrom] = useState(receipt.accountId);
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
 
   return (
     <div className="stack">
       <Back href="/parent/money" label="Money" />
       <Masthead title="Check this receipt" sub="Read from your photo · nothing counts until you confirm" />
 
-      <div className={`draft${done ? " done" : ""}`} style={{ marginTop: -12 }}>
+      <div className={`draft${done ? " done" : ""}`}>
         {done && <span className="confirmed">Confirmed</span>}
         <div className="row"><span>Shop</span><b>{receipt.shop}</b></div>
         <div className="row"><span>Date</span><b>{receipt.date}</b></div>
