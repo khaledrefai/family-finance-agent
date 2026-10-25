@@ -1,6 +1,7 @@
 package ae.familyfinance.core.money;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -70,11 +71,60 @@ public record Money(long minor, String currency) implements Comparable<Money> {
         return new Money((minor * 2 + count) / (count * 2), currency);
     }
 
-    /** For people: "AED 12" for whole amounts, "AED 12.50" otherwise. */
+    /** {@code this × numerator ÷ denominator}, rounded half up. 52 weeks ÷ 12 months: {@code weekly.scaled(52, 12)}. */
+    public Money scaled(long numerator, long denominator) {
+        if (denominator <= 0) {
+            throw new IllegalArgumentException("denominator must be positive: " + denominator);
+        }
+        long product = Math.multiplyExact(minor, numerator);
+        long rounded = product >= 0
+                ? (product * 2 + denominator) / (denominator * 2)
+                : -((-product * 2 + denominator) / (denominator * 2));
+        return new Money(rounded, currency);
+    }
+
+    /** Divided into {@code parts}, rounded up so the parts never fall short (monthly reserves). */
+    public Money dividedRoundingUp(long parts) {
+        if (parts <= 0) {
+            throw new IllegalArgumentException("parts must be positive: " + parts);
+        }
+        return new Money(Math.ceilDiv(minor, parts), currency);
+    }
+
+    /** Rounded up to a whole multiple of {@code unitMinor}: AED 1,051.20 to the next AED 50 is AED 1,100. */
+    public Money roundedUpTo(long unitMinor) {
+        return new Money(Math.multiplyExact(Math.ceilDiv(minor, unitMinor), unitMinor), currency);
+    }
+
+    /** Rounded down to a whole multiple of {@code unitMinor} (a cautious planning base). */
+    public Money roundedDownTo(long unitMinor) {
+        return new Money(Math.multiplyExact(Math.floorDiv(minor, unitMinor), unitMinor), currency);
+    }
+
+    public Money min(Money other) {
+        return compareTo(other) <= 0 ? this : other;
+    }
+
+    public Money max(Money other) {
+        return compareTo(other) >= 0 ? this : other;
+    }
+
+    public boolean isPositive() {
+        return minor > 0;
+    }
+
+    public Money negate() {
+        return new Money(Math.negateExact(minor), currency);
+    }
+
+    /** For people: "AED 12" for whole amounts, "AED 12.50" otherwise, "AED 34,500" with thousands, "-AED 2,400" below zero. */
     public String toDisplay() {
-        return minor % 100 == 0
-                ? currency + " " + (minor / 100)
-                : currency + " " + toMajor().toPlainString();
+        String sign = minor < 0 ? "-" : "";
+        BigDecimal abs = toMajor().abs();
+        String number = minor % 100 == 0
+                ? String.format(Locale.ROOT, "%,d", abs.longValueExact())
+                : String.format(Locale.ROOT, "%,.2f", abs);
+        return sign + currency + " " + number;
     }
 
     public boolean isNegative() {
