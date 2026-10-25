@@ -1,6 +1,9 @@
 package ae.familyfinance.core.requests;
 
 import ae.familyfinance.core.auth.CurrentMember;
+import ae.familyfinance.core.family.FamilyRepository;
+import ae.familyfinance.core.plan.Amounts;
+import ae.familyfinance.core.requests.AffordabilityService.Assessment;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,9 +30,13 @@ import java.util.UUID;
 public class RequestController {
 
     private final RequestService service;
+    private final AffordabilityService affordability;
+    private final FamilyRepository families;
 
-    public RequestController(RequestService service) {
+    public RequestController(RequestService service, AffordabilityService affordability, FamilyRepository families) {
         this.service = service;
+        this.affordability = affordability;
+        this.families = families;
     }
 
     public record CreateRequest(@NotNull RequestKind kind,
@@ -37,6 +44,10 @@ public class RequestController {
                                 @PositiveOrZero long amountMinor,
                                 @Size(max = 40) String category,
                                 @Size(max = 1000) String productUrl) {
+    }
+
+    /** {@code amount} is the text typed ("45" or "45.50"); the core turns it into fils. */
+    public record AssessBody(UUID requesterId, @NotBlank @Size(max = 20) String amount, UUID paidFromAccountId) {
     }
 
     public record DecideRequest(@Size(max = 500) String note) {
@@ -58,6 +69,16 @@ public class RequestController {
     public RequestView create(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody CreateRequest body) {
         return RequestView.of(service.create(CurrentMember.from(jwt), body.kind(), body.title(),
                 body.amountMinor(), body.category(), body.productUrl()));
+    }
+
+    /** "Can we afford it?" before asking: free cash until pay day, the wallet, the approval limit and the card bill. */
+    @PostMapping("/assess")
+    public Assessment assess(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AssessBody body) {
+        CurrentMember me = CurrentMember.from(jwt);
+        String currency = families.findById(me.familyId()).orElseThrow().getCurrency();
+        Assessment a = affordability.assess(me, body.requesterId(),
+                Amounts.parse(body.amount(), currency, "amount").minor(), body.paidFromAccountId());
+        return me.isParent() ? a : a.forChild();
     }
 
     @GetMapping
