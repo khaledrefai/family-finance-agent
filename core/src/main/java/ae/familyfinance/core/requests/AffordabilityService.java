@@ -9,6 +9,13 @@ import ae.familyfinance.core.money.MoneyView;
 import ae.familyfinance.core.plan.Cashflow;
 import ae.familyfinance.core.plan.MoneyFacts;
 import ae.familyfinance.core.plan.MoneyFacts.Snapshot;
+import ae.familyfinance.core.rules.RuleEngine;
+import ae.familyfinance.core.rules.RuleEngine.Ask;
+import ae.familyfinance.core.rules.RuleEngine.Hit;
+import ae.familyfinance.core.rules.RuleEngine.Outcome;
+import ae.familyfinance.core.rules.RuleKind;
+import ae.familyfinance.core.rules.RuleService;
+import ae.familyfinance.core.spend.SpendCategory;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
@@ -20,14 +27,15 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * "Can we afford it?" worked out by the money engine. The Gatekeeper agent only puts these facts into words;
- * every number it may say is in {@link Assessment#facts()}.
+ * "Can we afford it, and is it allowed?" worked out by the core: the money engine for the money, the
+ * {@link RuleEngine} for the family rules (blocked kinds of thing, allergens, limits, the monthly cap).
+ * The Gatekeeper agent only puts these facts into words; every number it may say is in {@link Assessment#facts()}.
  */
 @Service
 public class AffordabilityService {
 
     /** Bump when the shape or the rules of the assessment change, so old stored ones can be told apart. */
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
 
     /** For a child paying from their wallet the wallet decides; otherwise free cash until pay day and the card bill. */
     public enum Verdict {
@@ -43,38 +51,58 @@ public class AffordabilityService {
     public record KidSide(UUID memberId, String name, MoneyView wallet, boolean walletCovers, MoneyView walletAfter) {
     }
 
+    /**
+     * The family rules checked for a child's request. {@code outcome} BLOCKED means it can't be bought;
+     * NEEDS_PARENT means a parent decides; OK means no rule said anything. Empty for a parent's own spending.
+     */
+    public record RuleCheck(Outcome outcome, List<Hit> hits) {
+    }
+
     public record Assessment(int version, MoneyView amount, Verdict verdict, MoneyView freeUntilPay,
                              LocalDate nextIncomeOn, MoneyView freeAfter, String nextCommitment,
-                             boolean needsParent, MoneyView approvalLimit, KidSide kid, CardCheck card,
-                             List<String> facts) {
+                             boolean needsParent, boolean blocked, MoneyView approvalLimit, KidSide kid,
+                             RuleCheck rules, CardCheck card, List<String> facts) {
 
-        /** What a child may see: their wallet and the approval rule, never the family's free cash. */
+        /** What a child may see: their wallet and their family rules, never the family's free cash. */
         public Assessment forChild() {
             List<String> own = new ArrayList<>();
             own.add(facts.get(0));
-            facts.stream().filter(f -> f.contains("wallet") || f.startsWith("A parent says yes")).forEach(own::add);
+            facts.stream().filter(f -> f.contains("wallet") || f.startsWith("A parent says yes") || f.startsWith(RULE))
+                    .forEach(own::add);
             Verdict v = kid != null && kid.walletCovers() ? Verdict.FITS : Verdict.DOES_NOT_FIT;
-            return new Assessment(version, amount, v, null, null, null, null, needsParent, approvalLimit, kid, null,
-                    List.copyOf(own));
+            return new Assessment(version, amount, v, null, null, null, null, needsParent, blocked, approvalLimit, kid,
+                    rules, null, List.copyOf(own));
         }
     }
 
+    /** Every fact about a family rule starts with this, so the child's view can keep them. */
+    static final String RULE = "Family rule: ";
+
     private final MoneyFacts moneyFacts;
     private final AccountService accounts;
+    private final RuleService rules;
     private final JdbcClient db;
 
-    public AffordabilityService(MoneyFacts moneyFacts, AccountService accounts, JdbcClient db) {
+    public AffordabilityService(MoneyFacts moneyFacts, AccountService accounts, RuleService rules, JdbcClient db) {
         this.moneyFacts = moneyFacts;
         this.accounts = accounts;
+        this.rules = rules;
         this.db = db;
+    }
+
+    @Transactional(readOnly = true)
+    public Assessment assess(CurrentMember me, UUID requesterId, long amountMinor, UUID paidFromAccountId) {
+        return assess(me, requesterId, amountMinor, paidFromAccountId, null, null);
     }
 
     /**
      * Assesses {@code amountMinor} for {@code requesterId} (null = the caller). A child can only assess their own
      * spending; {@code paidFromAccountId} is a parent's card or account, which adds the card-bill check.
+     * {@code text} (the name or product text) and {@code category} are what the family rules are checked against.
      */
     @Transactional(readOnly = true)
-    public Assessment assess(CurrentMember me, UUID requesterId, long amountMinor, UUID paidFromAccountId) {
+    public Assessment assess(CurrentMember me, UUID requesterId, long amountMinor, UUID paidFromAccountId,
+                             String text, SpendCategory category) {
         UUID who = requesterId == null ? me.memberId() : requesterId;
         if (!me.isParent() && !who.equals(me.memberId())) {
             throw new ApiException(HttpStatus.FORBIDDEN, "You can only check your own spending");
@@ -113,8 +141,10 @@ public class AffordabilityService {
         }
 
         KidSide kid = null;
-        Money limit = approvalLimit(me.familyId(), who);
-        boolean needsParent;
+        RuleCheck ruleCheck = null;
+        Money limit = null;
+        boolean needsParent = false;
+        boolean blocked = false;
         if (member.child()) {
             Money wallet = new Money(walletMinor(who), cur);
             boolean covers = wallet.compareTo(amount) >= 0;
@@ -122,12 +152,19 @@ public class AffordabilityService {
             facts.add(member.name() + "'s wallet has " + MoneyView.of(wallet).text() + (covers
                     ? ", enough for this."
                     : ", " + MoneyView.of(amount.minus(wallet)).text() + " short."));
-            needsParent = !covers || limit == null || amount.compareTo(limit) > 0;
+
+            RuleEngine.Result r = RuleEngine.check(rules.activeFor(me.familyId(), who),
+                    new Ask(amountMinor, category, text), rules.spentBy(me.familyId(), who), member.name(), cur);
+            ruleCheck = new RuleCheck(r.outcome(), r.hits());
+            limit = r.approvalLimit();
+            blocked = r.blocked();
+            // With no approval limit set, a parent says yes to everything
+            needsParent = !blocked && (!covers || limit == null || r.outcome() != Outcome.OK);
             if (limit != null) {
                 facts.add("A parent says yes to anything over " + MoneyView.of(limit).text() + ".");
             }
-        } else {
-            needsParent = false;
+            r.hits().stream().filter(h -> h.outcome() != Outcome.OK && h.kind() != RuleKind.APPROVAL_LIMIT)
+                    .forEach(h -> facts.add(RULE + h.rule() + ". " + h.detail()));
         }
 
         CardCheck card = paidFromAccountId == null ? null : accounts.cardCheck(s, paidFromAccountId, amountMinor);
@@ -141,8 +178,8 @@ public class AffordabilityService {
             verdict = Verdict.DOES_NOT_FIT;
         }
         return new Assessment(VERSION, MoneyView.of(amount), verdict, MoneyView.of(free),
-                flow.untilNextIncome().nextIncomeOn(), MoneyView.of(after), next, needsParent,
-                limit == null ? null : MoneyView.of(limit), kid, card, List.copyOf(facts));
+                flow.untilNextIncome().nextIncomeOn(), MoneyView.of(after), next, needsParent, blocked,
+                limit == null ? null : MoneyView.of(limit), kid, ruleCheck, card, List.copyOf(facts));
     }
 
     private static String day(LocalDate d) {
@@ -150,17 +187,6 @@ public class AffordabilityService {
     }
 
     private record Member(String name, boolean child) {
-    }
-
-    /** The member's own limit if a parent set one, else the family's. */
-    private Money approvalLimit(UUID family, UUID member) {
-        return db.sql("""
-                SELECT r.limit_minor, f.currency FROM family_rule r JOIN family f ON f.id = r.family_id
-                WHERE r.family_id = ? AND r.kind = 'APPROVAL_LIMIT'
-                  AND (r.applies_to_member_id = ? OR r.applies_to_member_id IS NULL)
-                ORDER BY r.applies_to_member_id NULLS LAST LIMIT 1
-                """).params(family, member)
-                .query((rs, n) -> new Money(rs.getLong(1), rs.getString(2))).optional().orElse(null);
     }
 
     private long walletMinor(UUID member) {

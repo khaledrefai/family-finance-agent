@@ -19,6 +19,9 @@ DELETE FROM demo_wallet_entry e USING demo_wallet w
 DELETE FROM source_document   WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM agent_run         WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM finding_decision  WHERE family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM family_rule       WHERE family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM saving_tip_decision WHERE family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM saving_tip_words  WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM gold_holding      WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM gold_price        WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM ledger_transaction WHERE family_id = '00000000-0000-0000-0000-00000000f001';
@@ -100,12 +103,13 @@ INSERT INTO budget (family_id, member_id, category, period, limit_minor, bucket)
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1', 'POCKET_MONEY', 'WEEKLY', 10000, 'EVERYDAY'),
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'POCKET_MONEY', 'WEEKLY',  6000, 'EVERYDAY');
 
--- Family rules
-INSERT INTO family_rule (family_id, applies_to_member_id, kind, category, allergen, limit_minor, note, created_by) VALUES
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'BLOCK_ALLERGEN', NULL, 'PEANUT', NULL, 'Adam has a peanut allergy. Always check the pack label.', '00000000-0000-0000-0000-0000000000a1'),
- ('00000000-0000-0000-0000-00000000f001', NULL, 'BLOCK_CATEGORY', 'IN_GAME_PURCHASES', NULL, NULL, 'No in-game purchases', '00000000-0000-0000-0000-0000000000a2'),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'BLOCK_CATEGORY', 'SUGARY_DRINKS', NULL, NULL, 'No fizzy drinks for Adam', '00000000-0000-0000-0000-0000000000a1'),
- ('00000000-0000-0000-0000-00000000f001', NULL, 'APPROVAL_LIMIT', NULL, NULL, 5000, 'Anything over AED 50 needs a parent', '00000000-0000-0000-0000-0000000000a1');
+-- Family rules, in the parents' own words (week 4: the agent drafts a rule from words like these, a parent turns it on).
+-- Adam's allergy blocks anything whose name says peanut, and any food he asks for waits for a parent to check the label.
+INSERT INTO family_rule (family_id, applies_to_member_id, kind, category, allergen, limit_minor, note, said, status, source, created_by, confirmed_by, confirmed_at) VALUES
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'BLOCK_ALLERGEN', NULL, 'PEANUT', NULL, 'Adam has a peanut allergy. Always check the pack label.', 'No peanuts for Adam', 'ACTIVE', 'SEED', '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000a1', now()),
+ ('00000000-0000-0000-0000-00000000f001', NULL, 'BLOCK_CATEGORY', 'IN_GAME_PURCHASES', NULL, NULL, 'No in-game purchases', 'No in-game purchases', 'ACTIVE', 'SEED', '00000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-0000000000a2', now()),
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'BLOCK_CATEGORY', 'SUGARY_DRINKS', NULL, NULL, 'No fizzy drinks for Adam', 'No fizzy drinks for Adam', 'ACTIVE', 'SEED', '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000a1', now()),
+ ('00000000-0000-0000-0000-00000000f001', NULL, 'APPROVAL_LIMIT', NULL, NULL, 5000, 'Anything over AED 50 needs a parent', 'Anything over AED 50 needs a parent', 'ACTIVE', 'SEED', '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000a1', now());
 
 -- Demo wallets (DEMO MONEY) with an opening balance
 INSERT INTO demo_wallet (id, family_id, member_id) VALUES
@@ -153,6 +157,39 @@ INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, 
                                 duplicate_hash, source, paid_from_account_id) VALUES
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', current_date - 71, 'SHAHID VIP', 'SHAHID VIP', 'ENTERTAINMENT', 'DEBIT', 3500, encode(digest('seed-4', 'sha256'), 'hex'), 'DOCUMENT', '00000000-0000-0000-0000-0000000000e3'),
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', current_date - 40, 'SHAHID VIP', 'SHAHID VIP', 'ENTERTAINMENT', 'DEBIT', 3500, encode(digest('seed-5', 'sha256'), 'hex'), 'DOCUMENT', '00000000-0000-0000-0000-0000000000e3');
+
+-- Family outings (week 4), paid from the ENBD current account, so the Visa demo and the card warning are untouched.
+-- With the two Shahid VIP payments above, the last 3 months average AED 1,520 against the AED 1,200 entertainment budget, and this month is already
+-- AED 1,560: the overspend alert and the "Outings" tip in Ways to save. Amounts differ every month on purpose,
+-- so none of them looks like a subscription. This month's dates never fall before the 1st.
+INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, merchant, category, direction, amount_minor,
+                                duplicate_hash, source, paid_from_account_id)
+SELECT '00000000-0000-0000-0000-00000000f001', v.member,
+       CASE WHEN v.months_ago = 0 THEN greatest(date_trunc('month', current_date)::date, current_date - v.day)
+            ELSE (date_trunc('month', current_date) - make_interval(months => v.months_ago))::date + v.day END,
+       v.descr, v.merchant, 'ENTERTAINMENT', 'DEBIT', v.amt,
+       encode(digest('seed-fun-' || v.months_ago || '-' || v.merchant || '-' || v.amt, 'sha256'), 'hex'), 'SEED',
+       '00000000-0000-0000-0000-0000000000e1'
+FROM (VALUES
+ -- this month: day = days ago
+ (0,  9, '00000000-0000-0000-0000-0000000000a1'::uuid, 'KidZania tickets',        'KidZania',           56000),
+ (0,  6, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Theme park day',          'Dubai Parks',        64000),
+ (0,  4, '00000000-0000-0000-0000-0000000000a1'::uuid, 'Cinema, family of four',  'VOX Cinemas',        18500),
+ (0,  1, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Bowling',                 'Bowling alley',      17500),
+ -- last month and the two before: day = day of that month
+ (1,  4, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Ski Dubai',               'Ski Dubai',          69000),
+ (1, 11, '00000000-0000-0000-0000-0000000000a1'::uuid, 'Cinema, family of four',  'VOX Cinemas',        22500),
+ (1, 17, '00000000-0000-0000-0000-0000000000a1'::uuid, 'Aquarium tickets',        'Dubai Aquarium',     38000),
+ (1, 24, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Bowling',                 'Bowling alley',      18500),
+ (2,  3, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Water park',              'Wild Wadi',          78000),
+ (2, 10, '00000000-0000-0000-0000-0000000000a1'::uuid, 'Cinema, family of four',  'VOX Cinemas',        24000),
+ (2, 16, '00000000-0000-0000-0000-0000000000a1'::uuid, 'KidZania tickets',        'KidZania',           42000),
+ (2, 23, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Escape room',             'Escape room',        18000),
+ (3,  5, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Global Village',          'Global Village',     35000),
+ (3, 12, '00000000-0000-0000-0000-0000000000a1'::uuid, 'Cinema, family of four',  'VOX Cinemas',        19500),
+ (3, 18, '00000000-0000-0000-0000-0000000000a1'::uuid, 'Dubai Frame tickets',     'Dubai Frame',        31500),
+ (3, 25, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Trampoline park',         'Trampoline park',    53000)
+) AS v(months_ago, day, member, descr, merchant, amt);
 
 -- ---------------------------------------------------------------- saving in gold (week 3)
 -- Gold the family already holds (from the app mockups): 40 g of 24K for the home deposit and a 22K bangle for the

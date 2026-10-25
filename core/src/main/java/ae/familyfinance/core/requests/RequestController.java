@@ -4,6 +4,7 @@ import ae.familyfinance.core.auth.CurrentMember;
 import ae.familyfinance.core.family.FamilyRepository;
 import ae.familyfinance.core.plan.Amounts;
 import ae.familyfinance.core.requests.AffordabilityService.Assessment;
+import ae.familyfinance.core.spend.SpendCategory;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -47,7 +48,9 @@ public class RequestController {
     }
 
     /** {@code amount} is the text typed ("45" or "45.50"); the core turns it into fils. */
-    public record AssessBody(UUID requesterId, @NotBlank @Size(max = 20) String amount, UUID paidFromAccountId) {
+    /** {@code title} and {@code category} are what the family rules are checked against (both optional). */
+    public record AssessBody(UUID requesterId, @NotBlank @Size(max = 20) String amount, UUID paidFromAccountId,
+                             @Size(max = 300) String title, SpendCategory category) {
     }
 
     public record DecideRequest(@Size(max = 500) String note) {
@@ -71,13 +74,14 @@ public class RequestController {
                 body.amountMinor(), body.category(), body.productUrl()));
     }
 
-    /** "Can we afford it?" before asking: free cash until pay day, the wallet, the approval limit and the card bill. */
+    /** "Can we afford it, and is it allowed?" before asking: free cash, the wallet, the family rules and the card bill. */
     @PostMapping("/assess")
     public Assessment assess(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AssessBody body) {
         CurrentMember me = CurrentMember.from(jwt);
         String currency = families.findById(me.familyId()).orElseThrow().getCurrency();
         Assessment a = affordability.assess(me, body.requesterId(),
-                Amounts.parse(body.amount(), currency, "amount").minor(), body.paidFromAccountId());
+                Amounts.parse(body.amount(), currency, "amount").minor(), body.paidFromAccountId(), body.title(),
+                body.category());
         return me.isParent() ? a : a.forChild();
     }
 

@@ -221,7 +221,7 @@ public class SpendService {
         Map<SpendCategory, String> blocked = new LinkedHashMap<>();
         jdbc.query("""
                 SELECT category, note FROM family_rule
-                WHERE family_id = ? AND kind = 'BLOCK_CATEGORY'
+                WHERE family_id = ? AND kind = 'BLOCK_CATEGORY' AND status = 'ACTIVE'
                   AND (applies_to_member_id IS NULL OR applies_to_member_id = ?)
                 """, rs -> {
             try {
