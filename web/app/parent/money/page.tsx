@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { aed } from "@/lib/api";
 import { useMoney } from "@/lib/live";
 import { findings, wealth } from "@/lib/sample";
@@ -16,6 +16,10 @@ export default function MoneyPage() {
   const { me } = useSession("PARENT");
   const { monthly, cashflow, bills, live } = useMoney(!!me);
   const [handled, setHandled] = useState<Record<string, string>>({});
+  // The page renders after the session loads, so the browser can't jump to #bills or #uploads on its own.
+  useEffect(() => {
+    if (me && window.location.hash) document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
+  }, [me]);
   if (!me) return <p className="muted">Loading…</p>;
   const tight = cashflow.months.filter((c) => c.tight).map((c) => `${aed(c.freeMinor)} in ${c.m}`);
 
@@ -90,6 +94,12 @@ export default function MoneyPage() {
 
       <section id="uploads" className="stack" style={{ gap: 10 }}>
         <h2 className="first">Found in your uploads</h2>
+        <div className="card" style={{ display: "grid", gap: 8 }}>
+          <p style={{ fontSize: 14 }}>
+            <b>Uploading receipts and statements comes next.</b> Reading them is the next build step, so the findings below are samples for now.
+          </p>
+          <Link href="/parent/money/receipt" className="link">See how a checked receipt will look</Link>
+        </div>
         {findings.map((f) => (
           <div className="card" key={f.id} style={{ display: "grid", gap: 8 }}>
             <p style={{ fontSize: 14 }}>
