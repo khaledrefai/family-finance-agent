@@ -29,10 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${readex.variable} ${baloo.variable}`}>
       <body>
         <ServiceWorker />
-        <main>
-          {children}
-          <p className="fine">Prototype. Demo money only, no real payments.</p>
-        </main>
+        {children}
       </body>
     </html>
   );

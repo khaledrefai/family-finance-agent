@@ -106,6 +106,14 @@ function Why() {
           Why this?
         </button>
       )}
+      {r.offer && (
+        <p className="trust">
+          {r.offer.source === "SEEDED" ? "From our saved price list" : `Best of ${r.offer.offersCompared} offers the app compared`}:{" "}
+          {r.offer.total} at {r.offer.store} ({r.offer.price}{r.offer.delivery === null ? ", delivery not listed" : r.offer.delivery === "AED 0" ? " + free delivery" : ` + ${r.offer.delivery} delivery`}
+          {r.offer.verified ? ", re-checked" : ""}).{" "}
+          {r.productUrl && <a className="link" href={r.productUrl} target="_blank" rel="noreferrer noopener">Open the shop&apos;s page</a>}
+        </p>
+      )}
       {ruleNotes.map((n) => (
         <p key={n} className="trust">{n}</p>
       ))}

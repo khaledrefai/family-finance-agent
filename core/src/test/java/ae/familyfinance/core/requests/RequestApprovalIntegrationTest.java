@@ -4,6 +4,7 @@ import ae.familyfinance.core.support.DemoFamily;
 import ae.familyfinance.core.support.PostgresIntegrationTest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,6 +33,13 @@ class RequestApprovalIntegrationTest extends PostgresIntegrationTest {
     @Autowired ObjectMapper json;
     @Autowired JdbcTemplate jdbc;
 
+    /** Approving pays from Layla's demo wallet; give the money back so later tests start from the seed's wallet. */
+    @AfterEach
+    void refundTheWallets() {
+        jdbc.update("DELETE FROM demo_wallet_entry WHERE request_id IN (SELECT id FROM spending_request WHERE family_id = ?)",
+                DemoFamily.FAMILY);
+    }
+
     private String login(String username) throws Exception {
         String body = mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"" + username + "\",\"password\":\"" + DemoFamily.PASSWORD + "\"}"))
@@ -44,8 +52,7 @@ class RequestApprovalIntegrationTest extends PostgresIntegrationTest {
         String body = mvc.perform(post("/api/requests").header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"kind":"ASK_TO_BUY","title":"%s","amountMinor":%d,"category":"ELECTRONICS",
-                                 "productUrl":"https://www.noon.com/uae-en/example-headphones"}
+                                {"kind":"ASK_TO_BUY","title":"%s","amountMinor":%d,"category":"ELECTRONICS"}
                                 """.formatted(title, amountMinor)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDING"))

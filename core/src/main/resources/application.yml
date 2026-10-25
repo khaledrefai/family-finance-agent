@@ -5,6 +5,10 @@ spring:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/ffa}
     username: ${DB_USER:ffa}
     password: ${DB_PASSWORD:ffa}
+    hikari:
+      # "Today" in SQL (current_date in the demo seed) must be the UAE day, like the core's clock (ClockConfig).
+      # Without this the database uses the server's zone (UTC), and from midnight to 4 am UAE the two disagree.
+      connection-init-sql: SET TIME ZONE 'Asia/Dubai'
   jpa:
     open-in-view: false
     hibernate:
@@ -45,6 +49,15 @@ app:
     vapid-private-key: ${VAPID_PRIVATE_KEY:}
     # How push services can reach whoever runs this server: mailto:you@example.com or an https address
     subject: ${PUSH_CONTACT:}
+  # Price search (week 6). live = 24 h cache, then SerpApi, then the saved price list; cache = cache (any age), then the
+  # saved list (record the demo this way after ops/prewarm-prices.sh); off = the saved list only.
+  pricing:
+    search-live: ${SEARCH_LIVE:live}
+    serpapi-key: ${SERPAPI_KEY:}
+    timeout: 6s
+    cache-for: 24h
+    # Each comparison re-checks its top offers with one narrower search each. 0 = no re-check (saves searches).
+    verify-top: ${PRICE_VERIFY_TOP:3}
 
 management:
   health:

@@ -1,0 +1,111 @@
+{
+ "id": "44444444-4444-4444-4444-444444444444",
+ "intent": {
+  "query": "peanut butter cups"
+ },
+ "searchedFor": "peanut butter cups",
+ "source": "SEEDED",
+ "mode": "LIVE",
+ "checkedAt": "2026-10-25T21:30:00+04:00",
+ "exact": false,
+ "offers": [
+  {
+   "key": "o1",
+   "store": "Lulu Hypermarket",
+   "title": "Reese's Peanut Butter Cups 42g",
+   "price": {
+    "minor": 750,
+    "currency": "AED",
+    "text": "AED 7.50"
+   },
+   "delivery": null,
+   "deliveryKnown": false,
+   "fees": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "total": {
+    "minor": 750,
+    "currency": "AED",
+    "text": "AED 7.50"
+   },
+   "source": "SEEDED",
+   "verified": false,
+   "checkedAt": "2026-10-25T21:30:00+04:00",
+   "link": null
+  }
+ ],
+ "substitutes": [],
+ "best": {
+  "key": "o1",
+  "store": "Lulu Hypermarket",
+  "title": "Reese's Peanut Butter Cups 42g",
+  "price": {
+   "minor": 750,
+   "currency": "AED",
+   "text": "AED 7.50"
+  },
+  "delivery": null,
+  "deliveryKnown": false,
+  "fees": {
+   "minor": 0,
+   "currency": "AED",
+   "text": "AED 0"
+  },
+  "total": {
+   "minor": 750,
+   "currency": "AED",
+   "text": "AED 7.50"
+  },
+  "source": "SEEDED",
+  "verified": false,
+  "checkedAt": "2026-10-25T21:30:00+04:00",
+  "link": null
+ },
+ "shopsChecked": 1,
+ "dropped": 0,
+ "assessment": {
+  "version": 2,
+  "amount": {
+   "minor": 750,
+   "currency": "AED",
+   "text": "AED 7.50"
+  },
+  "verdict": "DOES_NOT_FIT",
+  "needsParent": false,
+  "blocked": true,
+  "kid": {
+   "memberId": "00000000-0000-0000-0000-0000000000c1",
+   "name": "Layla",
+   "wallet": {
+    "minor": 30900,
+    "currency": "AED",
+    "text": "AED 309"
+   },
+   "walletCovers": true,
+   "walletAfter": {
+    "minor": 2000,
+    "currency": "AED",
+    "text": "AED 20"
+   }
+  },
+  "rules": {
+   "outcome": "NEEDS_PARENT",
+   "hits": []
+  },
+  "card": null,
+  "facts": [
+   "It costs AED 7.50.",
+   "Adam's wallet has AED 120, enough for this.",
+   "Family rule: No peanuts for Adam. Reese's Peanut Butter Cups 42g has peanuts in its name, and Adam can't have peanuts."
+  ]
+ },
+ "facts": [
+  "I compared 1 offer from 1 shop for \"peanut butter cups\" (from our saved price list of 25 Oct, not live prices).",
+  "Lowest total: AED 7.50 at Lulu Hypermarket (AED 7.50 + delivery not listed).",
+  "Lulu Hypermarket doesn't list delivery, so check that before paying.",
+  "Adam's wallet has AED 120, enough for this.",
+  "Family rule: No peanuts for Adam. Reese's Peanut Butter Cups 42g has peanuts in its name, and Adam can't have peanuts."
+ ]
+}

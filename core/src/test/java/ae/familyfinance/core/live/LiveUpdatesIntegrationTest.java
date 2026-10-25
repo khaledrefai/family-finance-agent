@@ -82,13 +82,6 @@ class LiveUpdatesIntegrationTest extends PostgresIntegrationTest {
                 """, Long.class, member);
     }
 
-    private void topUp(UUID member, long amountMinor) {
-        jdbc.update("""
-                INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description)
-                SELECT id, 'ADJUSTMENT', ?, 'Top-up for a test (demo money)' FROM demo_wallet WHERE member_id = ?
-                """, amountMinor, member);
-    }
-
     @Test
     void a_childs_request_reaches_both_parents_and_no_child() throws Exception {
         String id = ask(login("layla"), "SPEND", "Phone case", 4500, "ELECTRONICS").get("id").asText();
@@ -114,10 +107,13 @@ class LiveUpdatesIntegrationTest extends PostgresIntegrationTest {
 
     @Test
     void approving_pays_from_the_childs_wallet_and_tells_the_child() throws Exception {
-        // What is left in Layla's wallet depends on the day the seed ran and on what other tests paid from it
-        // (an approved AED 300 pair of headphones can leave AED 1), so put the AED 20 in first.
-        topUp(DemoFamily.LAYLA, 2000);
         String omar = login("omar");
+        // Other tests spend Layla's demo money too (her AED 300 headphones), and the seeded balance depends on the day
+        // of the week, so give her wallet the AED 20 first: this test is about paying from it, not about what is left
+        jdbc.update("""
+                INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description)
+                SELECT id, 'ADJUSTMENT', 2000, 'Test top-up (demo money)' FROM demo_wallet WHERE member_id = ?
+                """, DemoFamily.LAYLA);
         long before = wallet(DemoFamily.LAYLA);
         String id = ask(login("layla"), "SPEND", "Bus card top-up", 2000, "TRANSPORT").get("id").asText();
 

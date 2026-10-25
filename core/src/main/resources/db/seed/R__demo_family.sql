@@ -3,14 +3,17 @@
 -- with `./deploy.sh reseed` before every recording.
 --
 -- All logins use the password: demo1234   (DEMO ONLY)
--- Dates are relative to today so the story always looks current. "Today" is (now() AT TIME ZONE 'Asia/Dubai')::date,
--- the core's clock (ClockConfig). Never current_date: that is the database session's time zone (UTC in tests and
--- with psql), a day behind the UAE from 20:00 to 24:00 UTC.
+-- Dates are relative to today so the story always looks current.
 --
 --   Sara  (parent)  sara / demo1234
 --   Omar  (parent)  omar / demo1234
 --   Layla (13)      layla / demo1234   -> wants AED 300 headphones from noon
 --   Adam  (9)       adam / demo1234    -> peanut allergy, tries to buy peanut snacks
+
+-- "Today" is today in the UAE, as in the app (ClockConfig). Without this, current_date is the database's date (UTC),
+-- which from 20:00 to 24:00 UTC is a day behind the app: "DEWA due tomorrow" would read "due today", and the
+-- core's tests would fail every evening. Reset at the end, so a pooled connection goes back to its own zone.
+SET TIME ZONE 'Asia/Dubai';
 
 -- Phones that said yes to notifications, and email addresses a parent typed in, survive a reseed (the member ids
 -- are fixed), so there is no need to turn notifications on again before every recording.
@@ -71,44 +74,44 @@ CROSS JOIN (VALUES ('CHILD_ACCOUNT'), ('AI_PROCESSING')) AS p(purpose);
 -- Income: Omar's fixed salary and Sara's commission (variable). Sara's planning base is worked out by the
 -- engine from the last 6 months below: the average of the 3 lowest = AED 6,500.
 INSERT INTO income (id, family_id, member_id, name, kind, amount_minor, frequency, next_on, status, source) VALUES
- ('00000000-0000-0000-0000-0000000001a2', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', 'Omar salary',     'FIXED',    2800000, 'MONTHLY', (now() AT TIME ZONE 'Asia/Dubai')::date + 20, 'ACTIVE', 'SEED'),
- ('00000000-0000-0000-0000-0000000001a1', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', 'Sara commission', 'VARIABLE',  750000, 'MONTHLY', (now() AT TIME ZONE 'Asia/Dubai')::date + 24, 'ACTIVE', 'SEED');
+ ('00000000-0000-0000-0000-0000000001a2', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', 'Omar salary',     'FIXED',    2800000, 'MONTHLY', current_date + 20, 'ACTIVE', 'SEED'),
+ ('00000000-0000-0000-0000-0000000001a1', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', 'Sara commission', 'VARIABLE',  750000, 'MONTHLY', current_date + 24, 'ACTIVE', 'SEED');
 
 INSERT INTO income_receipt (income_id, received_on, amount_minor)
-SELECT '00000000-0000-0000-0000-0000000001a1', (date_trunc('month', (now() AT TIME ZONE 'Asia/Dubai')::date) - make_interval(months => k))::date + 24, amt
+SELECT '00000000-0000-0000-0000-0000000001a1', (date_trunc('month', current_date) - make_interval(months => k))::date + 24, amt
 FROM (VALUES (1, 980000), (2, 620000), (3, 740000), (4, 650000), (5, 1120000), (6, 680000)) AS r(k, amt);
 
 -- Accounts and cards, typed in by hand (no bank links). The Visa's bill falls due before Omar's next pay,
 -- so putting Layla's AED 300 headphones on it shows the card warning.
 INSERT INTO money_account (id, family_id, owner_member_id, kind, label, last4, balance_minor, balance_as_of,
                            is_savings, limit_minor, statement_day, due_day) VALUES
- ('00000000-0000-0000-0000-0000000000e1', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', 'BANK',        'ENBD current',      '4821', 1165000, (now() AT TIME ZONE 'Asia/Dubai')::date,     FALSE, NULL,    NULL, NULL),
- ('00000000-0000-0000-0000-0000000000e2', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', 'BANK',        'ADCB savings',      '1093', 3260000, (now() AT TIME ZONE 'Asia/Dubai')::date,     TRUE,  NULL,    NULL, NULL),
- ('00000000-0000-0000-0000-0000000000e3', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', 'CREDIT_CARD', 'Omar''s Visa',      '7710',  595000, (now() AT TIME ZONE 'Asia/Dubai')::date - 1, FALSE, 2000000,
-  extract(day FROM (now() AT TIME ZONE 'Asia/Dubai')::date + 1)::int, extract(day FROM (now() AT TIME ZONE 'Asia/Dubai')::date + 19)::int),
- ('00000000-0000-0000-0000-0000000000e4', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', 'CREDIT_CARD', 'Sara''s Mastercard', '3356', 135000, (now() AT TIME ZONE 'Asia/Dubai')::date - 1, FALSE, 1200000,
-  extract(day FROM (now() AT TIME ZONE 'Asia/Dubai')::date + 3)::int, extract(day FROM (now() AT TIME ZONE 'Asia/Dubai')::date + 28)::int),
- ('00000000-0000-0000-0000-0000000000e5', '00000000-0000-0000-0000-00000000f001', NULL,                                   'CASH',        'Cash at home',      NULL,     65000, (now() AT TIME ZONE 'Asia/Dubai')::date,     FALSE, NULL,    NULL, NULL);
+ ('00000000-0000-0000-0000-0000000000e1', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', 'BANK',        'ENBD current',      '4821', 1165000, current_date,     FALSE, NULL,    NULL, NULL),
+ ('00000000-0000-0000-0000-0000000000e2', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', 'BANK',        'ADCB savings',      '1093', 3260000, current_date,     TRUE,  NULL,    NULL, NULL),
+ ('00000000-0000-0000-0000-0000000000e3', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', 'CREDIT_CARD', 'Omar''s Visa',      '7710',  595000, current_date - 1, FALSE, 2000000,
+  extract(day FROM current_date + 1)::int, extract(day FROM current_date + 19)::int),
+ ('00000000-0000-0000-0000-0000000000e4', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', 'CREDIT_CARD', 'Sara''s Mastercard', '3356', 135000, current_date - 1, FALSE, 1200000,
+  extract(day FROM current_date + 3)::int, extract(day FROM current_date + 28)::int),
+ ('00000000-0000-0000-0000-0000000000e5', '00000000-0000-0000-0000-00000000f001', NULL,                                   'CASH',        'Cash at home',      NULL,     65000, current_date,     FALSE, NULL,    NULL, NULL);
 
 -- Commitments: rent in 4 cheques, school fees in 3 terms, the car loan, DEWA (an estimate, higher in summer),
 -- du, and a forgotten subscription. Half of term 2 is already put aside; term 3 comes too soon after it, so March is a tight month.
 INSERT INTO commitment (id, family_id, name, kind, amount_minor, frequency, next_due_on, remaining_count, status, source,
                         is_estimate, summer_amount_minor, reserved_minor, balance_left_minor, paid_from_account_id) VALUES
- ('00000000-0000-0000-0000-0000000002c1', '00000000-0000-0000-0000-00000000f001', 'Apartment rent',             'RENT',         3000000, 'CUSTOM',  (now() AT TIME ZONE 'Asia/Dubai')::date + 68, NULL, 'ACTIVE', 'SEED', FALSE, NULL,   2000000, NULL,    '00000000-0000-0000-0000-0000000000e1'),
- ('00000000-0000-0000-0000-0000000002c2', '00000000-0000-0000-0000-00000000f001', 'School fees',                'SCHOOL_FEES',  1500000, 'CUSTOM',  (now() AT TIME ZONE 'Asia/Dubai')::date + 72, NULL, 'ACTIVE', 'SEED', FALSE, NULL,    750000, NULL,    '00000000-0000-0000-0000-0000000000e1'),
- ('00000000-0000-0000-0000-0000000002c3', '00000000-0000-0000-0000-00000000f001', 'Car loan',                   'LOAN',          210000, 'MONTHLY', (now() AT TIME ZONE 'Asia/Dubai')::date + 22, 18,   'ACTIVE', 'SEED', FALSE, NULL,         0, 3840000, '00000000-0000-0000-0000-0000000000e1'),
- ('00000000-0000-0000-0000-0000000002c4', '00000000-0000-0000-0000-00000000f001', 'DEWA electricity and water', 'UTILITY',        90000, 'MONTHLY', (now() AT TIME ZONE 'Asia/Dubai')::date + 1,  NULL, 'ACTIVE', 'SEED', TRUE,  140000,      0, NULL,    '00000000-0000-0000-0000-0000000000e1'),
- ('00000000-0000-0000-0000-0000000002c5', '00000000-0000-0000-0000-00000000f001', 'du home and mobile',         'TELECOM',        45000, 'MONTHLY', (now() AT TIME ZONE 'Asia/Dubai')::date + 7,  NULL, 'ACTIVE', 'SEED', FALSE, NULL,         0, NULL,    '00000000-0000-0000-0000-0000000000e3'),
- ('00000000-0000-0000-0000-0000000002c6', '00000000-0000-0000-0000-00000000f001', 'Streaming bundle',           'SUBSCRIPTION',    5900, 'MONTHLY', (now() AT TIME ZONE 'Asia/Dubai')::date + 3,  NULL, 'ACTIVE', 'SEED', FALSE, NULL,         0, NULL,    '00000000-0000-0000-0000-0000000000e4');
+ ('00000000-0000-0000-0000-0000000002c1', '00000000-0000-0000-0000-00000000f001', 'Apartment rent',             'RENT',         3000000, 'CUSTOM',  current_date + 68, NULL, 'ACTIVE', 'SEED', FALSE, NULL,   2000000, NULL,    '00000000-0000-0000-0000-0000000000e1'),
+ ('00000000-0000-0000-0000-0000000002c2', '00000000-0000-0000-0000-00000000f001', 'School fees',                'SCHOOL_FEES',  1500000, 'CUSTOM',  current_date + 72, NULL, 'ACTIVE', 'SEED', FALSE, NULL,    750000, NULL,    '00000000-0000-0000-0000-0000000000e1'),
+ ('00000000-0000-0000-0000-0000000002c3', '00000000-0000-0000-0000-00000000f001', 'Car loan',                   'LOAN',          210000, 'MONTHLY', current_date + 22, 18,   'ACTIVE', 'SEED', FALSE, NULL,         0, 3840000, '00000000-0000-0000-0000-0000000000e1'),
+ ('00000000-0000-0000-0000-0000000002c4', '00000000-0000-0000-0000-00000000f001', 'DEWA electricity and water', 'UTILITY',        90000, 'MONTHLY', current_date + 1,  NULL, 'ACTIVE', 'SEED', TRUE,  140000,      0, NULL,    '00000000-0000-0000-0000-0000000000e1'),
+ ('00000000-0000-0000-0000-0000000002c5', '00000000-0000-0000-0000-00000000f001', 'du home and mobile',         'TELECOM',        45000, 'MONTHLY', current_date + 7,  NULL, 'ACTIVE', 'SEED', FALSE, NULL,         0, NULL,    '00000000-0000-0000-0000-0000000000e3'),
+ ('00000000-0000-0000-0000-0000000002c6', '00000000-0000-0000-0000-00000000f001', 'Streaming bundle',           'SUBSCRIPTION',    5900, 'MONTHLY', current_date + 3,  NULL, 'ACTIVE', 'SEED', FALSE, NULL,         0, NULL,    '00000000-0000-0000-0000-0000000000e4');
 
 INSERT INTO commitment_occurrence (commitment_id, due_on, amount_minor, label) VALUES
- ('00000000-0000-0000-0000-0000000002c1', (now() AT TIME ZONE 'Asia/Dubai')::date + 68,  3000000, 'Cheque 2 of 4'),
- ('00000000-0000-0000-0000-0000000002c1', (now() AT TIME ZONE 'Asia/Dubai')::date + 159, 3000000, 'Cheque 3 of 4'),
- ('00000000-0000-0000-0000-0000000002c1', (now() AT TIME ZONE 'Asia/Dubai')::date + 250, 3000000, 'Cheque 4 of 4'),
- ('00000000-0000-0000-0000-0000000002c1', (now() AT TIME ZONE 'Asia/Dubai')::date + 341, 3000000, 'Cheque 1 of 4, next contract'),
- ('00000000-0000-0000-0000-0000000002c2', (now() AT TIME ZONE 'Asia/Dubai')::date + 72,  1500000, 'Term 2'),
- ('00000000-0000-0000-0000-0000000002c2', (now() AT TIME ZONE 'Asia/Dubai')::date + 162, 1500000, 'Term 3'),
- ('00000000-0000-0000-0000-0000000002c2', (now() AT TIME ZONE 'Asia/Dubai')::date + 312, 1500000, 'Term 1, next year');
+ ('00000000-0000-0000-0000-0000000002c1', current_date + 68,  3000000, 'Cheque 2 of 4'),
+ ('00000000-0000-0000-0000-0000000002c1', current_date + 159, 3000000, 'Cheque 3 of 4'),
+ ('00000000-0000-0000-0000-0000000002c1', current_date + 250, 3000000, 'Cheque 4 of 4'),
+ ('00000000-0000-0000-0000-0000000002c1', current_date + 341, 3000000, 'Cheque 1 of 4, next contract'),
+ ('00000000-0000-0000-0000-0000000002c2', current_date + 72,  1500000, 'Term 2'),
+ ('00000000-0000-0000-0000-0000000002c2', current_date + 162, 1500000, 'Term 3'),
+ ('00000000-0000-0000-0000-0000000002c2', current_date + 312, 1500000, 'Term 1, next year');
 
 -- Budgets: the family's everyday money each month, and weekly pocket money per child
 -- (Layla's AED 100 includes school canteen money).
@@ -150,7 +153,7 @@ INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description) VALUE
 -- The kids' goals are their own and come out of their pocket money, not the family plan.
 INSERT INTO goal (id, family_id, member_id, name, tier, target_minor, saved_minor, monthly_minor, target_date, priority) VALUES
  ('00000000-0000-0000-0000-0000000003f1', '00000000-0000-0000-0000-00000000f001', NULL, 'Emergency buffer', 'SURVIVAL',  2500000, 1000000, 500000, NULL,              10),
- ('00000000-0000-0000-0000-0000000003f2', '00000000-0000-0000-0000-00000000f001', NULL, 'Summer trip',      'GOOD_LIFE', 1200000,  360000, 150000, (now() AT TIME ZONE 'Asia/Dubai')::date + 248, 50),
+ ('00000000-0000-0000-0000-0000000003f2', '00000000-0000-0000-0000-00000000f001', NULL, 'Summer trip',      'GOOD_LIFE', 1200000,  360000, 150000, current_date + 248, 50),
  ('00000000-0000-0000-0000-0000000003f3', '00000000-0000-0000-0000-00000000f001', NULL, 'Home deposit',     'DREAM',    15000000,       0, NULL,   NULL,              90),
  ('00000000-0000-0000-0000-0000000003c1', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1', 'Headphones',   'GOOD_LIFE', 30000, 12000, NULL, NULL, 100),
  ('00000000-0000-0000-0000-0000000003c2', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'Building set', 'GOOD_LIFE', 16000,  7200, NULL, NULL, 100);
@@ -164,16 +167,16 @@ INSERT INTO points_entry (family_id, member_id, points, reason) VALUES
 -- fuel and the dinner on it too: uploading it shows them as "already in your spending", not counted twice.
 INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, merchant, category, direction, amount_minor,
                                 duplicate_hash, source, paid_from_account_id) VALUES
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', (now() AT TIME ZONE 'Asia/Dubai')::date - 5, 'Weekly groceries', 'Carrefour',        'GROCERIES',  'DEBIT', 61250, encode(digest('seed-1', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e4'),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', (now() AT TIME ZONE 'Asia/Dubai')::date - 3, 'Fuel',             'ENOC',             'TRANSPORT',  'DEBIT', 18000, encode(digest('seed-2', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e3'),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', (now() AT TIME ZONE 'Asia/Dubai')::date - 2, 'Dinner out',       'Local restaurant', 'EATING_OUT', 'DEBIT', 23500, encode(digest('seed-3', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e3');
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', current_date - 5, 'Weekly groceries', 'Carrefour',        'GROCERIES',  'DEBIT', 61250, encode(digest('seed-1', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e4'),
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', current_date - 3, 'Fuel',             'ENOC',             'TRANSPORT',  'DEBIT', 18000, encode(digest('seed-2', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e3'),
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a1', current_date - 2, 'Dinner out',       'Local restaurant', 'EATING_OUT', 'DEBIT', 23500, encode(digest('seed-3', 'sha256'), 'hex'), 'SEED', '00000000-0000-0000-0000-0000000000e3');
 
 -- Two earlier months of a streaming subscription on the Visa, read from earlier statements. Nobody put it on the
 -- commitments list. Uploading this month's Visa statement adds the third, and the Bookkeeper finds it.
 INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, merchant, category, direction, amount_minor,
                                 duplicate_hash, source, paid_from_account_id) VALUES
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', (now() AT TIME ZONE 'Asia/Dubai')::date - 71, 'SHAHID VIP', 'SHAHID VIP', 'ENTERTAINMENT', 'DEBIT', 3500, encode(digest('seed-4', 'sha256'), 'hex'), 'DOCUMENT', '00000000-0000-0000-0000-0000000000e3'),
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', (now() AT TIME ZONE 'Asia/Dubai')::date - 40, 'SHAHID VIP', 'SHAHID VIP', 'ENTERTAINMENT', 'DEBIT', 3500, encode(digest('seed-5', 'sha256'), 'hex'), 'DOCUMENT', '00000000-0000-0000-0000-0000000000e3');
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', current_date - 71, 'SHAHID VIP', 'SHAHID VIP', 'ENTERTAINMENT', 'DEBIT', 3500, encode(digest('seed-4', 'sha256'), 'hex'), 'DOCUMENT', '00000000-0000-0000-0000-0000000000e3'),
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000a2', current_date - 40, 'SHAHID VIP', 'SHAHID VIP', 'ENTERTAINMENT', 'DEBIT', 3500, encode(digest('seed-5', 'sha256'), 'hex'), 'DOCUMENT', '00000000-0000-0000-0000-0000000000e3');
 
 -- Family outings (week 4), paid from the ENBD current account, so the Visa demo and the card warning are untouched.
 -- With the two Shahid VIP payments above, the last 3 months average AED 1,520 against the AED 1,200 entertainment budget, and this month is already
@@ -182,8 +185,8 @@ INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, 
 INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, merchant, category, direction, amount_minor,
                                 duplicate_hash, source, paid_from_account_id)
 SELECT '00000000-0000-0000-0000-00000000f001', v.member,
-       CASE WHEN v.months_ago = 0 THEN greatest(date_trunc('month', (now() AT TIME ZONE 'Asia/Dubai')::date)::date, (now() AT TIME ZONE 'Asia/Dubai')::date - v.day)
-            ELSE (date_trunc('month', (now() AT TIME ZONE 'Asia/Dubai')::date) - make_interval(months => v.months_ago))::date + v.day END,
+       CASE WHEN v.months_ago = 0 THEN greatest(date_trunc('month', current_date)::date, current_date - v.day)
+            ELSE (date_trunc('month', current_date) - make_interval(months => v.months_ago))::date + v.day END,
        v.descr, v.merchant, 'ENTERTAINMENT', 'DEBIT', v.amt,
        encode(digest('seed-fun-' || v.months_ago || '-' || v.merchant || '-' || v.amt, 'sha256'), 'hex'), 'SEED',
        '00000000-0000-0000-0000-0000000000e1'
@@ -214,9 +217,9 @@ FROM (VALUES
 -- The bangle is worth less than was paid (making charges), so the screen shows the jewellery note.
 INSERT INTO gold_holding (family_id, description, grams_mg, purity, paid_minor, bought_on, seller, bucket, goal_id,
                           is_jewellery, created_by) VALUES
- ('00000000-0000-0000-0000-00000000f001', 'Gold bar',            20000, '24K', 580000, (now() AT TIME ZONE 'Asia/Dubai')::date - 229, 'Gold Souk, Deira',     'GOALS', '00000000-0000-0000-0000-0000000003f3', FALSE, '00000000-0000-0000-0000-0000000000a2'),
- ('00000000-0000-0000-0000-00000000f001', 'Gold coins, 4 x 5 g', 20000, '24K', 620000, (now() AT TIME ZONE 'Asia/Dubai')::date - 115, 'Mall of the Emirates', 'GOALS', '00000000-0000-0000-0000-0000000003f3', FALSE, '00000000-0000-0000-0000-0000000000a1'),
- ('00000000-0000-0000-0000-00000000f001', 'Bangle',              10000, '22K', 340000, (now() AT TIME ZONE 'Asia/Dubai')::date - 40,  'Gold Souk, Deira',     'GOALS', '00000000-0000-0000-0000-0000000003f1', TRUE,  '00000000-0000-0000-0000-0000000000a1');
+ ('00000000-0000-0000-0000-00000000f001', 'Gold bar',            20000, '24K', 580000, current_date - 229, 'Gold Souk, Deira',     'GOALS', '00000000-0000-0000-0000-0000000003f3', FALSE, '00000000-0000-0000-0000-0000000000a2'),
+ ('00000000-0000-0000-0000-00000000f001', 'Gold coins, 4 x 5 g', 20000, '24K', 620000, current_date - 115, 'Mall of the Emirates', 'GOALS', '00000000-0000-0000-0000-0000000003f3', FALSE, '00000000-0000-0000-0000-0000000000a1'),
+ ('00000000-0000-0000-0000-00000000f001', 'Bangle',              10000, '22K', 340000, current_date - 40,  'Gold Souk, Deira',     'GOALS', '00000000-0000-0000-0000-0000000003f1', TRUE,  '00000000-0000-0000-0000-0000000000a1');
 
 -- Today's price for the demo, so the "as of" time is always this morning. A sample, not a real rate.
 INSERT INTO gold_price (family_id, purity, per_gram_minor, as_of, source, seeded) VALUES
@@ -304,3 +307,5 @@ GROUP BY w.id;
 INSERT INTO demo_wallet_entry (wallet_id, kind, amount_minor, description) VALUES
  ('00000000-0000-0000-0000-0000000000d1', 'SAVINGS_MOVE', -12000, 'Into the headphones goal (demo money)'),
  ('00000000-0000-0000-0000-0000000000d2', 'SAVINGS_MOVE',  -7200, 'Into the building set goal (demo money)');
+
+RESET TIME ZONE;

@@ -78,6 +78,9 @@ jobs:
           APP_JWT_SECRET: ${{ secrets.APP_JWT_SECRET }}
           WEB_PORT: ${{ vars.WEB_PORT || '3000' }}
           AGENTS_LLM: ${{ vars.AGENTS_LLM || 'auto' }}
+          # Price search: live, cache (for recording the demo after a pre-warm) or off. PRICE_VERIFY_TOP=0 saves searches.
+          SEARCH_LIVE: ${{ vars.SEARCH_LIVE || 'live' }}
+          PRICE_VERIFY_TOP: ${{ vars.PRICE_VERIFY_TOP || '3' }}
         run: |
           if [ -z "$POSTGRES_PASSWORD" ]; then echo "::error::POSTGRES_PASSWORD is not set in the production environment"; exit 1; fi
           if [ "$DOMAIN" = "none" ]; then DOMAIN=""; fi
@@ -95,6 +98,8 @@ jobs:
             echo "DOMAIN=$DOMAIN"
             if [ -n "$DOMAIN" ] && [ "$CADDY" = "on" ]; then echo "COMPOSE_PROFILES=https"; else echo "COMPOSE_PROFILES="; fi
             echo "AGENTS_LLM=$AGENTS_LLM"
+            echo "SEARCH_LIVE=$SEARCH_LIVE"
+            echo "PRICE_VERIFY_TOP=$PRICE_VERIFY_TOP"
             if [ -n "$APP_JWT_SECRET" ]; then echo "APP_JWT_SECRET=$APP_JWT_SECRET"; fi
           } | ssh vps "umask 077 && mkdir -p ~/ffa/shared && cat > ~/ffa/shared/incoming.env"
 

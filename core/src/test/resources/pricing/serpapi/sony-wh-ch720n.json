@@ -1,0 +1,91 @@
+{
+ "search_metadata": {
+  "id": "replay",
+  "status": "Success",
+  "created_at": "2026-10-25 17:30:00 UTC"
+ },
+ "search_parameters": {
+  "engine": "google_shopping",
+  "q": "Sony WH-CH720N",
+  "gl": "ae",
+  "hl": "en",
+  "google_domain": "google.ae"
+ },
+ "shopping_results": [
+  {
+   "position": 1,
+   "title": "Sony WH-CH720N Wireless Noise Cancelling Headphones",
+   "product_link": "https://www.google.ae/shopping/product/1001",
+   "product_id": "9001",
+   "source": "Amazon.ae",
+   "price": "AED 289.00",
+   "extracted_price": 289.0,
+   "delivery": "Free delivery",
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 2,
+   "title": "Sony WH-CH720N Noise Cancelling Wireless Headphones - Blue",
+   "product_link": "https://www.google.ae/shopping/product/1002",
+   "product_id": "9002",
+   "source": "noon",
+   "price": "AED 299.00",
+   "extracted_price": 299.0,
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 3,
+   "title": "Sony WH-CH720N Wireless Headphones",
+   "product_link": "https://www.google.ae/shopping/product/1003",
+   "product_id": "9003",
+   "source": "Sharaf DG",
+   "price": "AED 329.00",
+   "extracted_price": 329.0,
+   "delivery": "Free delivery",
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 4,
+   "title": "SONY WH-CH720N Headphones (Original)",
+   "product_link": "https://www.google.ae/shopping/product/1004",
+   "product_id": "9004",
+   "source": "megadealz.ae",
+   "price": "AED 119.00",
+   "extracted_price": 119.0,
+   "delivery": "AED 15.00 delivery",
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 5,
+   "title": "Hard Case for Sony WH-CH720N Headphones",
+   "product_link": "https://www.google.ae/shopping/product/1005",
+   "product_id": "9005",
+   "source": "Amazon.ae",
+   "price": "AED 45.00",
+   "extracted_price": 45.0,
+   "delivery": "Free delivery",
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 6,
+   "title": "Sony WH-CH520 Wireless On-Ear Headphones",
+   "product_link": "https://www.google.ae/shopping/product/1006",
+   "product_id": "9006",
+   "source": "Amazon.ae",
+   "price": "AED 169.00",
+   "extracted_price": 169.0,
+   "delivery": "Free delivery",
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  },
+  {
+   "position": 7,
+   "title": "JBL Tune 720BT Wireless Over-Ear Headphones",
+   "product_link": "https://www.google.ae/shopping/product/1007",
+   "product_id": "9007",
+   "source": "noon",
+   "price": "AED 249.00",
+   "extracted_price": 249.0,
+   "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=replay"
+  }
+ ]
+}

@@ -93,6 +93,8 @@ export default function AddSpendingPage() {
         </div>
       </div>
 
+      <Link href="/parent/money/compare" className="link">Buying something big? Compare the shops&apos; prices first</Link>
+
       <form className="card" onSubmit={submit} style={{ gap: 14 }}>
         <label>
           Amount in AED

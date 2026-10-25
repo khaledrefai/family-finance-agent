@@ -7,6 +7,9 @@ import ae.familyfinance.core.live.LiveKind;
 import ae.familyfinance.core.live.Outbox;
 import ae.familyfinance.core.money.Money;
 import ae.familyfinance.core.money.MoneyView;
+import ae.familyfinance.core.pricing.PricingService;
+import ae.familyfinance.core.pricing.PricingService.ChosenOffer;
+import ae.familyfinance.core.pricing.PricingService.OfferView;
 import ae.familyfinance.core.requests.AffordabilityService.Assessment;
 import ae.familyfinance.core.rules.RuleEngine;
 import ae.familyfinance.core.spend.SpendCategory;
@@ -35,10 +38,11 @@ public class RequestService {
     private final Outbox outbox;
     private final JdbcClient db;
     private final ObjectMapper json;
+    private final PricingService pricing;
 
     public RequestService(SpendingRequestRepository requests, ApprovalRepository approvals, FamilyRepository families,
                           AffordabilityService affordability, WalletService wallets, Outbox outbox, JdbcClient db,
-                          ObjectMapper json) {
+                          ObjectMapper json, PricingService pricing) {
         this.requests = requests;
         this.approvals = approvals;
         this.families = families;
@@ -47,6 +51,29 @@ public class RequestService {
         this.outbox = outbox;
         this.db = db;
         this.json = json;
+        this.pricing = pricing;
+    }
+
+    /**
+     * A request for one offer of a price comparison: the title, the payable total (the price when delivery isn't
+     * listed) and the shop's page come from the saved comparison, so nobody can change the price on the way.
+     */
+    @Transactional
+    public SpendingRequest createFromOffer(CurrentMember me, UUID comparisonId, String offerKey) {
+        ChosenOffer chosen = pricing.chosen(me, comparisonId, offerKey);
+        OfferView o = chosen.offer();
+        String title = o.title().length() > 200 ? o.title().substring(0, 200) : o.title();
+        Map<String, Object> offer = new HashMap<>();
+        offer.put("comparisonId", comparisonId.toString());
+        offer.put("store", o.store());
+        offer.put("price", o.price().text());
+        offer.put("delivery", o.deliveryKnown() ? o.delivery().text() : null);
+        offer.put("total", o.total().text());
+        offer.put("source", o.source().name());
+        offer.put("verified", o.verified());
+        offer.put("checkedAt", o.checkedAt().toString());
+        offer.put("offersCompared", chosen.offersCompared());
+        return create(me, RequestKind.ASK_TO_BUY, title, o.total().minor(), chosen.category(), o.link(), offer);
     }
 
     /**
@@ -56,9 +83,16 @@ public class RequestService {
     @Transactional
     public SpendingRequest create(CurrentMember me, RequestKind kind, String title, long amountMinor,
                                   String category, String productUrl) {
+        return create(me, kind, title, amountMinor, category, productUrl, null);
+    }
+
+    private SpendingRequest create(CurrentMember me, RequestKind kind, String title, long amountMinor,
+                                   String category, String productUrl, Map<String, Object> offer) {
         String currency = families.findById(me.familyId()).orElseThrow().getCurrency();
-        SpendingRequest saved = requests.saveAndFlush(new SpendingRequest(me.familyId(), me.memberId(), kind, title,
-                amountMinor, currency, category, productUrl));
+        SpendingRequest request = new SpendingRequest(me.familyId(), me.memberId(), kind, title, amountMinor, currency,
+                category, productUrl);
+        request.fromOffer(offer);
+        SpendingRequest saved = requests.saveAndFlush(request);
         Assessment assessment = affordability.assess(me, me.memberId(), amountMinor, null, title, spendCategory(category));
         try {
             db.sql("UPDATE spending_request SET assessment = CAST(? AS jsonb), assessment_version = ? WHERE id = ?")

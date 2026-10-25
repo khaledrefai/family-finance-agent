@@ -11,6 +11,7 @@ from .graph import orchestrator
 from .spend_story import nudge
 from .core_client import CoreError, WaysToSave
 from .ways_to_save import write as write_ways_to_save
+from . import shopper
 
 app = FastAPI(title="Family Finance Coach - agent service", version="0.1.0")
 
@@ -21,6 +22,18 @@ class ChatIn(BaseModel):
 
 class ChatOut(BaseModel):
     agent: str
+    reply: str
+
+
+class PricesIn(BaseModel):
+    text: str
+    requesterId: UUID | None = None       # a parent checking for a child
+    paidFromAccountId: UUID | None = None  # a parent's card, for the card bill check
+
+
+class PricesOut(BaseModel):
+    intent: dict | None
+    comparison: dict | None   # the core's comparison as it sent it; the app draws the offers from it
     reply: str
 
 
@@ -61,6 +74,15 @@ def read(doc_id: UUID, core: CoreClient = Depends(core_for_caller)) -> ReadOut:
     """The Bookkeeper reads an uploaded receipt or statement into a draft for a parent to confirm."""
     doc, reply = read_document(core, core.me(), doc_id)
     return ReadOut(documentId=doc.id if doc else None, status=doc.status if doc else None, reply=reply)
+
+
+@app.post("/prices", response_model=PricesOut)
+def prices(body: PricesIn, core: CoreClient = Depends(core_for_caller)) -> PricesOut:
+    """'Wireless headphones' -> the shops' prices. The Shopper reads the words; the core searches, ranks and checks."""
+    intent, comparison, reply = shopper.compare(core, core.me(), body.text[:300], None, body.requesterId,
+                                                body.paidFromAccountId)
+    return PricesOut(intent=intent.model_dump(exclude_none=True, mode="json") if intent else None,
+                     comparison=comparison, reply=reply)
 
 
 @app.get("/nudge", response_model=NudgeOut)
