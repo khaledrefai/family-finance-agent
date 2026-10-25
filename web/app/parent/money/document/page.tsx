@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Doc, docName, docs, docState, longDay, useAccounts } from "@/lib/live";
-import { AccountPicker, Back, Masthead, TRUST } from "../../../ui";
+import { AccountPicker, Back, Loading, Masthead, TRUST } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // One uploaded receipt or statement, as the Bookkeeper read it: a draft (dashed) until a parent confirms.
@@ -46,7 +46,7 @@ export default function DocumentPage() {
     }).catch((e) => setError((e as Error).message));
   }, [me, id]);
 
-  if (!me || (!doc && !error)) return <p className="muted">Loading…</p>;
+  if (!me || (!doc && !error)) return <Loading />;
   if (!doc) return (<div className="stack"><Back href="/parent/money#uploads" label="Money" /><p className="error" role="alert">{error}</p></div>);
 
   const receipt = doc.kind === "RECEIPT" || doc.kind === "INVOICE";
@@ -81,7 +81,7 @@ export default function DocumentPage() {
         sub={`${doc.fileName} · ${doc.readBy === "LLM" ? "read by the AI" : doc.readBy === "RULES" ? "read line by line" : "uploaded"} · ${state.label.toLowerCase()}`}
       />
 
-      <div className={`draft${doc.status === "CONFIRMED" ? " done" : ""}`} style={{ marginTop: -12 }}>
+      <div className={`draft${doc.status === "CONFIRMED" ? " done" : ""}`}>
         {doc.status === "CONFIRMED" && <span className="confirmed">Confirmed</span>}
         <p style={{ fontSize: 14 }}>{doc.summary}</p>
         {receipt && doc.status !== "FAILED" && doc.status !== "UPLOADED" && (

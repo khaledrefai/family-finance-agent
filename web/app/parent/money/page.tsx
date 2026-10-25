@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { aed } from "@/lib/api";
 import { useMoney, useWealth } from "@/lib/live";
-import { MonthColumns, SampleNote, TRUST, Waterfall } from "../../ui";
+import { Loading, MonthColumns, SampleNote, TRUST, Waterfall } from "../../ui";
 import { useSession } from "../../use-session";
 import { MoneyHeader } from "./money-tabs";
 import { Uploads } from "./uploads";
@@ -20,7 +20,7 @@ export default function MoneyPage() {
   useEffect(() => {
     if (me && window.location.hash) document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
   }, [me]);
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const tight = cashflow.months.filter((c) => c.tight).map((c) => `${aed(c.freeMinor)} in ${c.m}`);
 
   return (

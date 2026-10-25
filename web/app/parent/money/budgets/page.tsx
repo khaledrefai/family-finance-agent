@@ -4,7 +4,7 @@ import Link from "next/link";
 import { aed } from "@/lib/api";
 import { advice, BudgetMonth, useLive } from "@/lib/live";
 import { budgets, food } from "@/lib/sample";
-import { BudgetBar, MonthColumns, SampleNote } from "../../../ui";
+import { BudgetBar, Loading, MonthColumns, SampleNote } from "../../../ui";
 import { useSession } from "../../../use-session";
 import { MoneyHeader } from "../money-tabs";
 
@@ -13,7 +13,7 @@ import { MoneyHeader } from "../money-tabs";
 export default function BudgetsPage() {
   const { me } = useSession("PARENT");
   const { data: month, live } = useLive<BudgetMonth | null>(() => advice.budgets(), null, !!me);
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const h = budgets.history;
   const bars = live && month
     ? month.lines.map((l) => ({ name: l.label, spentMinor: l.spent.minor, limitMinor: l.limit.minor, fill: l.fillBp / 100,

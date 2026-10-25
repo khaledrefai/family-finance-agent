@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { aed, plain } from "@/lib/api";
 import { accounts as sampleAccounts, cardCheck, SAMPLE_NOTE } from "@/lib/sample";
 
@@ -62,6 +62,25 @@ const ICONS: Record<string, React.ReactNode> = {
       <rect x="17" y="14" width="4" height="6" rx="1.5" />
     </>
   ),
+  calendar: (
+    <>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+      <path d="M3.5 10h17M8 3v4M16 3v4" />
+    </>
+  ),
+  upload: (
+    <>
+      <path d="M12 15V4M7.5 8.5L12 4l4.5 4.5" />
+      <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+    </>
+  ),
+  card: (
+    <>
+      <rect x="2.5" y="5" width="19" height="14" rx="2.5" />
+      <path d="M2.5 10h19M6.5 15h4" />
+    </>
+  ),
+  back: <path d="M15 5l-7 7 7 7" />,
 };
 
 export function Icon({ name, size = 22 }: { name: keyof typeof ICONS; size?: number }) {
@@ -135,8 +154,22 @@ export function Masthead({ title, sub, action }: { title: string; sub?: string; 
 export function Back({ href, label }: { href: string; label: string }) {
   return (
     <Link href={href} className="back">
-      ‹ {label}
+      <Icon name="back" size={18} />
+      {label}
     </Link>
+  );
+}
+
+// While a screen waits for the session: grey blocks in its rough shape, and "Loading…" for screen readers.
+export function Loading() {
+  return (
+    <div className="stack" aria-busy="true" data-loading>
+      <span className="visually-hidden" role="status">Loading…</span>
+      <span className="skeleton title" />
+      <span className="skeleton tall" />
+      <span className="skeleton" />
+      <span className="skeleton" />
+    </div>
   );
 }
 
@@ -443,6 +476,32 @@ export function AccountPicker({ value, onChange, label = "Paid from", accounts =
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+// "Pay from" folded to one line: the chosen account, and Change to open the full list.
+// Keeps each waiting chit short enough that Approve and Decline stay in view.
+export function PayFrom({ value, onChange, accounts }: {
+  value: string; onChange: (id: string) => void; accounts: { id: string; label: string; last4?: string }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const chosen = accounts.find((a) => a.id === value);
+  if (open) {
+    return (
+      <div className="payfrom-pick">
+        <AccountPicker label="Pay from" value={value} accounts={accounts} onChange={(id) => { onChange(id); setOpen(false); }} />
+      </div>
+    );
+  }
+  return (
+    <div className="payfrom">
+      <span>
+        Pay from <b>{chosen ? `${chosen.label}${chosen.last4 ? ` ···${chosen.last4}` : ""}` : "an account"}</b>
+      </span>
+      <button type="button" className="text" onClick={() => setOpen(true)} aria-label="Change the account to pay from">
+        Change
+      </button>
     </div>
   );
 }

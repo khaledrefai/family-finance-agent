@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { aed } from "@/lib/api";
 import { CardCheck, core, dayLongMonth, useAccounts } from "@/lib/live";
 import { spendCategories } from "@/lib/sample";
-import { AccountPicker, Back, CardWarning, Icon, Masthead } from "../../../ui";
+import { AccountPicker, Back, CardWarning, Icon, Loading, Masthead } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // Add spending: upload a receipt for anything, or type in a payment that has no receipt
@@ -46,7 +46,7 @@ export default function AddSpendingPage() {
     return () => clearTimeout(t);
   }, [live, isCard, paidFrom, amount]);
 
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -80,7 +80,7 @@ export default function AddSpendingPage() {
       <Back href="/parent/money" label="Money" />
       <Masthead title="Add spending" sub="Anything the family paid for, with or without a receipt" />
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: -12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <Link href="/parent/money/receipt" className="card" style={{ display: "grid", gap: 6, textDecoration: "none", color: "var(--ink)" }}>
           <Icon name="receipt" size={24} />
           <b>Upload a receipt</b>

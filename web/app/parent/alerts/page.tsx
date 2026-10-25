@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useLiveEvents } from "@/lib/live-stream";
 import { Bell, notifyApi } from "@/lib/push";
-import { Back, Masthead } from "../../ui";
+import { Back, Loading, Masthead } from "../../ui";
 import { useSession } from "../../use-session";
 
 // Notifications: everything the app told me, newest first (the same words as the phone notifications).
@@ -24,12 +24,12 @@ export default function AlertsPage() {
     if (e.notification) load();
   }, !!me);
 
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   return (
     <div className="stack">
       <Back href="/parent" label="Today" />
       <Masthead title="Notifications" sub="Requests, answers, bills and budgets" />
-      {bell === null && <p className="muted">Loading…</p>}
+      {bell === null && <span className="skeleton" aria-label="Loading…" role="status" />}
       {bell?.items.length === 0 && (
         <p className="empty">Nothing yet. When one of the kids asks for something, or a bill is due soon, it shows up here.</p>
       )}

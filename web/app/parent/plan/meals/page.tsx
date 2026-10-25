@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Back, Masthead } from "../../../ui";
+import { Back, Loading, Masthead } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // The weekly dinners and shopping list arrive in a later version. Until then, delivery nights stay a line
 // in the weekly food budget (Money, Budgets) and receipts still count toward Groceries.
 export default function MealsPage() {
   const { me } = useSession("PARENT");
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
 
   return (
     <div className="stack">

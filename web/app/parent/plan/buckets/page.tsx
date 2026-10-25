@@ -5,7 +5,7 @@ import { useState } from "react";
 import { aed } from "@/lib/api";
 import { core, fromBuckets, useBuckets } from "@/lib/live";
 import { gold } from "@/lib/sample";
-import { Back, BucketFlow, Masthead, SampleNote, TRUST } from "../../../ui";
+import { Back, BucketFlow, Loading, Masthead, SampleNote, TRUST } from "../../../ui";
 import { useSession } from "../../../use-session";
 
 // Money buckets: every dirham of income gets a job. The flow chart shows how income splits into
@@ -17,7 +17,7 @@ export default function BucketsPage() {
   const { data: buckets, live, setData } = useBuckets(!!me);
   const [givingOn, setGivingOn] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const confirmed = buckets.confirmed;
 
   async function confirm() {

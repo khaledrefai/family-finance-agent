@@ -1,14 +1,14 @@
 "use client";
 
 import { familyGoal, saverOfTheMonth, summary } from "@/lib/sample";
-import { Back, Masthead, SampleNote, SavingLine } from "../../ui";
+import { Back, Loading, Masthead, SampleNote, SavingLine } from "../../ui";
 import { useSession } from "../../use-session";
 
 // The monthly family summary: one message for all four, figures from the engine, the AI picks what to say.
 // Sample month until proactive monitoring sends a real one.
 export default function SummaryPage() {
   const { me } = useSession("PARENT");
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   const [first, second] = saverOfTheMonth;
 
   return (

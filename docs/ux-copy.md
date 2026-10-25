@@ -27,7 +27,7 @@ How the app talks. Check new strings against this before they ship, in the web a
 - **Core `detail` strings:** a plain sentence with no trailing full stop (the agent adds one when it wraps them: "I couldn't do that. {detail}.").
 - **Empty states:** what will appear here and what makes it appear. "Nothing waiting. When one of the kids asks for something, it lands here."
 - **Success:** say it happened and where to look next. "Sent. Your parents can see … now, and their answer will show under My requests."
-- **Loading:** "Loading…" for pages, "Working it out…" while an agent answers.
+- **Loading:** pages show grey blocks in the screen's shape (`Loading` in `web/app/ui.tsx`) and say "Loading…" to screen readers; "Working it out…" while an agent answers.
 - **Agents not built yet:** say what isn't ready and what it will do. No week numbers or roadmap talk; these lines can appear in the demo video.
 - **Trust lines:** say where numbers come from in words a parent understands: "Totals are worked out exactly by the app, not guessed by the AI."
 

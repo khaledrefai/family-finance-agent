@@ -6,7 +6,7 @@ import { aed, api, MemberView } from "@/lib/api";
 import { Assessment, core, dayLongMonth, dayMonth, useAccounts } from "@/lib/live";
 import { cardCheck, headphones } from "@/lib/sample";
 import { Chit } from "../../chit";
-import { AccountPicker, Back, CardWarning, SampleNote, WhySheet } from "../../ui";
+import { AccountPicker, Back, CardWarning, Loading, SampleNote, WhySheet } from "../../ui";
 import { useSession } from "../../use-session";
 
 // One request with the "Why this?" sheet open: the figures the agent used, the kid's side and the family's side.
@@ -32,7 +32,7 @@ function Why() {
     core.assess((r.amountMinor / 100).toFixed(2), r.requesterId, account, r.title, r.category).then(setAssessment).catch(() => setAssessment(null));
   }, [live, r, account]);
 
-  if (!me) return <p className="muted">Loading…</p>;
+  if (!me) return <Loading />;
   if (!r) {
     return (
       <div className="stack">
@@ -142,7 +142,7 @@ function Why() {
 
 export default function WhyPage() {
   return (
-    <Suspense fallback={<p className="muted">Loading…</p>}>
+    <Suspense fallback={<Loading />}>
       <Why />
     </Suspense>
   );
