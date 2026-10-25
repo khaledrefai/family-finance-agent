@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Two Men, One Salary</title>
+<!--
+  The story video, as one page that draws any moment of it: render.js calls setup(timing, meta) once and then
+  render(t) for every frame. Nothing moves by itself (no CSS animation), so every frame is exact.
+  Scenes and their beats follow the narration: L('scene', line) is when that line starts.
+-->
+<style>
+@font-face { font-family: "Readex Pro"; src: url(node_modules/@fontsource-variable/readex-pro/files/readex-pro-latin-wght-normal.woff2) format("woff2"); font-weight: 160 700; }
+:root {
+  --ink: #17203a; --ink-soft: #525b74; --paper: #eff2f6; --chit: #ffffff; --rule: #cfd5e0;
+  --navy: #0f1729; --navy-2: #1a2440; --on-navy-soft: #b9c0d3;
+  --omar: #e8664f; --omar-deep: #b8331f; --omar-wash: #fde9e4;
+  --yousef: #2f9e6c; --yousef-deep: #1d6b3f; --yousef-wash: #e2f3ea;
+  --gold: #e5ad2e; --gold-deep: #9a6a00; --amber: #ffb020; --focus: #3155d6;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #000; }
+#stage {
+  position: relative; width: 1920px; height: 1080px; overflow: hidden;
+  font-family: "Readex Pro", system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+}
+.layer, .scene { position: absolute; inset: 0; }
+.scene { opacity: 0; }
+.abs { position: absolute; }
+.emoji { font-family: "Noto Color Emoji", sans-serif; line-height: 1; }
+
+/* backgrounds */
+#bg-navy { background: radial-gradient(1400px 900px at 50% 115%, #2a3a6a 0%, #16203b 45%, var(--navy) 100%); }
+#bg-paper { background: var(--paper); opacity: 0; }
+
+/* type */
+.kicker { font-size: 24px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber); }
+.big { font-size: 96px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; }
+.h2 { font-size: 64px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; }
+.soft { color: var(--on-navy-soft); }
+
+/* subtitles */
+#subs { position: absolute; left: 0; right: 0; bottom: 46px; display: flex; justify-content: center; pointer-events: none; }
+#subs span {
+  max-width: 1500px; padding: 12px 26px; border-radius: 14px; text-align: center;
+  background: rgba(9, 13, 26, 0.72); color: #fff; font-size: 33px; font-weight: 400; line-height: 1.3;
+}
+#subs.right { left: 960px; right: 70px; bottom: 60px; }
+#subs.right span { font-size: 29px; max-width: 880px; }
+#subs.right.kids { left: 1110px; }
+
+/* ---------- intro ---------- */
+#skyline { position: absolute; left: 0; right: 0; bottom: 0; height: 520px; }
+
+/* ---------- avatars and people ---------- */
+.avatar { width: 280px; height: 280px; border-radius: 50%; box-shadow: 0 20px 60px rgba(0,0,0,0.35); }
+.avatar svg { width: 100%; height: 100%; display: block; }
+.name { font-size: 64px; font-weight: 700; letter-spacing: -0.02em; text-align: center; }
+.chip {
+  display: inline-flex; align-items: center; gap: 12px; padding: 12px 22px; border-radius: 99px;
+  font-size: 30px; font-weight: 500; background: rgba(255,255,255,0.1); color: #fff; white-space: nowrap;
+}
+.chip.omar { background: rgba(232, 102, 79, 0.18); color: #ffd3c9; }
+.chip.yousef { background: rgba(47, 158, 108, 0.2); color: #c9f0dc; }
+
+/* habit chits: paper slips, like the app's request chits */
+.habit {
+  position: absolute; width: 590px; height: 132px; border-radius: 18px; background: var(--chit); color: var(--ink);
+  display: grid; grid-template-columns: 88px 1fr auto; align-items: center; gap: 18px; padding: 0 28px 0 22px;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.28);
+}
+.habit .emoji { font-size: 58px; text-align: center; }
+.habit .t { font-size: 28px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; }
+.habit .d { font-size: 21px; color: var(--ink-soft); margin-top: 4px; line-height: 1.25; }
+.habit .amt { text-align: right; font-size: 32px; font-weight: 700; letter-spacing: -0.01em; }
+.habit .amt small { display: block; font-size: 18px; font-weight: 400; color: var(--ink-soft); letter-spacing: 0; }
+.habit.bad { border-left: 10px solid var(--omar); }
+.habit.good { border-left: 10px solid var(--yousef); }
+.habit.alarm { background: var(--omar-wash); }
+.habit.alarm .amt { color: var(--omar-deep); }
+.habit.win .amt { color: var(--yousef-deep); }
+
+.counter { font-size: 26px; color: var(--on-navy-soft); }
+.counter b { display: block; font-size: 72px; font-weight: 700; color: #fff; letter-spacing: -0.03em; }
+
+/* ---------- chart ---------- */
+#chart text { font-family: "Readex Pro", sans-serif; }
+
+/* ---------- cards, loan, gold, shop ---------- */
+.ccard {
+  position: absolute; width: 360px; height: 226px; border-radius: 22px; padding: 26px 30px; color: #fff;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.4); font-size: 22px;
+}
+.ccard .chipgold { width: 56px; height: 42px; border-radius: 8px; background: linear-gradient(135deg, #f3d27a, #b88a1e); margin-top: 18px; }
+.ccard .num { position: absolute; left: 30px; bottom: 26px; font-size: 26px; letter-spacing: 0.12em; }
+.ccard .maxed { position: absolute; right: 22px; top: 22px; font-size: 20px; font-weight: 700; padding: 6px 12px; border-radius: 8px;
+  background: #fff; color: var(--omar-deep); letter-spacing: 0.06em; }
+.doc {
+  position: absolute; width: 520px; border-radius: 18px; background: var(--chit); color: var(--ink); padding: 30px 34px;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.35);
+}
+.doc h3 { margin: 0 0 18px; font-size: 34px; letter-spacing: -0.01em; }
+.doc .row { display: flex; justify-content: space-between; font-size: 27px; padding: 12px 0; border-top: 1px solid #e6e9f0; }
+.doc .row b { font-weight: 700; }
+.doc .row.red b { color: var(--omar-deep); }
+.stamp {
+  position: absolute; padding: 8px 18px; border: 5px solid currentColor; border-radius: 10px; font-size: 34px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; transform: rotate(-8deg);
+}
+
+/* ---------- versus ---------- */
+.vs-col { position: absolute; top: 300px; width: 700px; border-radius: 26px; padding: 34px 40px; background: rgba(255,255,255,0.06); }
+.vs-row { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 0; border-top: 1px solid rgba(255,255,255,0.12); font-size: 30px; }
+.vs-row:first-of-type { border-top: 0; }
+.vs-row span { color: var(--on-navy-soft); font-size: 26px; }
+.vs-row b { font-weight: 600; text-align: right; }
+
+/* ---------- app part ---------- */
+#brand { position: absolute; right: 64px; top: 48px; display: flex; align-items: center; gap: 16px; color: var(--ink); opacity: 0; }
+#brand img { width: 52px; height: 52px; }
+#brand span { font-size: 28px; font-weight: 600; letter-spacing: -0.01em; }
+.appcol { position: absolute; left: 960px; top: 200px; width: 880px; color: var(--ink); }
+.appcol .kicker { color: var(--focus); }
+.appcol .h2 { margin-top: 14px; }
+.bul { display: flex; gap: 20px; align-items: flex-start; margin-top: 30px; font-size: 34px; line-height: 1.3; font-weight: 500; }
+.bul i { flex: none; width: 46px; height: 46px; border-radius: 50%; background: var(--yousef-wash); position: relative; margin-top: -2px; }
+.bul i::after { content: ""; position: absolute; left: 15px; top: 10px; width: 12px; height: 21px; border: solid var(--yousef-deep);
+  border-width: 0 5px 5px 0; transform: rotate(45deg); }
+.note { margin-top: 34px; font-size: 22px; color: var(--ink-soft); display: flex; gap: 10px; align-items: center; }
+
+/* phone */
+.phone {
+  position: absolute; left: 0; top: 0; width: 414px; height: 868px; border-radius: 62px; padding: 12px;
+  background: #0b0f1a; box-shadow: 0 0 0 2px #2c3346 inset, 0 40px 80px rgba(15, 23, 41, 0.35), 0 8px 18px rgba(15,23,41,0.2);
+  transform-origin: 0 0;
+}
+.screen { position: relative; width: 390px; height: 844px; border-radius: 50px; overflow: hidden; background: var(--paper); }
+.slayer { position: absolute; inset: 0; opacity: 0; }
+.sb { position: absolute; left: 0; right: 0; top: 0; height: 44px; color: #17203a; }
+.sb .time { position: absolute; left: 34px; top: 13px; font-size: 16px; font-weight: 600; }
+.sb svg { position: absolute; right: 26px; top: 16px; }
+.vp { position: absolute; left: 0; right: 0; top: 44px; height: 800px; overflow: hidden; }
+.vp img { position: absolute; left: 0; top: 0; width: 390px; }
+.tabimg { position: absolute; left: 0; bottom: 0; width: 390px; }
+.island { position: absolute; left: 50%; top: 10px; width: 112px; height: 32px; margin-left: -56px; border-radius: 20px; background: #0b0f1a; z-index: 5; }
+.homebar { position: absolute; left: 50%; bottom: 7px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: #17203a; z-index: 5; }
+.spot { position: absolute; border-radius: 16px; opacity: 0; z-index: 3;
+  box-shadow: 0 0 0 4px var(--amber), 0 0 0 2000px rgba(15, 22, 41, 0.46); }
+.tap { position: absolute; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; z-index: 4; opacity: 0;
+  background: rgba(255, 176, 32, 0.35); border: 3px solid var(--amber); }
+.plabel { position: absolute; left: 0; right: 0; top: -54px; text-align: center; font-size: 26px; font-weight: 600; color: var(--ink); }
+
+/* outro */
+.endchip { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 12px; font-size: 26px; font-weight: 500;
+  background: rgba(47,158,108,0.22); color: #d4f5e4; margin: 6px 6px 0 0; }
+.fine { font-size: 21px; color: var(--on-navy-soft); line-height: 1.5; text-align: center; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg-navy" class="layer"></div>
+  <div id="bg-paper" class="layer"></div>
+
+  <!-- 1. intro -->
+  <section class="scene" id="sc-intro">
+    <svg id="skyline" viewBox="0 0 1920 520" preserveAspectRatio="none"></svg>
+    <div class="abs kicker" id="in-k" style="left:0;right:0;top:250px;text-align:center">A true story from the UAE</div>
+    <div class="abs big" style="left:0;right:0;top:320px;text-align:center">
+      <div id="in-1">Same salary.</div><div id="in-2">Same family size.</div>
+      <div id="in-3" style="color:var(--amber)">Two different futures.</div>
+    </div>
+  </section>
+
+  <!-- 2. meet -->
+  <section class="scene" id="sc-meet">
+    <div class="abs" id="mt-o" style="left:340px;top:150px;width:520px;text-align:center">
+      <div class="avatar" style="margin:0 auto" data-avatar="omar"></div>
+      <div class="name" style="margin-top:26px">Omar</div>
+    </div>
+    <div class="abs" id="mt-y" style="left:1060px;top:150px;width:520px;text-align:center">
+      <div class="avatar" style="margin:0 auto" data-avatar="yousef"></div>
+      <div class="name" style="margin-top:26px">Yousef</div>
+    </div>
+    <div class="abs" id="mt-eq" style="left:910px;top:250px;width:100px;text-align:center;font-size:110px;font-weight:300;color:var(--amber)">=</div>
+    <div class="abs" id="mt-s1" style="left:340px;top:640px;width:520px;text-align:center"><span class="chip">💵&nbsp;AED 28,000 a month</span></div>
+    <div class="abs" id="mt-s2" style="left:1060px;top:640px;width:520px;text-align:center"><span class="chip">💵&nbsp;AED 28,000 a month</span></div>
+    <div class="abs" id="mt-f1" style="left:340px;top:730px;width:520px;text-align:center"><span class="chip"><span data-family></span>Wife and 2 kids</span></div>
+    <div class="abs" id="mt-f2" style="left:1060px;top:730px;width:520px;text-align:center"><span class="chip"><span data-family></span>Wife and 2 kids</span></div>
+  </section>
+
+  <!-- 3. Omar's months -->
+  <section class="scene" id="sc-omar">
+    <div class="abs" style="left:90px;top:150px;width:520px;text-align:center">
+      <div class="avatar" style="margin:0 auto;width:250px;height:250px" data-avatar="omar"></div>
+      <div class="name" style="margin-top:20px">Omar</div>
+      <div style="margin-top:12px"><span class="chip omar">No plan</span></div>
+      <div class="counter" id="om-ctr" style="margin-top:56px">Lifestyle spending, every month<b>AED 0</b></div>
+    </div>
+    <div id="om-habits"></div>
+  </section>
+
+  <!-- 4. Yousef's months -->
+  <section class="scene" id="sc-yousef">
+    <div class="abs" style="left:90px;top:150px;width:520px;text-align:center">
+      <div class="avatar" style="margin:0 auto;width:250px;height:250px" data-avatar="yousef"></div>
+      <div class="name" style="margin-top:20px">Yousef</div>
+      <div style="margin-top:12px"><span class="chip yousef">A plan</span></div>
+      <div class="counter" id="yo-ctr" style="margin-top:56px">Saved and invested, every month<b>AED 0</b></div>
+    </div>
+    <div id="yo-habits"></div>
+  </section>
+
+  <!-- 5. three years -->
+  <section class="scene" id="sc-years">
+    <div class="abs kicker" id="yr-k" style="left:150px;top:70px">Small choices, every day, for three years</div>
+    <svg id="chart" class="abs" style="left:110px;top:130px" width="1700" height="800" viewBox="0 0 1700 800"></svg>
+    <div class="abs habit bad" id="yr-coffee" style="left:300px;top:720px;width:600px">
+      <div class="emoji">☕</div><div><div class="t">1,095 coffees</div><div class="d">One every morning, for three years</div></div>
+      <div class="amt">AED 27,375</div>
+    </div>
+  </section>
+
+  <!-- 6. Omar, three years later -->
+  <section class="scene" id="sc-omarEnd">
+    <div class="abs" style="left:110px;top:170px;width:440px;text-align:center">
+      <div class="kicker" id="oe-k">Three years later</div>
+      <div class="avatar" style="margin:34px auto 0;width:280px;height:280px" data-avatar="omar-sad"></div>
+      <div class="name" style="margin-top:22px">Omar</div>
+      <div id="oe-broke" style="margin-top:10px;font-size:44px;font-weight:700;color:var(--omar)">is broke</div>
+    </div>
+    <div id="oe-cards" class="abs" style="left:640px;top:250px;width:520px;height:420px"></div>
+    <div class="abs" id="oe-debt" style="left:640px;top:690px;width:480px;text-align:center">
+      <div style="font-size:26px;color:var(--on-navy-soft)">Owed on the cards</div>
+      <div style="font-size:84px;font-weight:700;color:var(--omar);letter-spacing:-0.03em" id="oe-debt-n">AED 0</div>
+    </div>
+    <div class="abs" id="oe-arrow" style="left:1170px;top:430px;font-size:80px;color:var(--amber)">→</div>
+    <div class="doc" id="oe-loan" style="left:1290px;top:280px">
+      <h3>🏦 Bank loan</h3>
+      <div class="row"><span>To clear the cards</span><b>AED 60,000</b></div>
+      <div class="row red"><span>Every month</span><b>AED 2,100</b></div>
+      <div class="row"><span>For</span><b>36 months</b></div>
+      <div class="row red"><span>Paid back in all</span><b>AED 75,600</b></div>
+      <div class="stamp" id="oe-stamp" style="right:20px;bottom:-62px;color:var(--omar-deep);background:#fff">+ interest</div>
+    </div>
+  </section>
+
+  <!-- 7. Yousef, three years later -->
+  <section class="scene" id="sc-yousefEnd">
+    <div class="abs" style="left:110px;top:170px;width:440px;text-align:center">
+      <div class="kicker">Three years later</div>
+      <div class="avatar" style="margin:34px auto 0;width:280px;height:280px" data-avatar="yousef-happy"></div>
+      <div class="name" style="margin-top:22px">Yousef</div>
+    </div>
+    <div class="abs" id="ye-save" style="left:640px;top:210px;width:520px;text-align:center">
+      <div style="font-size:130px" class="emoji">🏦</div>
+      <div style="font-size:84px;font-weight:700;color:#7fe0b0;letter-spacing:-0.03em;margin-top:10px" id="ye-save-n">AED 0</div>
+      <div style="font-size:28px;color:var(--on-navy-soft)">saved</div>
+    </div>
+    <div class="abs" id="ye-gold" style="left:640px;top:600px;width:520px;text-align:center">
+      <svg id="ye-bars" width="360" height="150" viewBox="0 0 360 150"></svg>
+      <div style="font-size:64px;font-weight:700;color:var(--gold);letter-spacing:-0.02em" id="ye-gold-n">0 g</div>
+      <div style="font-size:28px;color:var(--on-navy-soft)">of gold</div>
+    </div>
+    <div class="abs" id="ye-shop" style="left:1240px;top:230px;width:600px;text-align:center">
+      <svg id="ye-shop-svg" width="520" height="440" viewBox="0 0 520 440"></svg>
+      <div style="font-size:40px;font-weight:700;margin-top:18px">A small business</div>
+      <div style="font-size:28px;color:var(--on-navy-soft);margin-top:6px">of his wife's own</div>
+    </div>
+  </section>
+
+  <!-- 8. versus -->
+  <section class="scene" id="sc-versus">
+    <div class="abs h2" id="vs-t" style="left:0;right:0;top:110px;text-align:center">Same salary. Same family.</div>
+    <div class="vs-col" id="vs-o" style="left:200px">
+      <div style="display:flex;align-items:center;gap:22px;margin-bottom:16px">
+        <div class="avatar" style="width:96px;height:96px" data-avatar="omar-sad"></div><div style="font-size:46px;font-weight:700">Omar</div>
+      </div>
+      <div class="vs-row"><span>Salary</span><b>AED 28,000 a month</b></div>
+      <div class="vs-row"><span>After 3 years</span><b style="color:var(--omar)">AED 60,000 card debt</b></div>
+      <div class="vs-row"><span>Now</span><b>A loan: AED 2,100 a month</b></div>
+    </div>
+    <div class="vs-col" id="vs-y" style="left:1020px">
+      <div style="display:flex;align-items:center;gap:22px;margin-bottom:16px">
+        <div class="avatar" style="width:96px;height:96px" data-avatar="yousef-happy"></div><div style="font-size:46px;font-weight:700">Yousef</div>
+      </div>
+      <div class="vs-row"><span>Salary</span><b>AED 28,000 a month</b></div>
+      <div class="vs-row"><span>After 3 years</span><b style="color:#7fe0b0">AED 40,000 + 70 g gold</b></div>
+      <div class="vs-row"><span>Now</span><b>His wife's small business</b></div>
+    </div>
+    <div class="abs h2" id="vs-b" style="left:0;right:0;top:760px;text-align:center;color:var(--amber)">The difference: how they managed it.</div>
+  </section>
+
+  <!-- 9. bridge into the app -->
+  <section class="scene" id="sc-bridge" style="color:var(--ink)">
+    <div class="abs" id="br-logo" style="left:0;right:0;top:280px;text-align:center">
+      <div class="kicker" style="color:var(--focus)">Inspired by this true story</div>
+      <img src="../web/public/icon.svg" style="width:170px;height:170px;margin-top:40px" alt="">
+      <div class="big" style="margin-top:26px;font-size:104px">Family Finance Coach</div>
+    </div>
+    <div class="appcol" id="br-col">
+      <div class="kicker">Inspired by a true story</div>
+      <div class="h2">An AI accountant and money coach for the whole family</div>
+      <div class="bul" style="margin-top:44px"><i></i><span>Made to help the first man, Omar, manage his money</span></div>
+    </div>
+  </section>
+
+  <!-- 10-17. the app, one column of words per scene; the phone is its own layer -->
+  <section class="scene" id="sc-today"><div class="appcol">
+    <div class="kicker">Today</div><div class="h2">What's really free this month</div>
+    <div class="bul"><i></i><span>After rent, school fees and bills are set aside</span></div>
+    <div class="bul"><i></i><span>And what's left until pay day</span></div>
+  </div></section>
+  <section class="scene" id="sc-plan"><div class="appcol">
+    <div class="kicker">The plan</div><div class="h2">A plan, every month</div>
+    <div class="bul"><i></i><span>Bills first</span></div>
+    <div class="bul"><i></i><span>The credit card paid in full: no interest</span></div>
+    <div class="bul"><i></i><span>A safety buffer</span></div>
+    <div class="bul"><i></i><span>Every dirham gets a job, investing included</span></div>
+  </div></section>
+  <section class="scene" id="sc-budgets"><div class="appcol">
+    <div class="kicker">Budgets</div><div class="h2">Warned the same month, not three years later</div>
+    <div class="bul"><i></i><span>Overspending shows up early</span></div>
+    <div class="bul"><i></i><span>A way to save, suggested</span></div>
+  </div></section>
+  <section class="scene" id="sc-add"><div class="appcol">
+    <div class="kicker">Every dirham</div><div class="h2">Every coffee counts</div>
+    <div class="bul"><i></i><span>Typed in</span></div>
+    <div class="bul"><i></i><span>Said in his own words</span></div>
+    <div class="bul"><i></i><span>Read from a receipt</span></div>
+  </div></section>
+  <section class="scene" id="sc-compare"><div class="appcol">
+    <div class="kicker">Before a big buy</div><div class="h2">Compare the shops. Check the card.</div>
+    <div class="bul"><i></i><span>The best total across UAE shops</span></div>
+    <div class="bul"><i></i><span>Will the card bill be covered on its due date?</span></div>
+  </div></section>
+  <section class="scene" id="sc-wealth"><div class="appcol">
+    <div class="kicker">Gold and wealth</div><div class="h2">The whole picture</div>
+    <div class="bul"><i></i><span>Gold logged in grams, valued at today's price</span></div>
+    <div class="bul"><i></i><span>What they own, minus the cards and the old loan</span></div>
+    <div class="note">🛈 The app records gold. It never tells you to buy it.</div>
+  </div></section>
+  <section class="scene" id="sc-kids"><div class="appcol" style="left:1130px;width:720px">
+    <div class="kicker">The kids</div><div class="h2">Kids learn the value of money</div>
+    <div class="bul"><i></i><span>Layla saves for her headphones</span></div>
+    <div class="bul"><i></i><span>The best price is found, a parent decides</span></div>
+    <div class="bul"><i></i><span>Family rules are checked on every request</span></div>
+  </div></section>
+  <section class="scene" id="sc-summary"><div class="appcol">
+    <div class="kicker">Every month</div><div class="h2">A short family summary</div>
+    <div class="bul"><i></i><span>What went well</span></div>
+    <div class="bul"><i></i><span>What to change next</span></div>
+  </div></section>
+
+  <div id="phones" class="layer"></div>
+  <div id="brand"><img src="../web/public/icon.svg" alt=""><span>Family Finance Coach</span></div>
+
+  <!-- 18. outro -->
+  <section class="scene" id="sc-outro">
+    <div class="abs h2" id="ou-t" style="left:0;right:0;top:90px;text-align:center">Same salary. Same family.<br><span style="color:var(--amber)">A different ending.</span></div>
+    <div class="abs" id="ou-o" style="left:330px;top:350px;width:560px;text-align:center">
+      <div class="avatar" style="margin:0 auto;width:220px;height:220px" data-avatar="omar-happy"></div>
+      <div class="name" style="margin-top:16px;font-size:52px">Omar, with the coach</div>
+      <div style="margin-top:14px">
+        <span class="endchip">✓ Card paid in full</span><span class="endchip">✓ Loan half paid</span>
+        <span class="endchip">✓ AED 10,000 buffer</span><span class="endchip">✓ 50 g of gold</span>
+      </div>
+    </div>
+    <div class="abs" id="ou-logo" style="left:1000px;top:390px;width:700px;text-align:center">
+      <img src="../web/public/icon.svg" style="width:150px;height:150px" alt="">
+      <div style="font-size:58px;font-weight:700;letter-spacing:-0.02em;margin-top:18px">Family Finance Coach</div>
+      <div style="font-size:32px;color:var(--amber);margin-top:10px;font-weight:500">family-finance-coach.com</div>
+    </div>
+    <div class="abs fine" id="ou-fine" style="left:200px;right:200px;bottom:150px">
+      Inspired by a true story. Names and figures are changed. The app is a prototype: demo money only, no real payments.<br>
+      Information only, not financial advice.
+    </div>
+  </section>
+
+  <div id="subs"><span></span></div>
+</div>
+
+<script>
+// ------------------------------------------------------------------ helpers
+const $ = (s, r = document) => r.querySelector(s);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const prog = (t, t0, d) => clamp((t - t0) / d);
+const fmt = (n) => Math.round(n).toLocaleString("en-US");
+// fade and rise an element in at t0
+function rise(el, t, t0, d = 0.6, dy = 30) {
+  const k = easeOut(prog(t, t0, d));
+  el.style.opacity = k;
+  el.style.translate = `0 ${(1 - k) * dy}px`;
+}
+function pop(el, t, t0, d = 0.5) {
+  const k = prog(t, t0, d);
+  const s = k === 0 ? 0.6 : 1 + 0.08 * Math.sin(Math.PI * k) * (1 - k) + (1 - easeOut(k)) * -0.4;
+  el.style.opacity = easeOut(k);
+  el.style.scale = s;
+}
+
+let T, META;               // timing.json and the shots' meta.json
+const S = {};              // scene id -> { start, end, lines }
+// when line i of a scene starts (scene-local seconds); at = a word in the line to start from that word instead
+function L(id, i, at) {
+  const s = S[id], l = s.lines[i];
+  if (!at) return l.start - s.start;
+  const idx = l.text.indexOf(at);
+  return l.start - s.start + (idx / l.text.length) * (l.end - l.start);
+}
+
+// ------------------------------------------------------------------ drawings
+function avatar(kind) {
+  const omar = kind.startsWith("omar");
+  const mood = kind.endsWith("sad") ? "sad" : kind.endsWith("happy") ? "happy" : "neutral";
+  const id = "av" + Math.random().toString(36).slice(2, 8);
+  const bg = omar ? "#3a2f4f" : "#21414a";
+  const skin = omar ? "#c68a5c" : "#b97c52", shade = omar ? "#ad7449" : "#a06842";
+  const cloth = omar ? `url(#${id}p)` : "#fbfbf8";
+  const pattern = omar
+    ? `<pattern id="${id}p" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+         <rect width="16" height="16" fill="#fbf6f3"/><rect width="6" height="16" fill="#c9352a" opacity=".9"/><rect width="16" height="6" fill="#c9352a" opacity=".55"/></pattern>`
+    : "";
+  const mouth = mood === "happy"
+    ? `<path d="M87 117 Q100 132 113 117 Z" fill="#fff" stroke="#5b2a1c" stroke-width="3.5" stroke-linejoin="round"/>`
+    : mood === "sad"
+    ? `<path d="M90 124 Q100 115 110 124" stroke="#5b2a1c" stroke-width="4" fill="none" stroke-linecap="round"/>`
+    : `<path d="M89 118 Q100 127 111 118" stroke="#5b2a1c" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  const brows = mood === "sad"
+    ? `<path d="M80 89 L95 83 M120 89 L105 83" stroke="#2a1f1a" stroke-width="4" stroke-linecap="round"/>`
+    : `<path d="M80 87 Q87 82 95 85 M105 85 Q113 82 120 87" stroke="#2a1f1a" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  return `<svg viewBox="0 0 200 200"><defs>${pattern}<clipPath id="${id}c"><circle cx="100" cy="100" r="100"/></clipPath></defs>
+  <g clip-path="url(#${id}c)">
+    <rect width="200" height="200" fill="${bg}"/>
+    <path d="M58 76 C 48 116, 40 160, 22 214 L 178 214 C 160 160, 152 116, 142 76 Z" fill="${cloth}"/>
+    <path d="M28 214 C 32 170, 62 152, 100 152 C 138 152, 168 170, 172 214 Z" fill="#f2f2ee"/>
+    <path d="M100 156 L100 190" stroke="#d8dbe1" stroke-width="3"/>
+    <rect x="88" y="122" width="24" height="34" fill="${shade}"/>
+    <ellipse cx="100" cy="98" rx="29" ry="35" fill="${skin}"/>
+    <path d="M71 96 C 72 127, 86 141, 100 141 C 114 141, 128 127, 129 96 C 125 112, 117 124, 100 124 C 83 124, 75 112, 71 96 Z" fill="#2a1f1a"/>
+    <path d="M86 113 Q100 105 114 113 Q100 110 86 113 Z" fill="#2a1f1a"/>
+    ${mouth}
+    <circle cx="89" cy="96" r="3.6" fill="#1b1410"/><circle cx="111" cy="96" r="3.6" fill="#1b1410"/>
+    ${brows}
+    <path d="M59 108 C 50 60, 74 32, 100 32 C 126 32, 150 60, 141 108 C 137 84, 128 70, 100 69 C 72 70, 63 84, 59 108 Z" fill="${cloth}"/>
+    <path d="M59 104 C 58 124, 60 146, 52 168 L 68 168 C 71 146, 70 124, 70 104 Z" fill="${cloth}"/>
+    <path d="M141 104 C 142 124, 140 146, 148 168 L 132 168 C 129 146, 130 124, 130 104 Z" fill="${cloth}"/>
+    <path d="M62 50 Q100 62 138 50" stroke="#18181c" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+    <path d="M60 59 Q100 72 140 59" stroke="#18181c" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+  </g></svg>`;
+}
+function familyIcon() {
+  const p = (x, h, c) => `<circle cx="${x}" cy="${30 - h}" r="${h * 0.32}" fill="${c}"/><rect x="${x - h * 0.34}" y="${34 - h * 0.62}" width="${h * 0.68}" height="${h * 0.62}" rx="${h * 0.3}" fill="${c}"/>`;
+  return `<svg width="84" height="36" viewBox="0 0 84 36">${p(12, 26, "#fff")}${p(32, 24, "#fff")}${p(52, 17, "#ffcf6b")}${p(70, 15, "#ffcf6b")}</svg>`;
+}
+function skyline() {
+  // Dubai at dusk: a few towers, the Burj Khalifa's steps and the Burj Al Arab's sail
+  const far = "#1d2a4b", near = "#121b33";
+  let s = "";
+  const towers = [[40,250,70],[120,190,60],[190,300,50],[250,230,80],[340,170,55],[400,270,60],[470,210,45],[1180,260,60],[1250,200,70],[1330,320,50],[1390,240,65],[1470,180,55],[1530,280,60],[1600,220,70],[1680,300,50],[1740,200,65],[1820,260,70]];
+  for (const [x, h, w] of towers) s += `<rect x="${x}" y="${520 - h}" width="${w}" height="${h}" fill="${far}"/>`;
+  // Burj Khalifa
+  s += `<path d="M905 520 L905 330 L920 330 L920 230 L932 230 L932 150 L942 150 L942 70 L948 70 L950 10 L952 70 L958 70 L958 150 L968 150 L968 230 L980 230 L980 330 L995 330 L995 520 Z" fill="${near}"/>`;
+  // Burj Al Arab
+  s += `<path d="M1560 520 L1560 250 Q1660 300 1690 520 Z" fill="${near}"/><rect x="1554" y="230" width="8" height="290" fill="${near}"/>`;
+  const near2 = [[560,150,90],[660,210,70],[740,120,80],[1020,160,90],[1110,230,60],[1840,140,80],[0,130,90],[1440,110,90]];
+  for (const [x, h, w] of near2) s += `<rect x="${x}" y="${520 - h}" width="${w}" height="${h}" fill="${near}"/>`;
+  // a few lit windows
+  const r = mulberry(4);
+  for (let i = 0; i < 90; i++) {
+    const [x, h, w] = towers[Math.floor(r() * towers.length)];
+    s += `<rect x="${x + 6 + Math.floor(r() * (w - 16) / 10) * 10}" y="${520 - h + 12 + Math.floor(r() * (h - 30) / 16) * 16}" width="5" height="7" fill="#ffd27a" opacity="${0.35 + r() * 0.4}"/>`;
+  }
+  return s;
+}
+function mulberry(a) { return () => { a |= 0; a = a + 0x6d2b79f5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function goldBars(n) {
+  let s = `<defs><linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe29a"/><stop offset=".5" stop-color="#e5ad2e"/><stop offset="1" stop-color="#a87510"/></linearGradient></defs>`;
+  const pos = [[30,110],[130,110],[230,110],[80,70],[180,70],[130,30],[30,30],[230,30],[180,-10]];
+  for (let i = 0; i < 9; i++) {
+    const [x, y] = pos[i];
+    s += `<g class="bar" data-i="${i}" opacity="0"><path d="M${x + 14} ${y} L${x + 86} ${y} L${x + 100} ${y + 38} L${x} ${y + 38} Z" fill="url(#gb)" stroke="#8a5f0a" stroke-width="2"/></g>`;
+  }
+  return s;
+}
+function shop() {
+  let stripes = "";
+  for (let i = 0; i < 8; i++) stripes += `<path d="M${40 + i * 55} 120 L${95 + i * 55} 120 L${95 + i * 55} 160 Q${67 + i * 55} 182 ${40 + i * 55} 160 Z" fill="${i % 2 ? "#fff" : "#2f9e6c"}"/>`;
+  return `<rect x="60" y="150" width="400" height="270" rx="8" fill="#f6efe2"/>
+    <rect x="40" y="70" width="440" height="56" rx="10" fill="#1d6b3f"/>
+    <text x="260" y="108" text-anchor="middle" font-size="30" font-weight="700" fill="#fff" font-family="Readex Pro">SMALL BUSINESS</text>
+    ${stripes}
+    <rect x="96" y="210" width="170" height="130" rx="6" fill="#bfe3f2"/><rect x="96" y="210" width="170" height="130" rx="6" fill="none" stroke="#c9b48c" stroke-width="6"/>
+    <text x="181" y="300" text-anchor="middle" font-size="64" class="emoji">🧁</text>
+    <rect x="300" y="210" width="120" height="210" rx="6" fill="#8a5a3c"/><circle cx="400" cy="320" r="7" fill="#f3d27a"/>
+    <rect x="316" y="236" width="88" height="34" rx="6" fill="#fff"/><text x="360" y="260" text-anchor="middle" font-size="20" font-weight="700" fill="#1d6b3f" font-family="Readex Pro">OPEN</text>
+    <rect x="40" y="416" width="440" height="10" rx="5" fill="#d9cdb6"/>`;
+}
+
+// ------------------------------------------------------------------ habit chits
+const OMAR_HABITS = [
+  ["☕", "Starbucks coffee", "Every morning", "AED 750", "a month", 750],
+  ["🍽️", "Restaurant dinner", "Every week", "AED 1,800", "a month", 1800],
+  ["🛵", "Delivery meals", "When nobody cooks", "AED 720", "a month", 720],
+  ["🛍️", "Mall with the kids", "Always something in the bag", "AED 1,500", "a month", 1500],
+  ["🏨", "Hotel weekends", "Now and then", "AED 900", "a month, on average", 900],
+  ["💳", "The card pays the rest", "Only the minimum, every month", "+ interest", "", 0, "alarm"],
+];
+const YOUSEF_HABITS = [
+  ["📋", "A plan, every month", "Every dirham gets a job", "✓", "", 0],
+  ["🏦", "Save", "Before spending", "AED 1,100", "a month", 1100],
+  ["📈", "Invest", "Kept apart from savings", "AED 750", "a month", 750],
+  ["🥇", "Gold", "Every AED 3,000 invested", "≈ 8 g", "each time", 0],
+  ["🍽️", "Restaurants", "Every 2 or 3 weeks, in budget", "✓", "", 0],
+  ["🏷️", "Compares prices", "Buys what the family needs", "✓", "", 0],
+  ["💳", "Card paid in full", "Every month, no interest", "AED 0", "interest", 0, "win"],
+  ["🧒", "Kids learn money", "Spend wisely, save for goals", "✓", "", 0],
+];
+function buildHabits(box, list, cls, top, rows) {
+  list.forEach((h, i) => {
+    const el = document.createElement("div");
+    el.className = `habit ${cls} ${h[6] || ""}`;
+    const col = i % 2, row = Math.floor(i / 2);
+    el.style.left = `${650 + col * 615}px`;
+    el.style.top = `${top + row * (132 + 22)}px`;
+    el.innerHTML = `<div class="emoji">${h[0]}</div><div><div class="t">${h[1]}</div><div class="d">${h[2]}</div></div>
+      <div class="amt">${h[3]}${h[4] ? `<small>${h[4]}</small>` : ""}</div>`;
+    box.appendChild(el);
+  });
+}
+
+// ------------------------------------------------------------------ the three-year chart
+const CH = { x0: 150, x1: 1300, y0: 60, y1: 690, min: -70000, max: 50000 };
+const cx = (m) => CH.x0 + (m / 36) * (CH.x1 - CH.x0);
+const cy = (v) => CH.y1 - ((v - CH.min) / (CH.max - CH.min)) * (CH.y1 - CH.y0);
+// Omar: about AED 1,000 a month more than he earns, on a card at 3% a month, scaled to end at 60,000
+const omarDebt = (m) => -60000 * ((Math.pow(1.03, m) - 1) / (Math.pow(1.03, 36) - 1));
+// Yousef: AED 1,100 a month saved, to 40,000 in three years; 70 g of gold bought in 9 steps
+const yousefSaved = (m) => (40000 / 36) * m;
+const GOLD_AT = [4, 8, 12, 16, 20, 24, 28, 32, 36];
+const GOLD_G = [8, 8, 8, 8, 8, 8, 8, 7, 7];
+function buildChart() {
+  const svg = $("#chart");
+  let s = "";
+  for (const v of [-60000, -40000, -20000, 20000, 40000]) {
+    s += `<line x1="${CH.x0}" x2="${CH.x1}" y1="${cy(v)}" y2="${cy(v)}" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+      <text x="${CH.x0 - 18}" y="${cy(v) + 8}" text-anchor="end" font-size="22" fill="#8e97ad">${v > 0 ? "+" : "−"}${fmt(Math.abs(v) / 1000)}k</text>`;
+  }
+  s += `<line x1="${CH.x0}" x2="${CH.x1}" y1="${cy(0)}" y2="${cy(0)}" stroke="rgba(255,255,255,0.45)" stroke-width="2"/>
+    <text x="${CH.x0 - 18}" y="${cy(0) + 8}" text-anchor="end" font-size="22" fill="#c9cfdd">AED 0</text>`;
+  ["Start", "Year 1", "Year 2", "Year 3"].forEach((l, i) => {
+    s += `<text x="${cx(i * 12)}" y="${CH.y1 + 50}" text-anchor="middle" font-size="26" fill="#c9cfdd" font-weight="500">${l}</text>
+      <line x1="${cx(i * 12)}" x2="${cx(i * 12)}" y1="${CH.y1}" y2="${CH.y1 + 14}" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>`;
+  });
+  s += `<path id="ch-y" fill="none" stroke="#3ccf8e" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path id="ch-o" fill="none" stroke="#f0715a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g id="ch-golds"></g>
+    <g id="ch-ylab" opacity="0"><text x="${cx(36) + 26}" y="${cy(40000) - 8}" font-size="30" font-weight="700" fill="#7fe0b0">Yousef</text>
+      <text x="${cx(36) + 26}" y="${cy(40000) + 28}" font-size="24" fill="#c9cfdd">+AED 40,000 saved</text>
+      <text x="${cx(36) + 26}" y="${cy(40000) + 60}" font-size="24" fill="#f3cf72">+70 g of gold</text></g>
+    <g id="ch-olab" opacity="0"><text x="${cx(36) + 26}" y="${cy(-60000) - 8}" font-size="30" font-weight="700" fill="#ff9c87">Omar</text>
+      <text x="${cx(36) + 26}" y="${cy(-60000) + 28}" font-size="24" fill="#c9cfdd">−AED 60,000 on cards</text></g>
+    <g id="ch-head-y"><circle r="12" fill="#3ccf8e"/></g><g id="ch-head-o"><circle r="12" fill="#f0715a"/></g>
+    <text id="ch-gram" x="${CH.x0 + 10}" y="${CH.y0 + 10}" font-size="30" fill="#f3cf72" font-weight="600"></text>`;
+  svg.innerHTML = s;
+  const g = $("#ch-golds");
+  GOLD_AT.forEach((m, i) => {
+    g.innerHTML += `<g class="coin" data-m="${m}" opacity="0" transform="translate(${cx(m)} ${cy(yousefSaved(m)) - 34})">
+      <circle r="17" fill="#e5ad2e" stroke="#9a6a00" stroke-width="3"/><text y="7" text-anchor="middle" font-size="17" font-weight="700" fill="#5b3d00">${GOLD_G[i]}g</text></g>`;
+  });
+}
+function drawChart(m) {
+  const pts = (f) => {
+    let d = "";
+    for (let i = 0; i <= m + 1e-6; i += 0.25) d += `${d ? "L" : "M"}${cx(i).toFixed(1)} ${cy(f(i)).toFixed(1)}`;
+    d += `L${cx(m).toFixed(1)} ${cy(f(m)).toFixed(1)}`;
+    return d;
+  };
+  $("#ch-y").setAttribute("d", pts(yousefSaved));
+  $("#ch-o").setAttribute("d", pts(omarDebt));
+  $("#ch-head-y").setAttribute("transform", `translate(${cx(m)} ${cy(yousefSaved(m))})`);
+  $("#ch-head-o").setAttribute("transform", `translate(${cx(m)} ${cy(omarDebt(m))})`);
+  let grams = 0;
+  document.querySelectorAll("#ch-golds .coin").forEach((c, i) => {
+    const k = clamp((m - Number(c.dataset.m)) / 1.2 + 1);
+    c.setAttribute("opacity", k >= 1 ? 1 : 0);
+    if (m >= Number(c.dataset.m)) grams += GOLD_G[i];
+  });
+  $("#ch-gram").textContent = `🥇 Yousef's gold: ${grams} g`;
+}
+
+// ------------------------------------------------------------------ phones
+const STATUS_SVG = `<svg width="78" height="14" viewBox="0 0 78 14"><g fill="#17203a">
+  <rect x="0" y="9" width="3.5" height="5" rx="1"/><rect x="5.5" y="6" width="3.5" height="8" rx="1"/><rect x="11" y="3" width="3.5" height="11" rx="1"/><rect x="16.5" y="0" width="3.5" height="14" rx="1"/>
+  <path d="M33 4.5a10 10 0 0 1 13.5 0l-1.7 1.8a7.6 7.6 0 0 0-10.1 0z M35.6 7.4a6.3 6.3 0 0 1 8.3 0l-1.7 1.8a3.9 3.9 0 0 0-4.9 0z M39.7 12.4l2.2-2.3a1 1 0 0 0-4.4 0z"/>
+  <rect x="53" y="1" width="22" height="12" rx="3.5" fill="none" stroke="#17203a" stroke-width="1.6" opacity=".5"/><rect x="55" y="3" width="16" height="8" rx="2"/><rect x="76" y="5" width="2" height="4" rx="1" opacity=".5"/></g></svg>`;
+function makePhone(label) {
+  const el = document.createElement("div");
+  el.className = "phone";
+  el.innerHTML = `<div class="plabel">${label || ""}</div><div class="screen"><div class="island"></div><div class="homebar"></div>
+    <div class="spot"></div><div class="tap"></div></div>`;
+  const screen = $(".screen", el), layers = {};
+  for (const [name, m] of Object.entries(META)) {
+    const ly = document.createElement("div");
+    ly.className = "slayer";
+    ly.style.background = m.bg;
+    ly.innerHTML = `<div class="sb"><span class="time">9:41</span>${STATUS_SVG}</div>
+      <div class="vp"><img src="build/shots/${name}.png" alt=""></div>${m.tabH ? `<img class="tabimg" src="build/shots/${name}-tab.png" style="height:${m.tabH}px" alt="">` : ""}`;
+    screen.insertBefore(ly, $(".island", screen));
+    layers[name] = ly;
+  }
+  $("#phones").appendChild(el);
+  return { el, layers, spot: $(".spot", el), tap: $(".tap", el), label: $(".plabel", el) };
+}
+// a mark from the capture, or a box written out here, in page coordinates, with a little room around it
+function box(shot, m, pad = 6) {
+  const b = typeof m === "string" ? META[shot].marks[m] : m;
+  return { x: b.x - pad, y: b.y - pad, w: b.w + 2 * pad, h: b.h + 2 * pad };
+}
+// beats: [{ at, shot, scroll, spot, tap }] in stage seconds; draws the phone at time t
+function drawPhone(ph, beats, t) {
+  for (const ly of Object.values(ph.layers)) ly.style.opacity = 0;
+  if (!beats.length) return;
+  let i = 0;
+  while (i + 1 < beats.length && beats[i + 1].at <= t) i++;
+  const b = beats[i], p = beats[i - 1];
+  const change = p && p.shot !== b.shot;
+  const k = p ? easeInOut(prog(t, b.at, change ? 0.55 : 0.9)) : 1;
+  const scroll = p && !change ? lerp(p.scroll || 0, b.scroll || 0, k) : b.scroll || 0;
+  const show = (shot, sc, op) => {
+    const ly = ph.layers[shot];
+    ly.style.opacity = op;
+    $(".vp img", ly).style.translate = `0 ${-sc}px`;
+  };
+  if (change && k < 1) show(p.shot, p.scroll || 0, 1);
+  show(b.shot, scroll, change ? k : 1);
+  // the spotlight glides from the last beat's box to this one's
+  const cur = b.spot ? box(b.shot, b.spot) : null;
+  const was = p && p.spot && !change ? box(p.shot, p.spot) : null;
+  let bx = cur, op = 0;
+  if (cur && was) { bx = { x: lerp(was.x, cur.x, k), y: lerp(was.y, cur.y, k), w: lerp(was.w, cur.w, k), h: lerp(was.h, cur.h, k) }; op = 1; }
+  else if (cur) op = easeOut(prog(t, b.at + (change ? 0.45 : 0.25), 0.45));
+  else if (was) { bx = was; op = 1 - easeOut(prog(t, b.at, 0.35)); }
+  if (bx && op > 0) {
+    Object.assign(ph.spot.style, { left: `${bx.x}px`, top: `${bx.y - scroll + 44}px`, width: `${bx.w}px`, height: `${bx.h}px`, opacity: op });
+  } else ph.spot.style.opacity = 0;
+  if (b.tap) {
+    const kt = prog(t, b.at + (b.tapDelay || 0.6), 0.7);
+    Object.assign(ph.tap.style, { left: `${b.tap.x}px`, top: `${b.tap.y - scroll + 44}px`,
+      opacity: kt > 0 && kt < 1 ? 1 - kt : 0, scale: 0.6 + kt * 0.9 });
+  } else ph.tap.style.opacity = 0;
+}
+
+// ------------------------------------------------------------------ setup
+let PH1, PH2, BEATS1 = [], BEATS2 = [];
+window.setup = function (timing, meta) {
+  T = timing; META = meta;
+  for (const s of T.scenes) S[s.id] = s;
+  document.querySelectorAll("[data-avatar]").forEach((el) => (el.innerHTML = avatar(el.dataset.avatar)));
+  document.querySelectorAll("[data-family]").forEach((el) => (el.innerHTML = familyIcon()));
+  $("#skyline").innerHTML = skyline();
+  buildHabits($("#om-habits"), OMAR_HABITS, "bad", 250, 3);
+  buildHabits($("#yo-habits"), YOUSEF_HABITS, "good", 170, 4);
+  buildChart();
+  $("#ye-bars").innerHTML = goldBars();
+  $("#ye-shop-svg").innerHTML = shop();
+  // the cards Omar filled up
+  const cards = [["#3b4a7a", "#1f2a4d", "VISA", "7710", -12], ["#7a3b4a", "#4d1f2a", "MASTERCARD", "3356", -4], ["#2f5f5a", "#173a36", "STORE CARD", "0921", 6]];
+  cards.forEach(([a, b, n, d, r], i) => {
+    const c = document.createElement("div");
+    c.className = "ccard";
+    c.style.background = `linear-gradient(135deg, ${a}, ${b})`;
+    c.style.left = `${40 + i * 44}px`; c.style.top = `${20 + i * 60}px`; c.style.rotate = `${r}deg`;
+    c.innerHTML = `<div style="font-weight:700;letter-spacing:.08em">${n}</div><div class="chipgold"></div><div class="num">•••• ${d}</div><div class="maxed">MAXED</div>`;
+    $("#oe-cards").appendChild(c);
+  });
+
+  PH1 = makePhone("Omar's phone");
+  PH2 = makePhone("Layla's phone");
+  const at = (id, x) => S[id].start + x;
+  const shotTop = (shot, m, room = 120) => Math.max(0, META[shot].marks[m].y - room);
+  // Omar's phone
+  BEATS1 = [
+    { at: at("bridge", 0), shot: "today", scroll: 0 },
+    { at: at("today", L("today", 0, "really")), shot: "today", scroll: 0, spot: "hero" },
+    { at: at("today", L("today", 1)), shot: "today", scroll: 0, spot: "payday" },
+    { at: at("plan", 0.2), shot: "plan", scroll: 0 },
+    { at: at("plan", L("plan", 0, "plan")), shot: "plan", scroll: 0, spot: "steps" },
+    { at: at("plan", L("plan", 1, "Pay")), shot: "plan", scroll: 0, spot: { x: 20, y: 196, w: 350, h: 76 } },
+    { at: at("plan", L("plan", 1, "Build")), shot: "plan", scroll: 0, spot: { x: 20, y: 280, w: 350, h: 72 } },
+    { at: at("plan", L("plan", 2)), shot: "buckets", scroll: shotTop("buckets", "flow", 30), spot: "flow" },
+    { at: at("budgets", 0.2), shot: "budgets", scroll: 0 },
+    { at: at("budgets", L("budgets", 0, "run over")), shot: "budgets", scroll: 0, spot: { x: 20, y: 344, w: 350, h: 180 } },
+    { at: at("budgets", L("budgets", 1)), shot: "budgets", scroll: 640, spot: "advice" },
+    { at: at("add", 0.2), shot: "add", scroll: 300, spot: { x: 16, y: 352, w: 358, h: 310 } },
+    { at: at("add", L("add", 0, "said")), shot: "add", scroll: 520, spot: "addit", tap: { x: 195, y: 1233 }, tapDelay: 0.9 },
+    { at: at("compare", 0.2), shot: "compare", scroll: 0, spot: { x: 16, y: 150, w: 358, h: 52 } },
+    { at: at("compare", L("compare", 0, "compares")), shot: "compare", scroll: 900, spot: { x: 16, y: 975, w: 358, h: 590 } },
+    { at: at("compare", L("compare", 1)), shot: "compare", scroll: 560, spot: { x: 16, y: 692, w: 358, h: 246 } },
+    { at: at("wealth", 0.2), shot: "gold", scroll: 0, spot: "worth" },
+    { at: at("wealth", L("wealth", 1)), shot: "wealth", scroll: 120, spot: "adds" },
+    { at: at("wealth", L("wealth", 1, "minus")), shot: "wealth", scroll: 120, spot: { x: 22, y: 522, w: 346, h: 136 } },
+    { at: at("kids", 0.1), shot: "waiting", scroll: 0 },
+    { at: at("kids", L("kids", 2, "her parents")), shot: "waiting", scroll: 240, spot: { x: 16, y: 408, w: 358, h: 362 } },
+    { at: at("kids", L("kids", 2, "her parents") + 1.6), shot: "approved", scroll: 240, spot: { x: 16, y: 408, w: 358, h: 216 } },
+    { at: at("kids", L("kids", 3)), shot: "family", scroll: 380, spot: "peanut" },
+    { at: at("summary", 0.2), shot: "summary", scroll: 300, spot: "went" },
+    { at: at("summary", L("summary", 0, "what to change")), shot: "summary", scroll: 300, spot: "change" },
+  ];
+  // Layla's phone, in the kids' scene only
+  BEATS2 = [
+    { at: at("kids", 0), shot: "kid", scroll: 0 },
+    { at: at("kids", L("kids", 1, "saves")), shot: "kid", scroll: 0, spot: "goal" },
+    { at: at("kids", L("kids", 2)), shot: "kidfind", scroll: 560, spot: { x: 16, y: 800, w: 358, h: 322 } },
+  ];
+};
+
+// ------------------------------------------------------------------ render one moment
+let lastScene = null;
+window.render = function (t) {
+  // scenes dip through the background: out over the last 0.45 s, in over the first 0.5 s
+  for (const s of T.scenes) {
+    const el = $(`#sc-${s.id}`);
+    const op = Math.min(easeOut(prog(t, s.start, 0.5)), 1 - prog(t, s.end - 0.45, 0.45));
+    el.style.opacity = t >= s.start - 0.01 && t <= s.end ? op : 0;
+    el.style.display = t >= s.start - 0.5 && t <= s.end + 0.5 ? "block" : "none";
+  }
+  const lt = (id) => t - S[id].start;
+  const paperOn = prog(t, S.bridge.start - 0.2, 0.8) * (1 - prog(t, S.outro.start - 0.2, 0.8));
+  $("#bg-paper").style.opacity = paperOn;
+
+  // 1. intro
+  if (t < S.meet.start) {
+    const x = lt("intro");
+    rise($("#in-k"), x, L("intro", 0) + 0.1);
+    rise($("#in-1"), x, L("intro", 1, "Same salary"), 0.6, 40);
+    rise($("#in-2"), x, L("intro", 1, "Same family"), 0.6, 40);
+    rise($("#in-3"), x, L("intro", 1, "Two very"), 0.6, 40);
+    $("#skyline").style.translate = `0 ${40 - x * 4}px`;
+  }
+  // 2. meet
+  if (t >= S.meet.start - 0.5 && t < S.omar.start) {
+    const x = lt("meet");
+    rise($("#mt-o"), x, L("meet", 0, "Omar") - 0.2, 0.7, 50);
+    rise($("#mt-y"), x, L("meet", 0, "Yousef") - 0.1, 0.7, 50);
+    pop($("#mt-eq"), x, L("meet", 1));
+    rise($("#mt-s1"), x, L("meet", 1, "twenty")); rise($("#mt-s2"), x, L("meet", 1, "twenty") + 0.15);
+    rise($("#mt-f1"), x, L("meet", 2, "wife")); rise($("#mt-f2"), x, L("meet", 2, "wife") + 0.15);
+  }
+  // 3. Omar's months
+  if (t >= S.omar.start - 0.5 && t < S.yousef.start) {
+    const x = lt("omar");
+    let total = 0;
+    document.querySelectorAll("#om-habits .habit").forEach((el, i) => {
+      const t0 = L("omar", i + 1) - 0.1;
+      rise(el, x, t0, 0.55, 40);
+      total += OMAR_HABITS[i][5] * easeOut(prog(x, t0 + 0.2, 0.8));
+    });
+    $("#om-ctr b").textContent = `AED ${fmt(total)}`;
+  }
+  // 4. Yousef's months: line 1 brings save and invest together
+  if (t >= S.yousef.start - 0.5 && t < S.years.start) {
+    const x = lt("yousef");
+    const when = [L("yousef", 0, "plan"), L("yousef", 1, "save"), L("yousef", 1, "invest"), L("yousef", 2), L("yousef", 3),
+      L("yousef", 4), L("yousef", 5), L("yousef", 6)];
+    let total = 0;
+    document.querySelectorAll("#yo-habits .habit").forEach((el, i) => {
+      rise(el, x, when[i] - 0.1, 0.55, 40);
+      total += YOUSEF_HABITS[i][5] * easeOut(prog(x, when[i] + 0.1, 0.8));
+    });
+    $("#yo-ctr b").textContent = `AED ${fmt(total)}`;
+  }
+  // 5. three years
+  if (t >= S.years.start - 0.5 && t < S.omarEnd.start) {
+    const x = lt("years");
+    rise($("#yr-k"), x, 0.2);
+    const m = 36 * easeInOut(prog(x, 0.9, 9.5));
+    drawChart(m);
+    const end = prog(x, 10.2, 0.6);
+    $("#ch-ylab").setAttribute("opacity", end); $("#ch-olab").setAttribute("opacity", end);
+    rise($("#yr-coffee"), x, L("years", 1, "coffee") - 0.3, 0.6, 30);
+    $("#yr-coffee").style.opacity = Math.min(Number($("#yr-coffee").style.opacity), 1 - prog(x, 10.0, 0.5));
+  }
+  // 6. Omar, three years later
+  if (t >= S.omarEnd.start - 0.5 && t < S.yousefEnd.start) {
+    const x = lt("omarEnd");
+    rise($("#oe-broke"), x, L("omarEnd", 0, "broke") - 0.1, 0.5, 20);
+    document.querySelectorAll("#oe-cards .ccard").forEach((c, i) => rise(c, x, L("omarEnd", 1) + i * 0.25, 0.5, 60));
+    rise($("#oe-debt"), x, L("omarEnd", 1, "sixty") - 0.3, 0.5, 20);
+    $("#oe-debt-n").textContent = `AED ${fmt(60000 * easeOut(prog(x, L("omarEnd", 1, "sixty") - 0.2, 1.4)))}`;
+    rise($("#oe-arrow"), x, L("omarEnd", 2), 0.4, 0);
+    rise($("#oe-loan"), x, L("omarEnd", 2, "bank loan"), 0.6, 40);
+    pop($("#oe-stamp"), x, L("omarEnd", 2, "with interest"));
+  }
+  // 7. Yousef, three years later
+  if (t >= S.yousefEnd.start - 0.5 && t < S.versus.start) {
+    const x = lt("yousefEnd");
+    rise($("#ye-save"), x, L("yousefEnd", 0, "forty") - 0.3);
+    $("#ye-save-n").textContent = `AED ${fmt(40000 * easeOut(prog(x, L("yousefEnd", 0, "forty"), 1.4)))}`;
+    rise($("#ye-gold"), x, L("yousefEnd", 0, "seventy") - 0.3);
+    const gk = prog(x, L("yousefEnd", 0, "seventy"), 1.6);
+    $("#ye-gold-n").textContent = `${Math.round(70 * easeOut(gk))} g`;
+    document.querySelectorAll("#ye-bars .bar").forEach((b, i) => b.setAttribute("opacity", gk * 9 > i ? 1 : 0));
+    rise($("#ye-shop"), x, L("yousefEnd", 1, "small business") - 0.3, 0.7, 40);
+  }
+  // 8. versus
+  if (t >= S.versus.start - 0.5 && t < S.bridge.start) {
+    const x = lt("versus");
+    rise($("#vs-t"), x, 0.1);
+    rise($("#vs-o"), x, L("versus", 0, "Same family"), 0.6, 30);
+    rise($("#vs-y"), x, L("versus", 0, "Same family") + 0.2, 0.6, 30);
+    rise($("#vs-b"), x, L("versus", 0, "The difference"), 0.6, 20);
+  }
+  // 9. bridge: the logo, then the logo becomes the corner mark and the phone comes up
+  const brandIn = prog(t, S.bridge.start + L("bridge", 1) - 0.2, 0.7);
+  const brandOut = prog(t, S.outro.start - 0.45, 0.45);
+  $("#brand").style.opacity = brandIn * (1 - brandOut);
+  if (t >= S.bridge.start - 0.5 && t < S.today.start) {
+    const x = lt("bridge");
+    const k = prog(x, L("bridge", 1) - 0.3, 0.6);
+    rise($("#br-logo"), x, 0.2, 0.8, 30);
+    $("#br-logo").style.opacity = Number($("#br-logo").style.opacity) * (1 - k);
+    rise($("#br-col"), x, L("bridge", 1), 0.7, 30);
+  }
+  // 10-17. the app: bullets come in with the words
+  const bullets = {
+    today: [L("today", 0, "after rent"), L("today", 1)],
+    plan: [L("plan", 1), L("plan", 1, "Pay"), L("plan", 1, "Build"), L("plan", 2)],
+    budgets: [L("budgets", 0, "says so"), L("budgets", 1)],
+    add: [L("add", 0, "typed"), L("add", 0, "said"), L("add", 0, "read from")],
+    compare: [L("compare", 0, "compares"), L("compare", 1)],
+    wealth: [L("wealth", 0, "logs"), L("wealth", 1)],
+    kids: [L("kids", 1), L("kids", 2), L("kids", 3)],
+    summary: [L("summary", 0, "what went"), L("summary", 0, "what to change")],
+  };
+  for (const [id, times] of Object.entries(bullets)) {
+    if (t < S[id].start - 0.5 || t > S[id].end + 0.5) continue;
+    const x = lt(id), col = $(`#sc-${id} .appcol`);
+    rise($(".kicker", col), x, 0.1, 0.5, 16);
+    rise($(".h2", col), x, 0.2, 0.6, 24);
+    col.querySelectorAll(".bul").forEach((b, i) => rise(b, x, times[i] - 0.15, 0.5, 18));
+    const note = $(".note", col);
+    if (note) rise(note, x, L(id, 1, "minus"), 0.6, 10);
+  }
+
+  // phones: Omar's from the bridge to the summary; Layla's beside it for the kids
+  const p1In = easeOut(prog(t, S.bridge.start + L("bridge", 1) - 0.1, 0.9));
+  const p1Out = prog(t, S.summary.end - 0.5, 0.5);
+  const kidsK = easeInOut(prog(t, S.kids.start - 0.3, 0.8)) * (1 - easeInOut(prog(t, S.kids.end - 0.6, 0.8)));
+  const s1 = lerp(1.08, 1.0, kidsK);
+  const x1 = lerp(300, 610, kidsK), y1 = lerp(71, 130, kidsK) + (1 - p1In) * 1000;
+  Object.assign(PH1.el.style, { translate: `${x1}px ${y1}px`, scale: s1, opacity: (p1In > 0 ? 1 : 0) * (1 - p1Out),
+    display: t > S.bridge.start && t < S.summary.end + 0.1 ? "block" : "none" });
+  PH1.label.style.opacity = kidsK;
+  drawPhone(PH1, BEATS1, t);
+  const x2 = lerp(80, 120, kidsK);
+  Object.assign(PH2.el.style, { translate: `${x2}px ${130 + (1 - kidsK) * 60}px`, scale: 1.0, opacity: kidsK,
+    display: kidsK > 0 ? "block" : "none" });
+  PH2.label.style.opacity = kidsK;
+  drawPhone(PH2, BEATS2, t);
+
+  // 18. outro
+  if (t >= S.outro.start - 0.5) {
+    const x = lt("outro");
+    rise($("#ou-t"), x, 0.1, 0.7, 30);
+    rise($("#ou-o"), x, L("outro", 0, "A different") - 0.2, 0.7, 40);
+    $("#ou-o").querySelectorAll(".endchip").forEach((c, i) => rise(c, x, L("outro", 0, "A different") + 0.4 + i * 0.25, 0.4, 12));
+    rise($("#ou-logo"), x, L("outro", 1) - 0.2, 0.7, 40);
+    rise($("#ou-fine"), x, L("outro", 1) + 2.4, 0.8, 10);
+  }
+
+  // subtitles: the line being said, beside the phone in the app part
+  let line = null;
+  for (const s of T.scenes) for (const l of s.lines) if (t >= l.start - 0.05 && t <= l.end + 0.25) line = l;
+  const subs = $("#subs");
+  const appPart = t >= S.bridge.start + L("bridge", 1) - 0.2 && t < S.outro.start;
+  subs.className = appPart ? (t >= S.kids.start - 0.2 && t < S.kids.end ? "right kids" : "right") : "";
+  const span = $("span", subs);
+  if (line) {
+    span.textContent = line.text;
+    span.style.opacity = Math.min(prog(t, line.start - 0.05, 0.15), 1 - prog(t, line.end + 0.1, 0.15));
+  } else span.style.opacity = 0;
+};
+
+window.ready = async function () {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map((i) => (i.complete ? 0 : new Promise((r) => (i.onload = i.onerror = r)))));
+  return true;
+};
+</script>
+</body>
+</html>

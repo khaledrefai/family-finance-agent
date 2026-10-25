@@ -13,6 +13,7 @@ An agentic family accountant and money coach. Prototype for the Dubai Chambers "
 | `agents/` | The AI agents: an orchestrator that routes each message to Bookkeeper, Gatekeeper, Shopper, Coach or Planner. Talks to `core` only through its typed API. | Python 3.13, FastAPI, LangGraph |
 | `web/` | The phone web app (installable PWA) with a parent view and a child view. | Next.js 16, TypeScript |
 | `deploy.sh` + `docker-compose.yml` | The one deploy script. | Docker Compose |
+| `video/` | The story video (two men, one salary, then the real app) and how to make it again. | Playwright, ffmpeg, Kokoro |
 
 ## Run it
 
