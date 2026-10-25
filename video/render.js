@@ -73,7 +73,8 @@ function encode(file, frames, draw) {
   fs.writeFileSync(list, parts.map((f) => `file '${f}'`).join('\n') + '\n');
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list,
     '-i', path.join(here, 'build/audio_24k.wav'),
-    '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '160k', '-ar', '48000',
+    // -16 LUFS, the usual loudness for phones and video sites
+    '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11', '-c:a', 'aac', '-b:a', '160k', '-ar', '48000',
     '-movflags', '+faststart', '-shortest', out], { stdio: 'inherit' });
   console.log('wrote', out);
 })();

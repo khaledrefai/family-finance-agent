@@ -54,4 +54,6 @@ that it is information, not financial advice.
    `KOKORO_DIR=<that folder> python audio.py script.json build`. Lines are cached in `build/lines/`, so editing one line
    only respeaks that line.
 5. Check a few moments: `node render.js --stills 12,95.5,150` writes PNGs to `build/stills/`.
-6. The video: `npm run render` (about 15 minutes for 6,600 frames).
+6. The video: `npm run render` (about 10 minutes for 6,600 frames). It renders 30-second parts into
+   `build/parts/` and keeps the ones already done, so a stopped render picks up where it was; delete that folder after
+   changing the scenes, the screens or the narration.
