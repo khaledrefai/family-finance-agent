@@ -54,16 +54,20 @@ public final class BucketEngine {
     private BucketEngine() {
     }
 
-    /** Turns shares into AED with the largest-remainder rule, so the buckets add up to the income to the fils. */
+    /**
+     * Turns shares into AED with the largest-remainder rule, so the buckets add up to the income exactly.
+     * When the income is a whole number of dirhams, so is every bucket (AED 14,711, not AED 14,710.80).
+     */
     public static Map<BucketKind, Money> amounts(Money income, List<Share> shares) {
+        long unit = income.minor() % 100 == 0 ? 100 : 1;
         Map<BucketKind, Money> out = new EnumMap<>(BucketKind.class);
-        long total = income.minor();
+        long total = income.minor() / unit;
         long given = 0;
         List<long[]> remainders = new ArrayList<>(); // [kind ordinal, remainder]
         for (Share s : shares) {
             long product = Math.multiplyExact(total, (long) s.shareBp());
             long base = product / WHOLE;
-            out.put(s.kind(), new Money(base, income.currency()));
+            out.put(s.kind(), new Money(base * unit, income.currency()));
             given += base;
             remainders.add(new long[]{s.kind().ordinal(), product % WHOLE});
         }
@@ -71,7 +75,7 @@ public final class BucketEngine {
         long left = shares.stream().mapToInt(Share::shareBp).sum() == WHOLE ? total - given : 0;
         for (int k = 0; left > 0 && !remainders.isEmpty(); k = (k + 1) % remainders.size()) {
             BucketKind kind = BucketKind.values()[(int) remainders.get(k)[0]];
-            out.put(kind, out.get(kind).plus(new Money(1, income.currency())));
+            out.put(kind, out.get(kind).plus(new Money(unit, income.currency())));
             left--;
         }
         return out;
@@ -82,7 +86,10 @@ public final class BucketEngine {
         if (!income.isPositive()) {
             return WHOLE;
         }
-        return (int) Math.min(WHOLE, Math.ceilDiv(Math.multiplyExact(Math.max(0, amount.minor()), (long) WHOLE), income.minor()));
+        // Same unit as amounts(): in whole dirhams, the need is rounded up so the floored bucket still covers it
+        long unit = income.minor() % 100 == 0 ? 100 : 1;
+        long need = Math.ceilDiv(Math.max(0, amount.minor()), unit);
+        return (int) Math.min(WHOLE, Math.ceilDiv(Math.multiplyExact(need, (long) WHOLE), income.minor() / unit));
     }
 
     /**
