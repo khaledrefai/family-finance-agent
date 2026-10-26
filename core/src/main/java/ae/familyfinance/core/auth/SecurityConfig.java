@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.SecretKey;
@@ -46,8 +48,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                .oauth2ResourceServer(rs -> rs.bearerTokenResolver(bearerTokenResolver())
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         return http.build();
+    }
+
+    /**
+     * Logging in never reads a token. A browser tab can still hold an old one (expired after 8 hours, or signed
+     * before a redeploy), and checking it would turn a correct password into a 401.
+     */
+    BearerTokenResolver bearerTokenResolver() {
+        DefaultBearerTokenResolver standard = new DefaultBearerTokenResolver();
+        return request -> "/api/auth/login".equals(request.getRequestURI()) ? null : standard.resolve(request);
     }
 
     /** Turns the "role" claim (PARENT / CHILD) into ROLE_PARENT / ROLE_CHILD for hasRole(...) checks. */
