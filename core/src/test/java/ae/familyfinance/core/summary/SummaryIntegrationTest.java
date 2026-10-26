@@ -69,8 +69,9 @@ class SummaryIntegrationTest extends PostgresIntegrationTest {
         JsonNode watch = s.get("toWatch");
         assertThat(watch.get(0).get("key").asText()).isEqualTo("budget-entertainment");
         assertThat(watch.get(0).get("text").asText()).startsWith("Entertainment is AED 360 over its AED 1,200 budget (130%)");
-        // Adam logged a cola and a Robux card, both against family rules
-        assertThat(watch.toString()).contains("Adam logged 2 things the family rules say no to");
+        // Adam logged a cola and a Robux card, both against family rules (other tests may log more for him)
+        assertThat(watch.findValuesAsText("text")).anyMatch(t -> t.startsWith("Adam logged ")
+                && t.contains("things the family rules say no to:") && t.contains("Robux gift card") && t.contains("cola"));
 
         // The summer trip is the family's goal to talk about
         assertThat(s.get("wentWell").findValuesAsText("text"))
