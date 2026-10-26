@@ -32,8 +32,19 @@ public final class WaysToSaveEngine {
     public record Rent(String name, long yearlyMinor, LocalDate contractFrom) {
     }
 
-    /** {@code usualMinor}: the average of the last 3 months (null when there is no history). */
-    public record Outings(long budgetMinor, Long usualMinor) {
+    /**
+     * {@code usualMinor}: the average of the last 3 months (null when there is no history). {@code cheaper}: the
+     * outings planner's plan for next month (week 7), or null.
+     */
+    public record Outings(long budgetMinor, Long usualMinor, CheaperOutings cheaper) {
+
+        public Outings(long budgetMinor, Long usualMinor) {
+            this(budgetMinor, usualMinor, null);
+        }
+    }
+
+    /** The outings planner's plan: {@code count} outings in {@code monthLabel} for {@code totalMinor} in all. */
+    public record CheaperOutings(String monthLabel, int count, long totalMinor) {
     }
 
     public record Facts(LocalDate today, String currency, long incomeMonthlyMinor, List<Recurring> subscriptions,
@@ -116,13 +127,22 @@ public final class WaysToSaveEngine {
         String text = "Entertainment averaged " + usual.toDisplay() + " a month over the last 3 months, " + over.toDisplay()
                       + " over its " + budget.toDisplay() + " budget. Keeping to the budget frees about "
                       + yearly.toDisplay() + " a year.";
-        return java.util.Optional.of(new Tip("outings", "Outings", text,
-                List.of("Entertainment, 3-month average: " + usual.toDisplay() + " a month.",
-                        "Entertainment budget: " + budget.toDisplay() + " a month.",
-                        "Over the budget: " + over.toDisplay() + " a month, " + yearly.toDisplay() + " a year."),
-                List.of(new Row("Entertainment, 3-month average", usual.toDisplay()),
-                        new Row("Entertainment budget", budget.toDisplay()),
-                        new Row("Over the budget, a year", yearly.toDisplay())),
+        List<String> facts = new ArrayList<>(List.of("Entertainment, 3-month average: " + usual.toDisplay() + " a month.",
+                "Entertainment budget: " + budget.toDisplay() + " a month.",
+                "Over the budget: " + over.toDisplay() + " a month, " + yearly.toDisplay() + " a year."));
+        List<Row> why = new ArrayList<>(List.of(new Row("Entertainment, 3-month average", usual.toDisplay()),
+                new Row("Entertainment budget", budget.toDisplay()),
+                new Row("Over the budget, a year", yearly.toDisplay())));
+        CheaperOutings c = o.cheaper();
+        if (c != null && c.count() > 0 && c.totalMinor() < o.budgetMinor()) {
+            Money planned = new Money(c.totalMinor(), cur);
+            String line = "The outings planner found " + c.count() + (c.count() == 1 ? " outing" : " outings") + " for "
+                          + c.monthLabel() + " that come to " + planned.toDisplay() + ".";
+            text += " " + line;
+            facts.add(line);
+            why.add(new Row("Outings planner, " + c.monthLabel(), planned.toDisplay()));
+        }
+        return java.util.Optional.of(new Tip("outings", "Outings", text, List.copyOf(facts), List.copyOf(why),
                 yearly.minor(), usual.times(12).minor()));
     }
 

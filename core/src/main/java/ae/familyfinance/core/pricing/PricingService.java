@@ -135,8 +135,8 @@ public class PricingService {
         return mode;
     }
 
-    /** For tests: the same service with another SEARCH_LIVE. */
-    void useMode(Mode mode) {
+    /** For tests (price search and outings): the same service with another SEARCH_LIVE. */
+    public void useMode(Mode mode) {
         this.mode = mode;
     }
 

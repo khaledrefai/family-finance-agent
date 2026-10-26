@@ -1,0 +1,39 @@
+{
+  "search_metadata": {"status": "Success"},
+  "search_parameters": {"engine": "google_events", "q": "family events in Dubai", "gl": "ae", "hl": "en"},
+  "events_results": [
+    {
+      "title": "Family Movie Night at the Park",
+      "date": {"start_date": "Oct 30", "when": "Fri, Oct 30, 7 - 10 PM"},
+      "address": ["Zabeel Park, Gate 3", "Dubai"],
+      "link": "https://www.example-listing.ae/family-movie-night",
+      "description": "Bring a blanket for an outdoor film. Tickets from AED 30 per person.",
+      "ticket_info": [{"source": "Example Listing", "link": "https://www.example-listing.ae/family-movie-night", "link_type": "tickets"}],
+      "venue": {"name": "Zabeel Park"}
+    },
+    {
+      "title": "Kids' Science Saturday",
+      "date": {"start_date": "Oct 31", "when": "Sat, Oct 31, 10 AM - 2 PM"},
+      "address": ["Dubai Festival City"],
+      "link": "https://www.example-listing.ae/science-saturday",
+      "description": "Hands-on experiments for ages 6 to 12."
+    },
+    {
+      "title": "No link, so it is left out",
+      "date": {"when": "Sun, Nov 1"},
+      "link": "http://not-https.example"
+    },
+    {
+      "title": "Heritage Village Weekend",
+      "date": {"start_date": "Nov 1", "when": "Sun, Nov 1"},
+      "address": ["Al Shindagha, Dubai"],
+      "link": "https://www.example-listing.ae/heritage-weekend",
+      "venue": {"name": "Al Shindagha"}
+    },
+    {
+      "title": "A fourth one, beyond the three shown",
+      "date": {"when": "Mon, Nov 2"},
+      "link": "https://www.example-listing.ae/fourth"
+    }
+  ]
+}

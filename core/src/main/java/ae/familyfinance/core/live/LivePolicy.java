@@ -115,6 +115,16 @@ public final class LivePolicy {
                     notes.add(new Note(p.id(), title, e.get("body"), link, true));
                 }
             }
+            case OUTINGS_PLANNED -> {
+                // Everyone hears the plan; the kids only get the places, never what they cost
+                for (Member m : family) {
+                    live.add(m.id());
+                    if (!m.id().equals(e.actor())) {
+                        notes.add(new Note(m.id(), "Family fun in " + e.get("month"), e.get("places"),
+                                m.parent() ? "/parent/plan/outings" : "/child", false));
+                    }
+                }
+            }
             case TEST -> {
                 if (subject != null) {
                     live.add(subject.id());

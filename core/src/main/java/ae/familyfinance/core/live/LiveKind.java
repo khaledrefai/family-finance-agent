@@ -18,6 +18,8 @@ public enum LiveKind {
     OVERSPEND,
     /** Sunday's plan for the week: what is safe to spend, the bills, the budgets to slow down. */
     WEEKLY_PLAN,
+    /** A parent saved the family's outings for a month (week 7). Names only, no prices. */
+    OUTINGS_PLANNED,
     /** "Send me a test" from the notifications card. */
     TEST
 }
