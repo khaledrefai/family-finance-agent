@@ -32,6 +32,8 @@ public final class OutingEngine {
     /** When this month's entertainment money is used up, a few free ideas. */
     static final int MAX_FREE_WHEN_OVER = 3;
     static final int MAX_PAID = 2;
+    /** When few outings of the kind asked for fit, free ones of any kind fill the plan up to this many. */
+    static final int MIN_PICKS = 3;
 
     public enum When { THIS_MONTH, NEXT_MONTH }
 
@@ -186,6 +188,18 @@ public final class OutingEngine {
             }
             open.stream().filter(Costed::free).limit(MAX_PICKS - picks.size()).forEach(picks::add);
         }
+        if (!wanted.isEmpty() && picks.size() < MIN_PICKS) {
+            // Only one or two of the kind asked for fit: add free ideas of any kind, and say so
+            List<Costed> more = fitting(all, month, Set.of()).stream().filter(Costed::free).filter(c -> !picks.contains(c))
+                    .limit(MIN_PICKS - picks.size()).toList();
+            if (!more.isEmpty()) {
+                int asked = picks.size();
+                picks.addAll(more);
+                leftOut.add(asked == 0 ? "None of the kind asked for fit, so these are free ideas."
+                        : "Only " + asked + " of the kind asked for " + (asked == 1 ? "fits" : "fit")
+                          + ", so free ideas of other kinds are added.");
+            }
+        }
         return plan(when, month, fun, allowance, picks, leftOut, currency, paidCapNote(fun, allowance, currency, picks));
     }
 
@@ -287,6 +301,9 @@ public final class OutingEngine {
         }
         if (picks.isEmpty()) {
             facts.add("No outing on the list fits what is left for " + monthLabel + ".");
+        } else if (total.minor() == 0) {
+            facts.add(picks.size() == 1 ? "It is free to get in." : "All " + picks.size() + " are free to get in.");
+            why.add(new Row("This plan", "Free"));
         } else {
             facts.add("Together: " + total.toDisplay() + " for " + picks.size() + (picks.size() == 1 ? " outing" : " outings")
                       + (allowance.isPositive() ? ", leaving " + left.toDisplay() + " of the " + allowance.toDisplay() + "." : "."));

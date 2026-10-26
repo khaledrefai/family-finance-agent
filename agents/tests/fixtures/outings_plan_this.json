@@ -1,0 +1,213 @@
+{
+    "when": "THIS_MONTH",
+    "month": "2026-10",
+    "monthLabel": "October",
+    "budget": {
+        "minor": 120000,
+        "currency": "AED",
+        "text": "AED 1,200"
+    },
+    "spent": {
+        "minor": 156000,
+        "currency": "AED",
+        "text": "AED 1,560"
+    },
+    "allowance": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+    },
+    "picks": [
+        {
+            "key": "kite-beach",
+            "name": "Kite Beach",
+            "area": "Umm Suqeim",
+            "kinds": [
+                "OUTDOOR",
+                "BEACH"
+            ],
+            "cost": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "costLine": "Free to get in",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "Free"
+                },
+                {
+                    "label": "Sara",
+                    "value": "Free"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "Free"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "Free"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "Free beach with a running track, playgrounds and a view of the Burj Al Arab. Bring water and snacks from home.",
+            "site": "https://www.visitdubai.com/en/places-to-visit/kite-beach"
+        },
+        {
+            "key": "dubai-fountain",
+            "name": "Dubai Fountain show",
+            "area": "Downtown Dubai",
+            "kinds": [
+                "OUTDOOR"
+            ],
+            "cost": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "costLine": "Free to get in",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "Free"
+                },
+                {
+                    "label": "Sara",
+                    "value": "Free"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "Free"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "Free"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "The fountain show by the Burj Khalifa, every evening. Free to watch from the promenade.",
+            "site": "https://www.visitdubai.com/en/places-to-visit/the-dubai-fountain"
+        },
+        {
+            "key": "al-qudra",
+            "name": "Al Qudra Lakes picnic",
+            "area": "Al Qudra",
+            "kinds": [
+                "OUTDOOR",
+                "NATURE"
+            ],
+            "cost": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "costLine": "Free to get in",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "Free"
+                },
+                {
+                    "label": "Sara",
+                    "value": "Free"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "Free"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "Free"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "Desert lakes with birds and sunset views. Free; take a picnic. It is a drive out, so fuel is extra.",
+            "site": "https://www.visitdubai.com/en/places-to-visit/al-qudra-lakes"
+        }
+    ],
+    "total": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+    },
+    "left": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+    },
+    "usualOuting": {
+        "minor": 37400,
+        "currency": "AED",
+        "text": "AED 374"
+    },
+    "usualCost": {
+        "minor": 112200,
+        "currency": "AED",
+        "text": "AED 1,122"
+    },
+    "saving": {
+        "minor": 112200,
+        "currency": "AED",
+        "text": "AED 1,122"
+    },
+    "leftOut": [],
+    "facts": [
+        "Entertainment budget: AED 1,200 a month.",
+        "Spent on entertainment this month: AED 1,560, AED 360 over the budget.",
+        "The family's usual outing over the last 3 months cost about AED 374 (12 outings).",
+        "Nothing is left for outings in October, so these are free ones.",
+        "Kite Beach: free to get in.",
+        "Dubai Fountain show: free to get in.",
+        "Al Qudra Lakes picnic: free to get in.",
+        "All 3 are free to get in.",
+        "3 usual outings would cost about AED 1,122; this plan costs AED 1,122 less.",
+        "Prices are from our saved list of 26 Oct, not live. Check each price on the site before booking; travel, food and extras are not included."
+    ],
+    "why": [
+        {
+            "label": "Entertainment budget, a month",
+            "value": "AED 1,200"
+        },
+        {
+            "label": "Spent this month",
+            "value": "AED 1,560"
+        },
+        {
+            "label": "Over the budget",
+            "value": "AED 360"
+        },
+        {
+            "label": "Usual outing, last 3 months",
+            "value": "about AED 374"
+        },
+        {
+            "label": "Kite Beach",
+            "value": "Free"
+        },
+        {
+            "label": "Dubai Fountain show",
+            "value": "Free"
+        },
+        {
+            "label": "Al Qudra Lakes picnic",
+            "value": "Free"
+        },
+        {
+            "label": "This plan",
+            "value": "Free"
+        },
+        {
+            "label": "3 usual outings",
+            "value": "about AED 1,122"
+        },
+        {
+            "label": "Saved with this plan",
+            "value": "AED 1,122"
+        }
+    ],
+    "pricesFrom": "2026-10-26"
+}

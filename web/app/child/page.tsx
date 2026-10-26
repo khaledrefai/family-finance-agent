@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { agent, aed } from "@/lib/api";
 import { useLiveEvents } from "@/lib/live-stream";
 import { notifyApi, Wallet } from "@/lib/push";
+import { outingsApi, SavedPlan } from "@/lib/outings";
 import { kids } from "@/lib/sample";
 import { Chit } from "../chit";
 import { NotifyCard } from "../live-ui";
@@ -13,7 +14,8 @@ import { useSession } from "../use-session";
 import { artFor, Avatar, BuddySays, Camel, GoalArt, GoalJar, SmallStar } from "./kid-ui";
 
 // Kid Home: my goal jar, my demo wallet, my requests (a parent's answer lands here), the coin buddy's nudge,
-// and where my pocket money went.
+// the family's next outings (once a parent saves a plan: the places only, never the prices), and where my pocket
+// money went.
 // Kids only ever see their own money. Requests, the wallet and the nudge are live: when a parent says yes, the
 // answer and the new wallet balance arrive on this screen by themselves. Goal and the chart are still sample
 // figures until the goals endpoint exists. Adam (6 to 9) gets bigger type and fewer words.
@@ -22,6 +24,7 @@ export default function ChildHome() {
   const [nudge, setNudge] = useState<string | null>(null);
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [changed, setChanged] = useState(false);
+  const [fun, setFun] = useState<SavedPlan[]>([]);
 
   useEffect(() => {
     if (me) agent.nudge().then((n) => setNudge(n.nudge)).catch(() => {});
@@ -39,6 +42,13 @@ export default function ChildHome() {
     if (me) loadWallet();
   }, [me, loadWallet]);
   useLiveEvents(["hello", "WALLET_CHANGED"], (e) => loadWallet(e.kind === "WALLET_CHANGED"), !!me);
+  const loadFun = useCallback(() => {
+    outingsApi.saved().then(setFun).catch(() => {});
+  }, []);
+  useEffect(() => {
+    if (me) loadFun();
+  }, [me, loadFun]);
+  useLiveEvents(["OUTINGS_PLANNED"], loadFun, !!me);
   useEffect(() => {
     if (!changed) return;
     const t = setTimeout(() => setChanged(false), 2400);
@@ -93,6 +103,27 @@ export default function ChildHome() {
             {changed && wallet?.recent[0] && <p className="muted">{wallet.recent[0].description}</p>}
           </div>
           <span className="demo-tag">DEMO MONEY</span>
+        </section>
+      )}
+
+      {fun.length > 0 && (
+        <section className="card" style={{ display: "grid", gap: 10 }} aria-label="Family fun coming up">
+          <div className="row" style={{ padding: 0, alignItems: "center" }}>
+            <span>
+              <p className="card-title" style={{ margin: 0 }}>Family fun coming up</p>
+              <p className="muted" style={{ margin: 0 }}>{fun.map((f) => f.monthLabel).join(" and ")}</p>
+            </span>
+            <Camel size={young ? 64 : 56} />
+          </div>
+          <ul className="fun-list">
+            {fun.flatMap((f) => f.picks.map((p) => (
+              <li key={f.month + p.key}>
+                <span className="fun-dot" aria-hidden="true" />
+                <b>{p.name}</b>
+                {!young && <span className="fun-about">{p.about}</span>}
+              </li>
+            )))}
+          </ul>
         </section>
       )}
 

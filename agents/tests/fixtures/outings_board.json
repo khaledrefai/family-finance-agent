@@ -1,0 +1,636 @@
+{
+    "thisMonth": "October",
+    "nextMonth": "November",
+    "budget": {
+        "minor": 120000,
+        "currency": "AED",
+        "text": "AED 1,200"
+    },
+    "spent": {
+        "minor": 156000,
+        "currency": "AED",
+        "text": "AED 1,560"
+    },
+    "leftThisMonth": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+    },
+    "over": {
+        "minor": 36000,
+        "currency": "AED",
+        "text": "AED 360"
+    },
+    "usualOuting": {
+        "minor": 37400,
+        "currency": "AED",
+        "text": "AED 374"
+    },
+    "outingsCounted": 12,
+    "options": [
+        {
+            "key": "kite-beach",
+            "name": "Kite Beach",
+            "area": "Umm Suqeim",
+            "kinds": [
+                "OUTDOOR",
+                "BEACH"
+            ],
+            "cost": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "costLine": "Free to get in",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "Free"
+                },
+                {
+                    "label": "Sara",
+                    "value": "Free"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "Free"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "Free"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "Free beach with a running track, playgrounds and a view of the Burj Al Arab. Bring water and snacks from home.",
+            "site": "https://www.visitdubai.com/en/places-to-visit/kite-beach"
+        },
+        {
+            "key": "dubai-fountain",
+            "name": "Dubai Fountain show",
+            "area": "Downtown Dubai",
+            "kinds": [
+                "OUTDOOR"
+            ],
+            "cost": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "costLine": "Free to get in",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "Free"
+                },
+                {
+                    "label": "Sara",
+                    "value": "Free"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "Free"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "Free"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "The fountain show by the Burj Khalifa, every evening. Free to watch from the promenade.",
+            "site": "https://www.visitdubai.com/en/places-to-visit/the-dubai-fountain"
+        },
+        {
+            "key": "al-qudra",
+            "name": "Al Qudra Lakes picnic",
+            "area": "Al Qudra",
+            "kinds": [
+                "OUTDOOR",
+                "NATURE"
+            ],
+            "cost": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "costLine": "Free to get in",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "Free"
+                },
+                {
+                    "label": "Sara",
+                    "value": "Free"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "Free"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "Free"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "Desert lakes with birds and sunset views. Free; take a picnic. It is a drive out, so fuel is extra.",
+            "site": "https://www.visitdubai.com/en/places-to-visit/al-qudra-lakes"
+        },
+        {
+            "key": "mbr-library",
+            "name": "Mohammed Bin Rashid Library",
+            "area": "Al Jaddaf",
+            "kinds": [
+                "INDOOR",
+                "CULTURE"
+            ],
+            "cost": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "costLine": "Free to get in",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "Free"
+                },
+                {
+                    "label": "Sara",
+                    "value": "Free"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "Free"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "Free"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "A big library with a children's floor and reading corners, free to visit. Good on a hot day.",
+            "site": "https://www.mbrl.ae"
+        },
+        {
+            "key": "quranic-park",
+            "name": "Quranic Park gardens",
+            "area": "Al Khawaneej",
+            "kinds": [
+                "OUTDOOR",
+                "NATURE"
+            ],
+            "cost": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "costLine": "Free to get in",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "Free"
+                },
+                {
+                    "label": "Sara",
+                    "value": "Free"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "Free"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "Free"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "Gardens with plants named in the Quran and an open-air play area. The gardens are free; the cave and glasshouse cost extra.",
+            "site": "https://www.visitdubai.com/en/places-to-visit/quranic-park"
+        },
+        {
+            "key": "ripe-market",
+            "name": "Ripe Market weekend market",
+            "area": "Academy Park",
+            "kinds": [
+                "OUTDOOR"
+            ],
+            "cost": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "costLine": "Free to get in",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "Free"
+                },
+                {
+                    "label": "Sara",
+                    "value": "Free"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "Free"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "Free"
+                }
+            ],
+            "openThisMonth": false,
+            "openNextMonth": true,
+            "about": "A weekend market with music and kids' corners. Free to walk in; set a small amount for snacks before you go.",
+            "site": "https://www.ripeme.com"
+        },
+        {
+            "key": "abra-creek",
+            "name": "Abra ride on Dubai Creek",
+            "area": "Al Seef and Deira",
+            "kinds": [
+                "OUTDOOR",
+                "CULTURE"
+            ],
+            "cost": {
+                "minor": 400,
+                "currency": "AED",
+                "text": "AED 4"
+            },
+            "costLine": "2 adults at AED 1, Layla AED 1, Adam AED 1",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 1"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 1"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 1"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 1"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "Cross the creek on a wooden abra boat, then walk through Al Seef and the old souks.",
+            "site": "https://www.visitdubai.com/en/articles/guide-to-dubai-creek"
+        },
+        {
+            "key": "zabeel-park",
+            "name": "Zabeel Park picnic",
+            "area": "Zabeel",
+            "kinds": [
+                "OUTDOOR",
+                "NATURE",
+                "PLAY"
+            ],
+            "cost": {
+                "minor": 2000,
+                "currency": "AED",
+                "text": "AED 20"
+            },
+            "costLine": "2 adults at AED 5, Layla AED 5, Adam AED 5",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 5"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 5"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 5"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 5"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "A large park with playgrounds, a lake and space for a picnic and a ball game.",
+            "site": "https://www.visitdubai.com/en/places-to-visit/zabeel-park"
+        },
+        {
+            "key": "al-mamzar",
+            "name": "Al Mamzar Beach Park",
+            "area": "Al Mamzar",
+            "kinds": [
+                "OUTDOOR",
+                "BEACH",
+                "PLAY"
+            ],
+            "cost": {
+                "minor": 2000,
+                "currency": "AED",
+                "text": "AED 20"
+            },
+            "costLine": "2 adults at AED 5, Layla AED 5, Adam AED 5",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 5"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 5"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 5"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 5"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "Calm beaches, lawns and playgrounds in one park. Good for younger kids.",
+            "site": "https://www.visitdubai.com/en/places-to-visit/al-mamzar-beach-park"
+        },
+        {
+            "key": "al-shindagha",
+            "name": "Al Shindagha Museum",
+            "area": "Al Shindagha",
+            "kinds": [
+                "INDOOR",
+                "CULTURE"
+            ],
+            "cost": {
+                "minor": 5500,
+                "currency": "AED",
+                "text": "AED 55"
+            },
+            "costLine": "2 adults at AED 15, Layla AED 15, Adam AED 10",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 15"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 15"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 15"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 10"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "The story of Dubai and the creek, with hands-on rooms. Next to the abra stations.",
+            "site": "https://www.alshindagha.ae"
+        },
+        {
+            "key": "etihad-museum",
+            "name": "Etihad Museum",
+            "area": "Jumeirah",
+            "kinds": [
+                "INDOOR",
+                "CULTURE"
+            ],
+            "cost": {
+                "minor": 8500,
+                "currency": "AED",
+                "text": "AED 85"
+            },
+            "costLine": "2 adults at AED 25, Layla AED 25, Adam AED 10",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 25"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 25"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 25"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 10"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "How the UAE came together, with films and games. Indoors and cool.",
+            "site": "https://etihadmuseum.dubaiculture.gov.ae"
+        },
+        {
+            "key": "global-village",
+            "name": "Global Village",
+            "area": "Dubailand",
+            "kinds": [
+                "OUTDOOR",
+                "CULTURE"
+            ],
+            "cost": {
+                "minor": 10000,
+                "currency": "AED",
+                "text": "AED 100"
+            },
+            "costLine": "2 adults at AED 25, Layla AED 25, Adam AED 25",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 25"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 25"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 25"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 25"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "Pavilions from around the world, shows and food. The weekday online ticket is the cheapest; rides and food cost extra.",
+            "site": "https://www.globalvillage.ae"
+        },
+        {
+            "key": "safari-park",
+            "name": "Dubai Safari Park",
+            "area": "Al Warqa",
+            "kinds": [
+                "OUTDOOR",
+                "ANIMALS"
+            ],
+            "cost": {
+                "minor": 17000,
+                "currency": "AED",
+                "text": "AED 170"
+            },
+            "costLine": "2 adults at AED 50, Layla AED 50, Adam AED 20",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 20"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "Animals from Africa and Asia in big open areas. The basic explorer ticket is enough for a family day.",
+            "site": "https://dubaisafari.ae"
+        },
+        {
+            "key": "dubai-frame",
+            "name": "Dubai Frame",
+            "area": "Zabeel Park",
+            "kinds": [
+                "INDOOR"
+            ],
+            "cost": {
+                "minor": 17000,
+                "currency": "AED",
+                "text": "AED 170"
+            },
+            "costLine": "2 adults at AED 50, Layla AED 50, Adam AED 20",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 20"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "A glass bridge 150 metres up, with old Dubai on one side and new Dubai on the other.",
+            "site": "https://www.dubaiframe.ae"
+        },
+        {
+            "key": "miracle-garden",
+            "name": "Dubai Miracle Garden",
+            "area": "Al Barsha South",
+            "kinds": [
+                "OUTDOOR",
+                "NATURE"
+            ],
+            "cost": {
+                "minor": 38500,
+                "currency": "AED",
+                "text": "AED 385"
+            },
+            "costLine": "2 adults at AED 100, Layla AED 100, Adam AED 85",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 100"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 100"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 100"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 85"
+                }
+            ],
+            "openThisMonth": false,
+            "openNextMonth": true,
+            "about": "Millions of flowers shaped into castles, planes and animals. Open in the cooler months only.",
+            "site": "https://www.dubaimiraclegarden.com"
+        },
+        {
+            "key": "green-planet",
+            "name": "The Green Planet",
+            "area": "City Walk",
+            "kinds": [
+                "INDOOR",
+                "ANIMALS",
+                "NATURE"
+            ],
+            "cost": {
+                "minor": 60500,
+                "currency": "AED",
+                "text": "AED 605"
+            },
+            "costLine": "2 adults at AED 160, Layla AED 160, Adam AED 125",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 160"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 160"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 160"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 125"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "An indoor rainforest with sloths, birds and fish. A treat rather than a weekly outing.",
+            "site": "https://www.thegreenplanetdubai.com"
+        }
+    ],
+    "pricesFrom": "2026-10-26",
+    "events": {
+        "source": "NONE",
+        "checkedAt": null,
+        "events": []
+    },
+    "saved": [],
+    "facts": [
+        "Entertainment budget: AED 1,200 a month.",
+        "Spent on entertainment this month: AED 1,560, AED 360 over the budget.",
+        "The family's usual outing over the last 3 months cost about AED 374 (12 outings)."
+    ]
+}

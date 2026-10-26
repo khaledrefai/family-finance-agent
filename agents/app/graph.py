@@ -15,6 +15,8 @@ Week 4: the Gatekeeper turns a parent's plain words into a family rule draft (ru
 called from the parent's Today screen).
 Week 6: the Shopper compares prices (shopper.py): it reads what someone wants from their words into a PurchaseIntent
 and the core searches the shops, ranks the offers by payable total and checks the best one like any request.
+Week 7: the Planner plans cheaper family outings (outings.py): it reads the month and the kind of outing, may pick
+from the core's list, and the core prices them for the family and checks them against the entertainment budget.
 Later weeks replace route_message() with an LLM classifier and fill in each agent with tools
 that call the core API (core_client.py). Agents never calculate money themselves.
 """
@@ -26,7 +28,7 @@ from typing import TypedDict
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
-from . import bookkeeper, documents, gatekeeper, planner, rules, shopper
+from . import bookkeeper, documents, gatekeeper, outings, planner, rules, shopper
 from .spend_parser import looks_like_spend
 
 
@@ -84,6 +86,8 @@ def route_message(state: ChatState) -> ChatState:
         return {"agent": Agent.GATEKEEPER}
     if gatekeeper.amount_in(text) and _ASKING.search(text) or "afford" in text:
         return {"agent": Agent.GATEKEEPER}
+    if outings.is_outings_question(text):
+        return {"agent": Agent.PLANNER}
     if shopper.is_price_question(text):
         return {"agent": Agent.SHOPPER}
     if state.get("role") == "PARENT" and planner.is_plan_question(text):
@@ -131,6 +135,8 @@ def planner_node(state: ChatState, config: RunnableConfig) -> ChatState:
     ctx = config.get("configurable", {})
     core, me = ctx.get("core"), ctx.get("me")
     message = state.get("message", "")
+    if core is not None and me is not None and outings.is_outings_question(message):
+        return {"reply": outings.handle(core, me, message, ctx.get("llm"))}
     if core is not None and me is not None and planner.is_plan_question(message):
         return {"reply": planner.handle(core, me, message, ctx.get("llm"))}
     return {"reply": _PLACEHOLDER[Agent.PLANNER]}

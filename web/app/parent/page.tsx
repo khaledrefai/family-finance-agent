@@ -246,6 +246,7 @@ export default function TodayPage() {
                 {!idea.advice && <button type="button" className="text" onClick={() => tip(idea.key, "dismissed")}>Dismiss</button>}
                 {ideas.length > 1 && <button type="button" className="text" onClick={() => setIdeaAt((i) => i + 1)}>Next idea</button>}
               </div>
+              {idea.key === "outings" && <Link href="/parent/plan/outings" className="link">Plan cheaper outings ›</Link>}
               <p className="trust">Information only, not financial advice.</p>
             </>
           )}

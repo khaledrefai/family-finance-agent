@@ -50,6 +50,9 @@ class FakeCore:
         self.compare_fixture = "compare_sony.json"
         self.compare_bodies: list[dict] = []
         self.compare_headers: list[str] = []
+        self.outings_board = load("outings_board.json")
+        self.outing_plans: list[dict] = []
+        self.outing_headers: list[str] = []
 
     def handler(self, request: httpx.Request) -> httpx.Response:
         path = request.url.path
@@ -104,6 +107,19 @@ class FakeCore:
             self.compare_bodies.append(json.loads(request.content))
             self.compare_headers.append(request.headers.get("X-Agent-Run-Id", ""))
             return httpx.Response(200, json=load(self.compare_fixture))
+        if path == "/api/outings":
+            return httpx.Response(200, json=self.outings_board)
+        if path == "/api/outings/plan":
+            body = json.loads(request.content)
+            self.outing_plans.append(body)
+            self.outing_headers.append(request.headers.get("X-Agent-Run-Id", ""))
+            plan = load("outings_plan_next.json" if body["when"] == "NEXT_MONTH" else "outings_plan_this.json")
+            if body.get("keys"):
+                picks = [p for p in plan["picks"] if p["key"] in body["keys"]]
+                plan = {**plan, "picks": picks, "facts": [f for f in plan["facts"]
+                                                           if not f.split(":")[0] in {p["name"] for p in plan["picks"]}
+                                                           or f.split(":")[0] in {p["name"] for p in picks}]}
+            return httpx.Response(200, json=plan)
         if path == "/api/rules/drafts":
             body = json.loads(request.content)
             self.rule_drafts.append(body)

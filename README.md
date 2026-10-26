@@ -73,6 +73,28 @@ so the web server already running there (on ports 80 and 443) forwards `family-f
 
 To reset the demo family on the server: `ssh` in, then `cd ~/ffa/current && COMPOSE_PROJECT_NAME=ffa ./deploy.sh reseed`.
 
+## Family outings (week 7)
+
+Parents open Plan > Family outings (or "Plan cheaper outings" on the Outings tip in Ways to save) and say what
+the family would like, or tap a chip like Free or Animals. The Planner reads the month and the kind of outing (and,
+with Claude on, may pick outings from the core's list). The core does the rest:
+
+- **The saved list**: `core/src/main/resources/outings/outings.json`, 16 Dubai outings with adult and child ticket
+  prices and the months they are open. The prices are my estimates, not checked on the venues' sites (verify before
+  recording). The app always says so and links each venue's site to check before booking.
+- **Family cost**: each parent pays the adult price; a child pays the child price only when their whole age band is
+  within the child-ticket age (Layla, 13, pays the adult price at most places; Adam, 9, the child price).
+- **The plan**: this month gets what is left of the entertainment budget (free outings only when it is used up, as in
+  the demo: AED 360 over); next month gets the whole budget. The engine's own pick is up to 2 paid outings that each
+  cost at most half the family's usual outing (about AED 374, from the last 3 months without subscriptions), then free
+  ones, one a weekend. A pick from the Planner is checked the same way: closed or unknown outings are left out, and
+  the dearest one goes until the plan fits.
+- **Saving it** tells the family (bell, push, live screens). Kids see "Family fun coming up" on Home, with the places
+  and never the prices.
+- **On this week**: live events from SerpApi Google Events (the same `SERPAPI_KEY` and `SEARCH_LIVE` as price search,
+  24 hour cache). They are extra ideas with the organiser's link, never counted in a plan. Not yet tried with a real key.
+- **Ways to save**: the Outings tip now adds "The outings planner found 4 outings for November that come to AED 340."
+
 ## Live updates and notifications (week 5)
 
 Anything a family member should hear about writes a row to the `family_event` table (the outbox) in the same
@@ -171,6 +193,9 @@ npm install && npm run dev       # forwards /api/* to http://localhost:8080
 | GET | `/api/ways-to-save`, POST `/api/ways-to-save/words` | parents: up to 3 tips; the Planner saves this month's words |
 | POST | `/api/ways-to-save/{key}/dismiss`, `/snooze` | a parent in the app (an agent run is refused) |
 | POST | `/api/pricing/compare` | any member: `{intent, requesterId?, paidFromAccountId?}`; the shops' offers ranked by payable total, and the best one checked like a request (a child: own wallet side, no shop links) |
+| GET | `/api/outings` | parents: the entertainment budget this month, every outing on the saved list with this family's cost, this week's events, saved plans |
+| POST | `/api/outings/plan` | parents (and the Planner for them): `{when: THIS_MONTH or NEXT_MONTH, kinds?, keys?}`; a month of outings checked against what is left of the entertainment budget |
+| GET, PUT | `/api/outings/saved` | GET any member (kids: the places only, no prices); PUT a parent in the app saves the month's outings and the family hears |
 | GET | `/api/pricing/status` | parents: SEARCH_LIVE, whether a SerpApi key is set, how many items the saved price list has |
 | POST | `/api/requests` with `comparisonId` + `offerKey` | any member: ask for one offer; the core takes title, total and shop from the saved comparison |
 

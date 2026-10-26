@@ -98,6 +98,14 @@ export default function PlanPage() {
         />
       </Link>
 
+      <Link href="/parent/plan/outings" className="card" style={{ display: "grid", gap: 4, color: "inherit", textDecoration: "none" }}>
+        <div className="row" style={{ padding: 0 }}>
+          <span className="card-title">Family outings</span>
+          <span className="link">Plan cheaper ones ›</span>
+        </div>
+        <span className="muted">Days out that fit the entertainment budget, priced for the whole family.</span>
+      </Link>
+
       <section className="stack" style={{ gap: 10 }}>
         <div>
           <h2 className="first">{goalTitle}</h2>

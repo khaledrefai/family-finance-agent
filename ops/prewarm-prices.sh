@@ -49,4 +49,7 @@ for q in "${searches[@]}"; do
   best="$(printf '%s' "$answer" | grep -o '"best":{"key":"[^"]*","store":"[^"]*"' | sed 's/.*"store":"//; s/"$//' || true)"
   printf '%-28s %-7s %s\n' "$q" "${source:-failed}" "${best:+best at $best}"
 done
+# This week's events for the outings screen (one search, cached for a day)
+events="$(curl -fsS --max-time 30 "$base/api/outings" -H "Authorization: Bearer $token" | grep -o '"events":{"source":"[A-Z]*"' || true)"
+printf '%-28s %s\n' "Outings: this week's events" "${events:-failed}"
 echo "Done. For the recording set SEARCH_LIVE=cache (GitHub variable, then redeploy) and AGENTS_LLM=off."

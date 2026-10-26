@@ -103,6 +103,15 @@ class OutingEngineTest {
     }
 
     @Test
+    void when_few_of_the_kind_asked_for_fit_free_ideas_fill_the_plan_and_it_says_so() {
+        Plan p = OutingEngine.suggest(all, Set.of(Kind.ANIMALS), When.NEXT_MONTH, OCTOBER, OVER, "AED");
+
+        // The Green Planet (AED 605) is more than half the usual outing, so only the Safari Park fits
+        assertThat(p.picks()).extracting(c -> c.option().key()).containsExactly("safari-park", "kite-beach", "dubai-fountain");
+        assertThat(p.leftOut()).containsExactly("Only 1 of the kind asked for fits, so free ideas of other kinds are added.");
+    }
+
+    @Test
     void the_planners_pick_is_checked_closed_and_unknown_ones_left_out_and_the_dearest_dropped_until_it_fits() {
         Fun small = new Fun(60000, 0, 37400L, 12);  // AED 600 a month
         Plan p = OutingEngine.check(all, List.of("green-planet", "miracle-garden", "made-up", "dubai-frame", "kite-beach"),
