@@ -114,6 +114,22 @@ export default function PlanPage() {
         <span className="muted">Days out that fit the entertainment budget, priced for the whole family.</span>
       </Link>
 
+      <section id="goals-long-term" className="card" style={{ display: "grid", gap: 6 }}>
+        <div className="row" style={{ padding: 0 }}>
+          <span className="card-title">Savings calculator</span>
+          <Link href="/parent/plan/calculator?from=invest" className="link">Investing bucket ›</Link>
+        </div>
+        <span className="muted">See any goal over 1, 5 and 10 years at a rate you pick. Learning only.</span>
+        <div className="rows">
+          {(goals ?? []).map((g) => (
+            <Link key={g.id} href={`/parent/plan/calculator?goal=${g.id}`} className="row calc-link">
+              <span>{g.name} <span className="muted">· {g.saved.text} of {g.target.text}</span></span>
+              <span aria-hidden="true">›</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="stack" style={{ gap: 10 }}>
         <div>
           <h2 className="first">{goalTitle}</h2>

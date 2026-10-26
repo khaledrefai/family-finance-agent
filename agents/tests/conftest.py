@@ -55,6 +55,7 @@ class FakeCore:
         self.outing_headers: list[str] = []
         self.meal_plans: list[dict] = []
         self.meal_headers: list[str] = []
+        self.calculator_bodies: list[dict] = []
 
     def handler(self, request: httpx.Request) -> httpx.Response:
         path = request.url.path
@@ -97,6 +98,9 @@ class FakeCore:
             return httpx.Response(200, json=load("goals.json"))
         if path == "/api/plan/buckets/suggestion":
             return httpx.Response(200, json=load("bucket_suggestion.json"))
+        if path == "/api/plan/calculator":
+            self.calculator_bodies.append(json.loads(request.content))
+            return httpx.Response(200, json=load("calculator_1000_6pc.json"))
         if path == "/api/plan/options":
             return httpx.Response(200, json=load("options_trip.json"))
         if path == "/api/plan/buckets/draft":
