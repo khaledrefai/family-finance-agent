@@ -31,7 +31,7 @@ export default function LoginPage() {
       setUsername(as);
       setPassword(DEMO_PASSWORD);
     }
-    if (getToken()) api.me().then((me) => router.replace(me.role === "PARENT" ? "/parent" : "/child")).catch(() => {});
+    if (getToken()) api.me().then((me) => router.replace(me.role === "PARENT" ? "/parent" : "/child")).catch(() => setToken(null));
   }, [router]);
 
   async function submit(e: React.FormEvent) {
@@ -39,6 +39,7 @@ export default function LoginPage() {
     setError(null);
     setBusy(true);
     try {
+      setToken(null); // an old token (expired, or from before a redeploy) must not ride along with the login
       const res = await api.login(username, password);
       setToken(res.accessToken);
       router.push(res.role === "PARENT" ? "/parent" : "/child");

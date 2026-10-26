@@ -39,6 +39,15 @@ class AuthAndSeedIntegrationTest extends PostgresIntegrationTest {
     }
 
     @Test
+    void an_old_token_left_in_the_browser_does_not_block_logging_in() throws Exception {
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer expired-or-from-before-a-redeploy")
+                        .content("{\"username\":\"omar\",\"password\":\"" + DemoFamily.PASSWORD + "\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.displayName").value("Omar"));
+    }
+
+    @Test
     void api_needs_a_token() throws Exception {
         mvc.perform(get("/api/me")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/me").header("Authorization", "Bearer not-a-real-token")).andExpect(status().isUnauthorized());
