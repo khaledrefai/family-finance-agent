@@ -700,3 +700,16 @@ body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
   .camel-walk svg { animation: none; left: calc(50% - 42px); }
   .search-steps li.now::before { animation: none; }
 }
+
+/* Family outings (week 7): month toggle as buttons, the over-budget mark, an outing that is closed that month */
+.seg button { min-height: 40px; border-radius: 9px; font-size: 13px; font-weight: 500; background: transparent; color: var(--ink-soft); border: 0; padding: 0 8px; }
+.seg button:hover { background: transparent; color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--chit); color: var(--ink); font-weight: 600; box-shadow: 0 1px 3px rgb(23 32 58 / 0.14); }
+.stamp-mini { font-size: 12px; font-weight: 700; letter-spacing: 0.02em; padding: 2px 10px; border-radius: 99px; border: 1.5px solid currentColor; }
+.stamp-mini.over { color: var(--declined); background: var(--declined-wash); }
+.offer.closed { opacity: 0.6; }
+.fun-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.fun-list li { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: center; }
+.fun-list li b { font-size: 17px; }
+.fun-list li .fun-about { grid-column: 2; font-size: 14px; color: var(--ink-soft); }
+.fun-dot { width: 14px; height: 14px; border-radius: 99px; background: var(--kid-a, var(--ink)); grid-row: span 2; align-self: start; margin-top: 5px; }

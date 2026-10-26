@@ -11,7 +11,7 @@ from .graph import orchestrator
 from .spend_story import nudge
 from .core_client import CoreError, WaysToSave
 from .ways_to_save import write as write_ways_to_save
-from . import shopper
+from . import outings, shopper
 
 app = FastAPI(title="Family Finance Coach - agent service", version="0.1.0")
 
@@ -83,6 +83,24 @@ def prices(body: PricesIn, core: CoreClient = Depends(core_for_caller)) -> Price
                                                 body.paidFromAccountId)
     return PricesOut(intent=intent.model_dump(exclude_none=True, mode="json") if intent else None,
                      comparison=comparison, reply=reply)
+
+
+class OutingsIn(BaseModel):
+    text: str = ""
+    when: str | None = None   # THIS_MONTH or NEXT_MONTH, from the app's month toggle
+
+
+class OutingsOut(BaseModel):
+    plan: dict | None         # the core's plan as it sent it; the app draws the outings from it
+    reply: str
+
+
+@app.post("/outings", response_model=OutingsOut)
+def plan_outings(body: OutingsIn, core: CoreClient = Depends(core_for_caller)) -> OutingsOut:
+    """'Something free this weekend' -> outings that fit the fun budget. The Planner reads; the core prices and checks."""
+    when = body.when if body.when in ("THIS_MONTH", "NEXT_MONTH") else None
+    plan, reply = outings.plan(core, core.me(), body.text[:300] or "cheaper outings", None, when)
+    return OutingsOut(plan=plan, reply=reply)
 
 
 @app.get("/nudge", response_model=NudgeOut)

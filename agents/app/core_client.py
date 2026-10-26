@@ -594,6 +594,20 @@ class CoreClient:
         _raise_for_core(resp)
         return resp.json()
 
+    # ------------------------------------------------------------ outings (week 7)
+
+    def outings_board(self) -> dict:
+        """The fun budget, every outing on the core's list with this family's cost, and this week's events."""
+        resp = self._http.get("/api/outings", timeout=20.0)  # may wait on one live events search
+        _raise_for_core(resp)
+        return resp.json()
+
+    def outings_plan(self, when: str, kinds: list[str] | None = None, keys: list[str] | None = None) -> dict:
+        """THIS_MONTH or NEXT_MONTH. `keys` empty: the engine picks, of `kinds`. Else the core checks our pick."""
+        resp = self._http.post("/api/outings/plan", json={"when": when, "kinds": kinds or [], "keys": keys or []})
+        _raise_for_core(resp)
+        return resp.json()
+
     # ------------------------------------------------------------ family rules and ways to save
 
     def draft_rule(self, draft: RuleDraft) -> Rule:

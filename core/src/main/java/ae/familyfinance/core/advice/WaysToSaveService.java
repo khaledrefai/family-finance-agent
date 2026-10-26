@@ -12,6 +12,8 @@ import ae.familyfinance.core.budgets.BudgetService;
 import ae.familyfinance.core.common.ApiException;
 import ae.familyfinance.core.documents.FindingService;
 import ae.familyfinance.core.money.Money;
+import ae.familyfinance.core.outings.OutingEngine;
+import ae.familyfinance.core.outings.OutingsService;
 import ae.familyfinance.core.plan.CashflowEngine.CommitmentFact;
 import ae.familyfinance.core.plan.CashflowEngine.Dated;
 import ae.familyfinance.core.plan.CommitmentKind;
@@ -55,12 +57,15 @@ public class WaysToSaveService {
     private final MoneyFacts moneyFacts;
     private final BudgetService budgets;
     private final FindingService findings;
+    private final OutingsService outings;
     private final JdbcClient db;
 
-    public WaysToSaveService(MoneyFacts moneyFacts, BudgetService budgets, FindingService findings, JdbcClient db) {
+    public WaysToSaveService(MoneyFacts moneyFacts, BudgetService budgets, FindingService findings, OutingsService outings,
+                             JdbcClient db) {
         this.moneyFacts = moneyFacts;
         this.budgets = budgets;
         this.findings = findings;
+        this.outings = outings;
         this.db = db;
     }
 
@@ -192,7 +197,14 @@ public class WaysToSaveService {
 
         BudgetEngine.Line fun = budgets.month(family).lines().stream()
                 .filter(l -> "ENTERTAINMENT".equals(l.category())).findFirst().orElse(null);
-        Outings outings = fun == null ? null : new Outings(fun.limit().minor(), fun.usual() == null ? null : fun.usual().minor());
+        Outings outings = null;
+        if (fun != null) {
+            // The outings planner's own plan for next month: what the tip can point to (week 7)
+            OutingEngine.Plan next = this.outings.suggestNextMonth(family);
+            outings = new Outings(fun.limit().minor(), fun.usual() == null ? null : fun.usual().minor(),
+                    next.picks().isEmpty() ? null
+                            : new WaysToSaveEngine.CheaperOutings(next.monthLabel(), next.picks().size(), next.total().minor()));
+        }
         long income = s.engine().summary().income().total().minor();
         return new Facts(today, s.currency(), income, subs, rent, telecom, outings);
     }

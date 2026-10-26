@@ -1,0 +1,250 @@
+{
+    "when": "NEXT_MONTH",
+    "month": "2026-11",
+    "monthLabel": "November",
+    "budget": {
+        "minor": 120000,
+        "currency": "AED",
+        "text": "AED 1,200"
+    },
+    "spent": {
+        "minor": 156000,
+        "currency": "AED",
+        "text": "AED 1,560"
+    },
+    "allowance": {
+        "minor": 120000,
+        "currency": "AED",
+        "text": "AED 1,200"
+    },
+    "picks": [
+        {
+            "key": "safari-park",
+            "name": "Dubai Safari Park",
+            "area": "Al Warqa",
+            "kinds": [
+                "OUTDOOR",
+                "ANIMALS"
+            ],
+            "cost": {
+                "minor": 17000,
+                "currency": "AED",
+                "text": "AED 170"
+            },
+            "costLine": "2 adults at AED 50, Layla AED 50, Adam AED 20",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 20"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "Animals from Africa and Asia in big open areas. The basic explorer ticket is enough for a family day.",
+            "site": "https://dubaisafari.ae"
+        },
+        {
+            "key": "dubai-frame",
+            "name": "Dubai Frame",
+            "area": "Zabeel Park",
+            "kinds": [
+                "INDOOR"
+            ],
+            "cost": {
+                "minor": 17000,
+                "currency": "AED",
+                "text": "AED 170"
+            },
+            "costLine": "2 adults at AED 50, Layla AED 50, Adam AED 20",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Sara",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "AED 50"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "AED 20"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "A glass bridge 150 metres up, with old Dubai on one side and new Dubai on the other.",
+            "site": "https://www.dubaiframe.ae"
+        },
+        {
+            "key": "kite-beach",
+            "name": "Kite Beach",
+            "area": "Umm Suqeim",
+            "kinds": [
+                "OUTDOOR",
+                "BEACH"
+            ],
+            "cost": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "costLine": "Free to get in",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "Free"
+                },
+                {
+                    "label": "Sara",
+                    "value": "Free"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "Free"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "Free"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "Free beach with a running track, playgrounds and a view of the Burj Al Arab. Bring water and snacks from home.",
+            "site": "https://www.visitdubai.com/en/places-to-visit/kite-beach"
+        },
+        {
+            "key": "dubai-fountain",
+            "name": "Dubai Fountain show",
+            "area": "Downtown Dubai",
+            "kinds": [
+                "OUTDOOR"
+            ],
+            "cost": {
+                "minor": 0,
+                "currency": "AED",
+                "text": "AED 0"
+            },
+            "costLine": "Free to get in",
+            "tickets": [
+                {
+                    "label": "Omar",
+                    "value": "Free"
+                },
+                {
+                    "label": "Sara",
+                    "value": "Free"
+                },
+                {
+                    "label": "Layla, adult ticket",
+                    "value": "Free"
+                },
+                {
+                    "label": "Adam, child ticket",
+                    "value": "Free"
+                }
+            ],
+            "openThisMonth": true,
+            "openNextMonth": true,
+            "about": "The fountain show by the Burj Khalifa, every evening. Free to watch from the promenade.",
+            "site": "https://www.visitdubai.com/en/places-to-visit/the-dubai-fountain"
+        }
+    ],
+    "total": {
+        "minor": 34000,
+        "currency": "AED",
+        "text": "AED 340"
+    },
+    "left": {
+        "minor": 86000,
+        "currency": "AED",
+        "text": "AED 860"
+    },
+    "usualOuting": {
+        "minor": 37400,
+        "currency": "AED",
+        "text": "AED 374"
+    },
+    "usualCost": {
+        "minor": 149600,
+        "currency": "AED",
+        "text": "AED 1,496"
+    },
+    "saving": {
+        "minor": 115600,
+        "currency": "AED",
+        "text": "AED 1,156"
+    },
+    "leftOut": [],
+    "facts": [
+        "Entertainment budget: AED 1,200 a month.",
+        "The plan is for November, with the whole AED 1,200 budget.",
+        "The family's usual outing over the last 3 months cost about AED 374 (12 outings).",
+        "Each paid outing costs at most AED 187, half the family's usual outing.",
+        "Dubai Safari Park: AED 170 for the family (2 adults at AED 50, Layla AED 50, Adam AED 20).",
+        "Dubai Frame: AED 170 for the family (2 adults at AED 50, Layla AED 50, Adam AED 20).",
+        "Kite Beach: free to get in.",
+        "Dubai Fountain show: free to get in.",
+        "Together: AED 340 for 4 outings, leaving AED 860 of the AED 1,200.",
+        "4 usual outings would cost about AED 1,496; this plan costs AED 1,156 less.",
+        "Prices are from our saved list of 26 Oct, not live. Check each price on the site before booking; travel, food and extras are not included."
+    ],
+    "why": [
+        {
+            "label": "Entertainment budget, a month",
+            "value": "AED 1,200"
+        },
+        {
+            "label": "Usual outing, last 3 months",
+            "value": "about AED 374"
+        },
+        {
+            "label": "Dubai Safari Park",
+            "value": "AED 170"
+        },
+        {
+            "label": "Dubai Frame",
+            "value": "AED 170"
+        },
+        {
+            "label": "Kite Beach",
+            "value": "Free"
+        },
+        {
+            "label": "Dubai Fountain show",
+            "value": "Free"
+        },
+        {
+            "label": "This plan",
+            "value": "AED 340"
+        },
+        {
+            "label": "Left after it",
+            "value": "AED 860"
+        },
+        {
+            "label": "4 usual outings",
+            "value": "about AED 1,496"
+        },
+        {
+            "label": "Saved with this plan",
+            "value": "AED 1,156"
+        }
+    ],
+    "pricesFrom": "2026-10-26"
+}
