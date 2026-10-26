@@ -29,10 +29,12 @@ public class AlertController {
 
     /**
      * Runs the alert rules now instead of waiting for the 15-minute check. Anything already sent is not sent again.
-     * {@code weekly=true} also sends this week's plan if it hasn't gone yet (for the demo, any day of the week).
+     * {@code weekly=true} also sends this week's plan if it hasn't gone yet (for the demo, any day of the week);
+     * {@code summary=true} sends this month's family summary so far (for the demo, once a day).
      */
     @PostMapping("/api/alerts/check")
-    public Checked check(@AuthenticationPrincipal Jwt jwt, @RequestParam(defaultValue = "false") boolean weekly) {
-        return alerts.check(CurrentMember.from(jwt).familyId(), weekly);
+    public Checked check(@AuthenticationPrincipal Jwt jwt, @RequestParam(defaultValue = "false") boolean weekly,
+                         @RequestParam(defaultValue = "false") boolean summary) {
+        return alerts.check(CurrentMember.from(jwt).familyId(), weekly, summary);
     }
 }

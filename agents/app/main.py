@@ -11,7 +11,7 @@ from .graph import orchestrator
 from .spend_story import nudge
 from .core_client import CoreError, WaysToSave
 from .ways_to_save import write as write_ways_to_save
-from . import outings, shopper
+from . import outings, shopper, summary
 
 app = FastAPI(title="Family Finance Coach - agent service", version="0.1.0")
 
@@ -109,6 +109,16 @@ def get_nudge(core: CoreClient = Depends(core_for_caller)) -> NudgeOut:
     if core.me().role.value != "CHILD":
         return NudgeOut(nudge=None)
     return NudgeOut(nudge=nudge(core.spend_status()))
+
+
+@app.post("/summary")
+def month_summary(month: str | None = None, core: CoreClient = Depends(core_for_caller)) -> dict:
+    """The monthly family summary for a parent. The Planner writes its words when the month's facts have changed;
+    otherwise this just reads the page. Every number on it is the core's."""
+    try:
+        return summary.write(core, core.me(), month)
+    except CoreError as e:
+        raise HTTPException(status_code=e.status, detail=e.detail)
 
 
 @app.post("/ways-to-save", response_model=WaysToSave)

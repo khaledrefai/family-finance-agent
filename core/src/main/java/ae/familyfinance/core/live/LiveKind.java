@@ -20,6 +20,8 @@ public enum LiveKind {
     WEEKLY_PLAN,
     /** A parent saved the family's outings for a month (week 7). Names only, no prices. */
     OUTINGS_PLANNED,
+    /** The month's family summary is ready: parents get their page, each kid their own (no money in the words). */
+    MONTH_SUMMARY,
     /** "Send me a test" from the notifications card. */
     TEST
 }

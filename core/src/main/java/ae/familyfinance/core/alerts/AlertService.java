@@ -21,9 +21,12 @@ import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
 import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -81,8 +84,15 @@ public class AlertService {
         }
     }
 
-    /** {@code weeklyNow}: send this week's plan now instead of waiting for Sunday (the "Check now" button). */
     public Checked check(UUID family, boolean weeklyNow) {
+        return check(family, weeklyNow, false);
+    }
+
+    /**
+     * {@code weeklyNow}: send this week's plan now instead of waiting for Sunday (the "Check now" button).
+     * {@code summaryNow}: send this month's summary so far now instead of waiting for the 1st (for the demo).
+     */
+    public Checked check(UUID family, boolean weeklyNow, boolean summaryNow) {
         Snapshot s = moneyFacts.load(family);
         Cashflow flow = s.engine().summary();
         LocalDate today = s.today();
@@ -130,7 +140,27 @@ public class AlertService {
             String week = today.get(IsoFields.WEEK_BASED_YEAR) + "-W" + today.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
             once(family, LiveKind.WEEKLY_PLAN, "week:" + week, "This week's plan", plan.body(), sent);
         }
+
+        // On the 1st from 8 am, last month's family summary; the words on the page are the summary's own
+        if (now.getDayOfMonth() == 1 && now.getHour() >= WEEKLY_FROM_HOUR) {
+            YearMonth last = YearMonth.from(today).minusMonths(1);
+            monthSummary(family, last, "summary:" + last, sent);
+        }
+        if (summaryNow) {
+            monthSummary(family, YearMonth.from(today), "summary-now:" + today, sent);
+        }
         return new Checked(List.copyOf(sent));
+    }
+
+    private void monthSummary(UUID family, YearMonth month, String key, List<String> sent) {
+        String label = month.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        boolean running = month.equals(YearMonth.now(clock));
+        String title = "The family's " + label + (running ? " so far" : "");
+        String body = "Budgets, goals and the kids' month on one page. The kids get their own version, without the money.";
+        if (outbox.publishOnce(family, LiveKind.MONTH_SUMMARY, key,
+                Map.of("title", title, "body", body, "month", month.toString(), "monthLabel", label))) {
+            sent.add(title);
+        }
     }
 
     public WeekPlan weekPlan(UUID family) {

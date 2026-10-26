@@ -198,9 +198,13 @@ npm install && npm run dev       # forwards /api/* to http://localhost:8080
 | GET, PUT | `/api/outings/saved` | GET any member (kids: the places only, no prices); PUT a parent in the app saves the month's outings and the family hears |
 | GET | `/api/pricing/status` | parents: SEARCH_LIVE, whether a SerpApi key is set, how many items the saved price list has |
 | POST | `/api/requests` with `comparisonId` + `offerKey` | any member: ask for one offer; the core takes title, total and shop from the saved comparison |
+| GET | `/api/summary?month=2026-10` | parents: the monthly family summary (this month so far, or one of the 2 before): budgets, goals, each kid's month, Saver of the Month, went well, to watch, and each kid's page |
+| GET | `/api/summary/kid?month=&memberId=` | a kid: their own page (own goal, stars, requests; no family money); a parent: any of their kids' pages |
+| POST | `/api/summary/words?month=` | parents (the Planner): the headline, story and camel notes; dropped if a number is not in that piece's facts |
+| POST | `/api/alerts/check?summary=true` | parents: send this month's summary so far to the whole family now (the 1st of each month sends last month's by itself) |
 
 Agent service (the web app reaches it at `/agent/...`): `POST /chat`, `GET /nudge`, `POST /documents/{id}/read`,
-`POST /ways-to-save` and `POST /prices` (`{text}`: the Shopper reads the words, the core compares).
+`POST /ways-to-save`, `POST /summary?month=` and `POST /prices` (`{text}`: the Shopper reads the words, the core compares).
 
 ## Price search (week 6)
 

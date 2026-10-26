@@ -355,7 +355,13 @@ public class PlanService {
     @Transactional(readOnly = true)
     public List<GoalView> goals(CurrentMember me) {
         requireParent(me);
-        Snapshot s = facts.load(me.familyId());
+        return goals(me.familyId());
+    }
+
+    /** The family's goals as they stand today (for the monthly summary). */
+    @Transactional(readOnly = true)
+    public List<GoalView> goals(UUID family) {
+        Snapshot s = facts.load(family);
         return s.goals().stream().map(g -> goalView(s, g)).toList();
     }
 

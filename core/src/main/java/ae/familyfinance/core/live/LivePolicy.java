@@ -125,6 +125,17 @@ public final class LivePolicy {
                     }
                 }
             }
+            case MONTH_SUMMARY -> {
+                String month = e.get("month");
+                String label = orDefault(e.get("monthLabel"), "The month");
+                for (Member m : family) {
+                    live.add(m.id());
+                    notes.add(m.parent()
+                            ? new Note(m.id(), title, e.get("body"), "/parent/summary?month=" + month, true)
+                            : new Note(m.id(), label + " with the camel",
+                                    "See your stars, your goal and how your month went.", "/child/month?month=" + month, false));
+                }
+            }
             case TEST -> {
                 if (subject != null) {
                     live.add(subject.id());

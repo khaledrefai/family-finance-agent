@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +45,14 @@ public class BudgetService {
 
     @Transactional(readOnly = true)
     public Month month(UUID family) {
-        LocalDate today = LocalDate.now(clock);
+        return month(family, YearMonth.now(clock));
+    }
+
+    /** One month: this month up to today, or an earlier month as it ended (for the monthly summary). */
+    @Transactional(readOnly = true)
+    public Month month(UUID family, YearMonth month) {
+        LocalDate now = LocalDate.now(clock);
+        LocalDate today = month.equals(YearMonth.from(now)) ? now : month.atEndOfMonth();
         LocalDate monthStart = today.withDayOfMonth(1);
         LocalDate historyStart = monthStart.minusMonths(HISTORY_MONTHS);
         String currency = db.sql("SELECT currency FROM family WHERE id = ?").param(family).query(String.class).single();

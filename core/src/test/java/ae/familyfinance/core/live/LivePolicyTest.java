@@ -73,4 +73,19 @@ class LivePolicyTest {
             assertThat(d.notes()).allMatch(Note::email);
         }
     }
+
+    @Test
+    void the_month_summary_goes_to_everyone_and_the_kids_get_their_own_page_without_money() {
+        Delivery d = plan(LiveKind.MONTH_SUMMARY, null, null, Map.of("title", "The family's October",
+                "body", "Budgets, goals and the kids' month on one page.", "month", "2026-10", "monthLabel", "October"));
+        assertThat(told(d)).containsExactlyInAnyOrder(SARA.id(), OMAR.id(), LAYLA.id(), ADAM.id());
+        Note sara = d.notes().stream().filter(n -> n.memberId().equals(SARA.id())).findFirst().orElseThrow();
+        assertThat(sara.link()).isEqualTo("/parent/summary?month=2026-10");
+        assertThat(sara.email()).isTrue();
+        Note adam = d.notes().stream().filter(n -> n.memberId().equals(ADAM.id())).findFirst().orElseThrow();
+        assertThat(adam.title()).isEqualTo("October with the camel");
+        assertThat(adam.link()).isEqualTo("/child/month?month=2026-10");
+        assertThat(adam.body()).doesNotContain("AED").doesNotContain("Budgets");
+        assertThat(adam.email()).isFalse();
+    }
 }

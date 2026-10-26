@@ -118,8 +118,18 @@ public class SpendService {
 
     @Transactional(readOnly = true)
     public SpendSummary summary(CurrentMember me, UUID memberId, YearMonth month) {
-        Member subject = subject(me, memberId);
-        UUID family = me.familyId();
+        return summary(me.familyId(), subject(me, memberId), month);
+    }
+
+    /** One child's month for the monthly family summary, which has already checked who is asking. */
+    @Transactional(readOnly = true)
+    public SpendSummary summary(UUID family, UUID memberId, YearMonth month) {
+        Member subject = members.findById(memberId).filter(m -> m.getFamilyId().equals(family))
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Member not found"));
+        return summary(family, subject, month);
+    }
+
+    private SpendSummary summary(UUID family, Member subject, YearMonth month) {
         Period p = period(month);
         Period prev = previousPeriod(p, month);
         LocalDate lastLogged = ledger.findFirstByFamilyIdAndMemberIdAndDirectionOrderByOccurredOnDesc(
