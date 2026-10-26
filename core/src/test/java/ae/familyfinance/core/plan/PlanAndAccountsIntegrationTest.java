@@ -142,6 +142,32 @@ class PlanAndAccountsIntegrationTest extends PostgresIntegrationTest {
     }
 
     @Test
+    void the_calculator_starts_from_a_goal_and_shows_1_5_and_10_years() throws Exception {
+        String home = "00000000-0000-0000-0000-0000000003f3";
+        JsonNode c = read(postJson("/api/plan/calculator", login("sara"),
+                "{\"goalId\":\"" + home + "\",\"monthly\":\"1,000\",\"rate\":\"5\"}").andExpect(status().isOk()));
+        assertThat(c.get("from").asText()).isEqualTo("GOAL");
+        assertThat(c.get("goalName").asText()).isEqualTo("Home deposit");
+        JsonNode p = c.get("projection");
+        assertThat(p.get("marks").findValuesAsText("year")).containsExactly("1", "5", "10");
+        assertThat(p.get("marks").get(2).get("putIn").get("minor").asLong()).isEqualTo(12_000_000);
+        assertThat(p.get("reach").get("target").get("minor").asLong()).isEqualTo(15_000_000);
+        assertThat(p.get("reach").get("monthlyNeeded").get("minor").asLong()).isPositive();
+    }
+
+    @Test
+    void the_calculator_can_start_from_the_investing_bucket_and_children_cannot_use_it() throws Exception {
+        JsonNode c = read(postJson("/api/plan/calculator", login("omar"), "{\"from\":\"INVEST_ASIDE\",\"rate\":\"0\"}")
+                .andExpect(status().isOk()));
+        assertThat(c.get("from").asText()).isEqualTo("INVEST_ASIDE");
+        long monthly = c.get("projection").get("monthly").get("minor").asLong();
+        assertThat(monthly).isPositive();
+        assertThat(c.get("projection").get("marks").get(0).get("total").get("minor").asLong()).isEqualTo(12 * monthly);
+        postJson("/api/plan/calculator", login("omar"), "{\"monthly\":\"500\",\"rate\":\"40\"}").andExpect(status().isBadRequest());
+        postJson("/api/plan/calculator", login("layla"), "{\"monthly\":\"50\"}").andExpect(status().isForbidden());
+    }
+
+    @Test
     void buckets_add_up_to_the_income() throws Exception {
         JsonNode b = read(mvc.perform(get("/api/plan/buckets").header("Authorization", login("sara"))).andExpect(status().isOk()));
         long sum = 0;

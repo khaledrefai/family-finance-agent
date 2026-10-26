@@ -5,6 +5,8 @@ import ae.familyfinance.core.auth.CurrentMember;
 import ae.familyfinance.core.plan.BucketEngine.Buckets;
 import ae.familyfinance.core.plan.BucketEngine.Share;
 import ae.familyfinance.core.plan.PlanOptionsEngine.PlanOptions;
+import ae.familyfinance.core.plan.PlanService.Calculator;
+import ae.familyfinance.core.plan.PlanService.CalculatorAsk;
 import ae.familyfinance.core.plan.PlanService.CommitmentView;
 import ae.familyfinance.core.plan.PlanService.DraftType;
 import ae.familyfinance.core.plan.PlanService.Drafts;
@@ -74,6 +76,12 @@ public class PlanController {
     }
 
     public record ShareBody(@NotNull BucketKind kind, int shareBp, @Size(max = 240) String reason) {
+    }
+
+    /** {@code from}: "INVEST_ASIDE" starts from that bucket; a {@code goalId} starts from the goal. */
+    public record CalculatorBody(UUID goalId, @Size(max = 20) String from, @Size(max = 20) String start,
+                                 @Size(max = 20) String monthly, @Size(max = 12) String rate, Integer years,
+                                 @Size(max = 20) String target) {
     }
 
     public record BucketDraftBody(@NotEmpty @Size(max = 6) List<@Valid ShareBody> shares) {
@@ -167,6 +175,17 @@ public class PlanController {
     @GetMapping("/one-off-effect")
     public OneOffEffect oneOffEffect(@AuthenticationPrincipal Jwt jwt, @RequestParam String amount) {
         return service.oneOffEffect(CurrentMember.from(jwt), amount);
+    }
+
+    /**
+     * The long-term savings calculator: 1, 5 and 10 years (and the horizon picked) at the parent's example rate,
+     * next to the same money kept as cash. Education only. Agents may call it; it saves nothing.
+     */
+    @PostMapping("/calculator")
+    public Calculator calculator(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody CalculatorBody b) {
+        return service.calculator(CurrentMember.from(jwt), new CalculatorAsk(b.goalId(),
+                "INVEST_ASIDE".equalsIgnoreCase(b.from()) || "invest".equalsIgnoreCase(b.from()), b.start(), b.monthly(),
+                b.rate(), b.years(), b.target()));
     }
 
     /** The family's money buckets: the waiting draft if there is one, else the confirmed split, else the engine's. */
