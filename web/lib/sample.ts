@@ -458,17 +458,6 @@ export const wealth = {
   ],
 };
 
-// This week's food budget. The weekly meal plan arrives later, so delivery nights stay a line here.
-export const food = {
-  week: "Sun 26 Oct to Fri 31 Oct",
-  budgetMinor: 69_000,
-  lines: [
-    { label: "Groceries", amountMinor: 48_000 },
-    { label: "Delivery nights, 2 planned", amountMinor: 21_000 },
-  ],
-  note: "Six delivery nights cost about AED 1,050 last month. Two a week keeps food inside budget.",
-};
-
 // Ways to save: once a month, at most three suggestions built from recurring costs. The engine works out
 // every amount and share; the agent only words them. Never a product pitch, never a link to buy.
 export const waysToSave = {

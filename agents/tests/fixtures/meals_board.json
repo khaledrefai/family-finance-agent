@@ -1,0 +1,446 @@
+{
+    "weekStart": "2026-10-27",
+    "weekLabel": "Tue 27 Oct to Mon 2 Nov",
+    "days": [
+        {
+            "date": "2026-10-27",
+            "label": "Tue 27 Oct"
+        },
+        {
+            "date": "2026-10-28",
+            "label": "Wed 28 Oct"
+        },
+        {
+            "date": "2026-10-29",
+            "label": "Thu 29 Oct"
+        },
+        {
+            "date": "2026-10-30",
+            "label": "Fri 30 Oct"
+        },
+        {
+            "date": "2026-10-31",
+            "label": "Sat 31 Oct"
+        },
+        {
+            "date": "2026-11-01",
+            "label": "Sun 1 Nov"
+        },
+        {
+            "date": "2026-11-02",
+            "label": "Mon 2 Nov"
+        }
+    ],
+    "groceryLimit": {
+        "minor": 300000,
+        "currency": "AED",
+        "text": "AED 3,000"
+    },
+    "grocerySpent": {
+        "minor": 61250,
+        "currency": "AED",
+        "text": "AED 612.50"
+    },
+    "groceryWeek": {
+        "minor": 69000,
+        "currency": "AED",
+        "text": "AED 690"
+    },
+    "forDinners": {
+        "minor": 34500,
+        "currency": "AED",
+        "text": "AED 345"
+    },
+    "eatingOutLimit": {
+        "minor": 150000,
+        "currency": "AED",
+        "text": "AED 1,500"
+    },
+    "eatingOutLeft": {
+        "minor": 126500,
+        "currency": "AED",
+        "text": "AED 1,265"
+    },
+    "profiles": [
+        {
+            "memberId": "00000000-0000-0000-0000-0000000000a2",
+            "name": "Omar",
+            "child": false,
+            "halal": true,
+            "vegetarian": false,
+            "vegan": false,
+            "dislikes": [],
+            "allergies": []
+        },
+        {
+            "memberId": "00000000-0000-0000-0000-0000000000a1",
+            "name": "Sara",
+            "child": false,
+            "halal": true,
+            "vegetarian": false,
+            "vegan": false,
+            "dislikes": [],
+            "allergies": []
+        },
+        {
+            "memberId": "00000000-0000-0000-0000-0000000000c1",
+            "name": "Layla",
+            "child": true,
+            "halal": true,
+            "vegetarian": false,
+            "vegan": false,
+            "dislikes": [
+                "mushrooms"
+            ],
+            "allergies": []
+        },
+        {
+            "memberId": "00000000-0000-0000-0000-0000000000c2",
+            "name": "Adam",
+            "child": true,
+            "halal": true,
+            "vegetarian": false,
+            "vegan": false,
+            "dislikes": [],
+            "allergies": [
+                "peanuts"
+            ]
+        }
+    ],
+    "recipes": [
+        {
+            "key": "lentil-soup",
+            "name": "Red lentil soup with bread",
+            "main": "VEG",
+            "minutes": 35,
+            "about": "Thick lentil soup with cumin and lemon, and warm Arabic bread.",
+            "cost": {
+                "minor": 940,
+                "currency": "AED",
+                "text": "AED 9.40"
+            },
+            "vegetarian": true,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "mujaddara",
+            "name": "Mujaddara with cucumber yoghurt",
+            "main": "VEG",
+            "minutes": 50,
+            "about": "Lentils and rice with crispy onions, and a cool cucumber yoghurt on the side.",
+            "cost": {
+                "minor": 1520,
+                "currency": "AED",
+                "text": "AED 15.20"
+            },
+            "vegetarian": true,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "foul-eggs",
+            "name": "Foul medames with eggs",
+            "main": "VEG",
+            "minutes": 20,
+            "about": "Warm fava beans with lemon, garlic and parsley, boiled eggs and bread.",
+            "cost": {
+                "minor": 1816,
+                "currency": "AED",
+                "text": "AED 18.16"
+            },
+            "vegetarian": true,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "aubergine-fatteh",
+            "name": "Aubergine fatteh",
+            "main": "VEG",
+            "minutes": 45,
+            "about": "Roasted aubergine and chickpeas on toasted bread with tahini yoghurt.",
+            "cost": {
+                "minor": 1853,
+                "currency": "AED",
+                "text": "AED 18.53"
+            },
+            "vegetarian": true,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "veg-biryani",
+            "name": "Vegetable biryani",
+            "main": "VEG",
+            "minutes": 60,
+            "about": "Spiced rice with potato, cauliflower, carrots and peas, with yoghurt.",
+            "cost": {
+                "minor": 2253,
+                "currency": "AED",
+                "text": "AED 22.53"
+            },
+            "vegetarian": true,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "chickpea-spinach-stew",
+            "name": "Chickpea and spinach stew with rice",
+            "main": "VEG",
+            "minutes": 35,
+            "about": "Chickpeas and spinach in a garlicky tomato sauce, with rice.",
+            "cost": {
+                "minor": 2324,
+                "currency": "AED",
+                "text": "AED 23.24"
+            },
+            "vegetarian": true,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "shakshuka",
+            "name": "Shakshuka with bread",
+            "main": "VEG",
+            "minutes": 30,
+            "about": "Eggs cooked in a pepper and tomato sauce, with feta and bread.",
+            "cost": {
+                "minor": 2545,
+                "currency": "AED",
+                "text": "AED 25.45"
+            },
+            "vegetarian": true,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "chicken-machboos",
+            "name": "Chicken machboos",
+            "main": "CHICKEN",
+            "minutes": 75,
+            "about": "Spiced chicken and rice cooked in one pot, the Gulf way.",
+            "cost": {
+                "minor": 3022,
+                "currency": "AED",
+                "text": "AED 30.22"
+            },
+            "vegetarian": false,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "tuna-pasta-bake",
+            "name": "Tuna pasta bake",
+            "main": "FISH",
+            "minutes": 40,
+            "about": "Pasta, tuna, tomato and peas baked under melted cheese.",
+            "cost": {
+                "minor": 3362,
+                "currency": "AED",
+                "text": "AED 33.62"
+            },
+            "vegetarian": false,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "kofta-rice",
+            "name": "Beef kofta with rice and salad",
+            "main": "MEAT",
+            "minutes": 45,
+            "about": "Grilled beef kofta with parsley and onion, rice and a tomato and cucumber salad.",
+            "cost": {
+                "minor": 3410,
+                "currency": "AED",
+                "text": "AED 34.10"
+            },
+            "vegetarian": false,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "oven-chicken-potatoes",
+            "name": "Oven chicken with potatoes",
+            "main": "CHICKEN",
+            "minutes": 60,
+            "about": "Chicken thighs, potatoes and carrots roasted in one tray with lemon and garlic.",
+            "cost": {
+                "minor": 3632,
+                "currency": "AED",
+                "text": "AED 36.32"
+            },
+            "vegetarian": false,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "bolognese",
+            "name": "Spaghetti bolognese",
+            "main": "MEAT",
+            "minutes": 45,
+            "about": "Beef and tomato sauce with carrots hidden in it, over pasta.",
+            "cost": {
+                "minor": 3759,
+                "currency": "AED",
+                "text": "AED 37.59"
+            },
+            "vegetarian": false,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "shawarma-wraps",
+            "name": "Chicken shawarma wraps",
+            "main": "CHICKEN",
+            "minutes": 40,
+            "about": "Spiced chicken thighs in wraps with garlic yoghurt and salad.",
+            "cost": {
+                "minor": 4357,
+                "currency": "AED",
+                "text": "AED 43.57"
+            },
+            "vegetarian": false,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "bamia",
+            "name": "Lamb and okra stew (bamia) with rice",
+            "main": "MEAT",
+            "minutes": 90,
+            "about": "Lamb and okra slow-cooked in tomato, with rice.",
+            "cost": {
+                "minor": 5032,
+                "currency": "AED",
+                "text": "AED 50.32"
+            },
+            "vegetarian": false,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "halloumi-wraps",
+            "name": "Halloumi and vegetable wraps",
+            "main": "VEG",
+            "minutes": 25,
+            "about": "Grilled halloumi, zucchini and peppers in wraps with yoghurt.",
+            "cost": {
+                "minor": 5240,
+                "currency": "AED",
+                "text": "AED 52.40"
+            },
+            "vegetarian": true,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "sayadieh",
+            "name": "Fish sayadieh",
+            "main": "FISH",
+            "minutes": 60,
+            "about": "Spiced hammour on rice cooked with golden onions.",
+            "cost": {
+                "minor": 6580,
+                "currency": "AED",
+                "text": "AED 65.80"
+            },
+            "vegetarian": false,
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "satay-noodles",
+            "name": "Chicken satay noodles",
+            "main": "CHICKEN",
+            "minutes": 30,
+            "about": "Noodles with chicken and crunchy vegetables in a peanut sauce.",
+            "cost": {
+                "minor": 3440,
+                "currency": "AED",
+                "text": "AED 34.40"
+            },
+            "vegetarian": false,
+            "suits": false,
+            "unsuitable": "It has peanuts, and Adam must not have peanuts."
+        },
+        {
+            "key": "creamy-chicken-pasta",
+            "name": "Creamy chicken and mushroom pasta",
+            "main": "CHICKEN",
+            "minutes": 35,
+            "about": "Pasta with chicken, mushrooms and spinach in a light milk and cheese sauce.",
+            "cost": {
+                "minor": 3974,
+                "currency": "AED",
+                "text": "AED 39.74"
+            },
+            "vegetarian": false,
+            "suits": false,
+            "unsuitable": "Layla doesn't like mushrooms."
+        }
+    ],
+    "deliveries": [
+        {
+            "key": "falafel-box",
+            "name": "Falafel and hummus box",
+            "about": "Falafel, hummus, salad and bread for 4.",
+            "price": {
+                "minor": 7000,
+                "currency": "AED",
+                "text": "AED 70"
+            },
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "chicken-biryani",
+            "name": "Chicken biryani for 4",
+            "about": "A family tray of chicken biryani with raita.",
+            "price": {
+                "minor": 9000,
+                "currency": "AED",
+                "text": "AED 90"
+            },
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "shawarma-meal",
+            "name": "Chicken shawarma meal for 4",
+            "about": "Four shawarma sandwiches with fries and garlic sauce.",
+            "price": {
+                "minor": 9500,
+                "currency": "AED",
+                "text": "AED 95"
+            },
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "pizza-two",
+            "name": "Two large margherita pizzas",
+            "about": "Two large cheese and tomato pizzas.",
+            "price": {
+                "minor": 10500,
+                "currency": "AED",
+                "text": "AED 105"
+            },
+            "suits": true,
+            "unsuitable": null
+        },
+        {
+            "key": "mixed-grill",
+            "name": "Mixed grill for 4",
+            "about": "Kebabs, chicken tikka and kofta with rice, bread and salad.",
+            "price": {
+                "minor": 14000,
+                "currency": "AED",
+                "text": "AED 140"
+            },
+            "suits": true,
+            "unsuitable": null
+        }
+    ],
+    "saved": null,
+    "pricesFrom": "2026-10-26"
+}

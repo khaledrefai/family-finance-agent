@@ -38,6 +38,7 @@ DELETE FROM family_rule       WHERE family_id = '00000000-0000-0000-0000-0000000
 DELETE FROM saving_tip_decision WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM saving_tip_words  WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM outing_plan       WHERE family_id = '00000000-0000-0000-0000-00000000f001';
+DELETE FROM meal_plan         WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM gold_holding      WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM gold_price        WHERE family_id = '00000000-0000-0000-0000-00000000f001';
 DELETE FROM ledger_transaction WHERE family_id = '00000000-0000-0000-0000-00000000f001';
@@ -123,6 +124,14 @@ INSERT INTO budget (family_id, member_id, category, period, limit_minor, bucket)
  ('00000000-0000-0000-0000-00000000f001', NULL, 'TRANSPORT',     'MONTHLY', 100000, 'EVERYDAY'),
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1', 'POCKET_MONEY', 'WEEKLY', 10000, 'EVERYDAY'),
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'POCKET_MONEY', 'WEEKLY',  6000, 'EVERYDAY');
+
+-- What everyone eats, for the weekly dinner plan: the whole family eats halal, Layla doesn't like mushrooms.
+-- Adam's peanut allergy is a family rule below, so it keeps both ask-to-buy and the dinner plan peanut-free.
+INSERT INTO member_food_profile (member_id, family_id, halal, vegetarian, vegan, dislikes) VALUES
+ ('00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-00000000f001', true, false, false, ''),
+ ('00000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-00000000f001', true, false, false, ''),
+ ('00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-00000000f001', true, false, false, 'mushrooms'),
+ ('00000000-0000-0000-0000-0000000000c2', '00000000-0000-0000-0000-00000000f001', true, false, false, '');
 
 -- Family rules, in the parents' own words (week 4: the agent drafts a rule from words like these, a parent turns it on).
 -- Adam's allergy blocks anything whose name says peanut, and any food he asks for waits for a parent to check the label.
