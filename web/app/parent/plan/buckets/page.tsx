@@ -121,7 +121,15 @@ export default function BucketsPage() {
               <span aria-hidden="true">›</span>
             </Link>
           )}
-          {b.id === "invest" && <p className="muted">Learning only for now. Real investing would come later through a licensed partner.</p>}
+          {b.id === "invest" && (
+            <>
+              <p className="muted">Learning only for now. Real investing would come later through a licensed partner.</p>
+              <Link href="/parent/plan/calculator?from=invest" className="link">See what it could become in 1, 5 and 10 years ›</Link>
+            </>
+          )}
+          {b.id === "goals" && (
+            <Link href="/parent/plan#goals-long-term" className="link">Saving for years? Try the savings calculator ›</Link>
+          )}
         </section>
       ))}
       <SampleNote live={live} />

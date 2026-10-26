@@ -565,6 +565,12 @@ class CoreClient:
         _raise_for_core(resp)
         return PlanOptions.model_validate(resp.json())
 
+    def calculator(self, ask: dict) -> dict:
+        """The long-term savings calculator: 1, 5 and 10 years at the parent's example rate. Saves nothing."""
+        resp = self._http.post("/api/plan/calculator", json=ask)
+        _raise_for_core(resp)
+        return resp.json()
+
     def bucket_suggestion(self) -> list[Share]:
         return [Share.model_validate(s) for s in self._get("/api/plan/buckets/suggestion")]
 

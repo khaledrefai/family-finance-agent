@@ -1,0 +1,532 @@
+{
+    "from": "TYPED",
+    "goalId": null,
+    "goalName": null,
+    "fromLine": null,
+    "projection": {
+        "start": {
+            "minor": 0,
+            "currency": "AED",
+            "text": "AED 0"
+        },
+        "monthly": {
+            "minor": 100000,
+            "currency": "AED",
+            "text": "AED 1,000"
+        },
+        "rateBp": 600,
+        "rateText": "6%",
+        "years": 15,
+        "marks": [
+            {
+                "year": 1,
+                "putIn": {
+                    "minor": 1200000,
+                    "currency": "AED",
+                    "text": "AED 12,000"
+                },
+                "growth": {
+                    "minor": 33600,
+                    "currency": "AED",
+                    "text": "AED 336"
+                },
+                "total": {
+                    "minor": 1233600,
+                    "currency": "AED",
+                    "text": "AED 12,336"
+                },
+                "asCash": {
+                    "minor": 1200000,
+                    "currency": "AED",
+                    "text": "AED 12,000"
+                },
+                "totalBp": 424,
+                "cashBp": 413
+            },
+            {
+                "year": 5,
+                "putIn": {
+                    "minor": 6000000,
+                    "currency": "AED",
+                    "text": "AED 60,000"
+                },
+                "growth": {
+                    "minor": 977000,
+                    "currency": "AED",
+                    "text": "AED 9,770"
+                },
+                "total": {
+                    "minor": 6977000,
+                    "currency": "AED",
+                    "text": "AED 69,770"
+                },
+                "asCash": {
+                    "minor": 6000000,
+                    "currency": "AED",
+                    "text": "AED 60,000"
+                },
+                "totalBp": 2399,
+                "cashBp": 2063
+            },
+            {
+                "year": 10,
+                "putIn": {
+                    "minor": 12000000,
+                    "currency": "AED",
+                    "text": "AED 120,000"
+                },
+                "growth": {
+                    "minor": 4387900,
+                    "currency": "AED",
+                    "text": "AED 43,879"
+                },
+                "total": {
+                    "minor": 16387900,
+                    "currency": "AED",
+                    "text": "AED 163,879"
+                },
+                "asCash": {
+                    "minor": 12000000,
+                    "currency": "AED",
+                    "text": "AED 120,000"
+                },
+                "totalBp": 5635,
+                "cashBp": 4126
+            },
+            {
+                "year": 15,
+                "putIn": {
+                    "minor": 18000000,
+                    "currency": "AED",
+                    "text": "AED 180,000"
+                },
+                "growth": {
+                    "minor": 11081900,
+                    "currency": "AED",
+                    "text": "AED 110,819"
+                },
+                "total": {
+                    "minor": 29081900,
+                    "currency": "AED",
+                    "text": "AED 290,819"
+                },
+                "asCash": {
+                    "minor": 18000000,
+                    "currency": "AED",
+                    "text": "AED 180,000"
+                },
+                "totalBp": 10000,
+                "cashBp": 6189
+            }
+        ],
+        "everyYear": [
+            {
+                "year": 0,
+                "putIn": {
+                    "minor": 0,
+                    "currency": "AED",
+                    "text": "AED 0"
+                },
+                "growth": {
+                    "minor": 0,
+                    "currency": "AED",
+                    "text": "AED 0"
+                },
+                "total": {
+                    "minor": 0,
+                    "currency": "AED",
+                    "text": "AED 0"
+                },
+                "asCash": {
+                    "minor": 0,
+                    "currency": "AED",
+                    "text": "AED 0"
+                },
+                "totalBp": 0,
+                "cashBp": 0
+            },
+            {
+                "year": 1,
+                "putIn": {
+                    "minor": 1200000,
+                    "currency": "AED",
+                    "text": "AED 12,000"
+                },
+                "growth": {
+                    "minor": 33600,
+                    "currency": "AED",
+                    "text": "AED 336"
+                },
+                "total": {
+                    "minor": 1233600,
+                    "currency": "AED",
+                    "text": "AED 12,336"
+                },
+                "asCash": {
+                    "minor": 1200000,
+                    "currency": "AED",
+                    "text": "AED 12,000"
+                },
+                "totalBp": 424,
+                "cashBp": 413
+            },
+            {
+                "year": 2,
+                "putIn": {
+                    "minor": 2400000,
+                    "currency": "AED",
+                    "text": "AED 24,000"
+                },
+                "growth": {
+                    "minor": 143200,
+                    "currency": "AED",
+                    "text": "AED 1,432"
+                },
+                "total": {
+                    "minor": 2543200,
+                    "currency": "AED",
+                    "text": "AED 25,432"
+                },
+                "asCash": {
+                    "minor": 2400000,
+                    "currency": "AED",
+                    "text": "AED 24,000"
+                },
+                "totalBp": 874,
+                "cashBp": 825
+            },
+            {
+                "year": 3,
+                "putIn": {
+                    "minor": 3600000,
+                    "currency": "AED",
+                    "text": "AED 36,000"
+                },
+                "growth": {
+                    "minor": 333600,
+                    "currency": "AED",
+                    "text": "AED 3,336"
+                },
+                "total": {
+                    "minor": 3933600,
+                    "currency": "AED",
+                    "text": "AED 39,336"
+                },
+                "asCash": {
+                    "minor": 3600000,
+                    "currency": "AED",
+                    "text": "AED 36,000"
+                },
+                "totalBp": 1353,
+                "cashBp": 1238
+            },
+            {
+                "year": 4,
+                "putIn": {
+                    "minor": 4800000,
+                    "currency": "AED",
+                    "text": "AED 48,000"
+                },
+                "growth": {
+                    "minor": 609800,
+                    "currency": "AED",
+                    "text": "AED 6,098"
+                },
+                "total": {
+                    "minor": 5409800,
+                    "currency": "AED",
+                    "text": "AED 54,098"
+                },
+                "asCash": {
+                    "minor": 4800000,
+                    "currency": "AED",
+                    "text": "AED 48,000"
+                },
+                "totalBp": 1860,
+                "cashBp": 1651
+            },
+            {
+                "year": 5,
+                "putIn": {
+                    "minor": 6000000,
+                    "currency": "AED",
+                    "text": "AED 60,000"
+                },
+                "growth": {
+                    "minor": 977000,
+                    "currency": "AED",
+                    "text": "AED 9,770"
+                },
+                "total": {
+                    "minor": 6977000,
+                    "currency": "AED",
+                    "text": "AED 69,770"
+                },
+                "asCash": {
+                    "minor": 6000000,
+                    "currency": "AED",
+                    "text": "AED 60,000"
+                },
+                "totalBp": 2399,
+                "cashBp": 2063
+            },
+            {
+                "year": 6,
+                "putIn": {
+                    "minor": 7200000,
+                    "currency": "AED",
+                    "text": "AED 72,000"
+                },
+                "growth": {
+                    "minor": 1440900,
+                    "currency": "AED",
+                    "text": "AED 14,409"
+                },
+                "total": {
+                    "minor": 8640900,
+                    "currency": "AED",
+                    "text": "AED 86,409"
+                },
+                "asCash": {
+                    "minor": 7200000,
+                    "currency": "AED",
+                    "text": "AED 72,000"
+                },
+                "totalBp": 2971,
+                "cashBp": 2476
+            },
+            {
+                "year": 7,
+                "putIn": {
+                    "minor": 8400000,
+                    "currency": "AED",
+                    "text": "AED 84,000"
+                },
+                "growth": {
+                    "minor": 2007400,
+                    "currency": "AED",
+                    "text": "AED 20,074"
+                },
+                "total": {
+                    "minor": 10407400,
+                    "currency": "AED",
+                    "text": "AED 104,074"
+                },
+                "asCash": {
+                    "minor": 8400000,
+                    "currency": "AED",
+                    "text": "AED 84,000"
+                },
+                "totalBp": 3579,
+                "cashBp": 2888
+            },
+            {
+                "year": 8,
+                "putIn": {
+                    "minor": 9600000,
+                    "currency": "AED",
+                    "text": "AED 96,000"
+                },
+                "growth": {
+                    "minor": 2682900,
+                    "currency": "AED",
+                    "text": "AED 26,829"
+                },
+                "total": {
+                    "minor": 12282900,
+                    "currency": "AED",
+                    "text": "AED 122,829"
+                },
+                "asCash": {
+                    "minor": 9600000,
+                    "currency": "AED",
+                    "text": "AED 96,000"
+                },
+                "totalBp": 4224,
+                "cashBp": 3301
+            },
+            {
+                "year": 9,
+                "putIn": {
+                    "minor": 10800000,
+                    "currency": "AED",
+                    "text": "AED 108,000"
+                },
+                "growth": {
+                    "minor": 3474000,
+                    "currency": "AED",
+                    "text": "AED 34,740"
+                },
+                "total": {
+                    "minor": 14274000,
+                    "currency": "AED",
+                    "text": "AED 142,740"
+                },
+                "asCash": {
+                    "minor": 10800000,
+                    "currency": "AED",
+                    "text": "AED 108,000"
+                },
+                "totalBp": 4908,
+                "cashBp": 3714
+            },
+            {
+                "year": 10,
+                "putIn": {
+                    "minor": 12000000,
+                    "currency": "AED",
+                    "text": "AED 120,000"
+                },
+                "growth": {
+                    "minor": 4387900,
+                    "currency": "AED",
+                    "text": "AED 43,879"
+                },
+                "total": {
+                    "minor": 16387900,
+                    "currency": "AED",
+                    "text": "AED 163,879"
+                },
+                "asCash": {
+                    "minor": 12000000,
+                    "currency": "AED",
+                    "text": "AED 120,000"
+                },
+                "totalBp": 5635,
+                "cashBp": 4126
+            },
+            {
+                "year": 11,
+                "putIn": {
+                    "minor": 13200000,
+                    "currency": "AED",
+                    "text": "AED 132,000"
+                },
+                "growth": {
+                    "minor": 5432300,
+                    "currency": "AED",
+                    "text": "AED 54,323"
+                },
+                "total": {
+                    "minor": 18632300,
+                    "currency": "AED",
+                    "text": "AED 186,323"
+                },
+                "asCash": {
+                    "minor": 13200000,
+                    "currency": "AED",
+                    "text": "AED 132,000"
+                },
+                "totalBp": 6407,
+                "cashBp": 4539
+            },
+            {
+                "year": 12,
+                "putIn": {
+                    "minor": 14400000,
+                    "currency": "AED",
+                    "text": "AED 144,000"
+                },
+                "growth": {
+                    "minor": 6615000,
+                    "currency": "AED",
+                    "text": "AED 66,150"
+                },
+                "total": {
+                    "minor": 21015000,
+                    "currency": "AED",
+                    "text": "AED 210,150"
+                },
+                "asCash": {
+                    "minor": 14400000,
+                    "currency": "AED",
+                    "text": "AED 144,000"
+                },
+                "totalBp": 7226,
+                "cashBp": 4952
+            },
+            {
+                "year": 13,
+                "putIn": {
+                    "minor": 15600000,
+                    "currency": "AED",
+                    "text": "AED 156,000"
+                },
+                "growth": {
+                    "minor": 7944700,
+                    "currency": "AED",
+                    "text": "AED 79,447"
+                },
+                "total": {
+                    "minor": 23544700,
+                    "currency": "AED",
+                    "text": "AED 235,447"
+                },
+                "asCash": {
+                    "minor": 15600000,
+                    "currency": "AED",
+                    "text": "AED 156,000"
+                },
+                "totalBp": 8096,
+                "cashBp": 5364
+            },
+            {
+                "year": 14,
+                "putIn": {
+                    "minor": 16800000,
+                    "currency": "AED",
+                    "text": "AED 168,000"
+                },
+                "growth": {
+                    "minor": 9430500,
+                    "currency": "AED",
+                    "text": "AED 94,305"
+                },
+                "total": {
+                    "minor": 26230500,
+                    "currency": "AED",
+                    "text": "AED 262,305"
+                },
+                "asCash": {
+                    "minor": 16800000,
+                    "currency": "AED",
+                    "text": "AED 168,000"
+                },
+                "totalBp": 9020,
+                "cashBp": 5777
+            },
+            {
+                "year": 15,
+                "putIn": {
+                    "minor": 18000000,
+                    "currency": "AED",
+                    "text": "AED 180,000"
+                },
+                "growth": {
+                    "minor": 11081900,
+                    "currency": "AED",
+                    "text": "AED 110,819"
+                },
+                "total": {
+                    "minor": 29081900,
+                    "currency": "AED",
+                    "text": "AED 290,819"
+                },
+                "asCash": {
+                    "minor": 18000000,
+                    "currency": "AED",
+                    "text": "AED 180,000"
+                },
+                "totalBp": 10000,
+                "cashBp": 6189
+            }
+        ],
+        "reach": null,
+        "summary": "15 years of AED 1,000 a month: AED 180,000 put in. At an example 6% a year it comes to AED 290,819, AED 110,819 of it growth.",
+        "notes": [
+            "An example at the rate you picked, not a forecast or a promise. Real returns go up and down, and some years they are below zero.",
+            "Kept as cash is the same money at 0%. Prices also rise over the years, so the same amount buys less later.",
+            "The app never names a fund, a product or a time to buy. Real investing would come later, through a licensed partner."
+        ]
+    }
+}
