@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { badges, kids, saverOfTheMonth } from "@/lib/sample";
 import { KidMonth, summaryApi } from "@/lib/summary";
-import { Loading, SampleNote } from "../../ui";
+import { Loading } from "../../ui";
 import { useSession } from "../../use-session";
 import { BigStar, BuddySays, Race, SmallStar, StickerArt } from "../kid-ui";
 
 // Stars and badges, never money. Saver of the Month is scored on how far each kid is toward their own goal,
 // so a 9-year-old and a 13-year-old compete fairly. The stars and the race are live from this month's summary;
-// the sticker book is still a sample until the rewards endpoint exists.
+// the sticker book follows my own goal (the demo family keeps its sample stickers).
 const EARN = [
   ["Tell me what you bought", 1],
   ["A week you save as planned", 2],
@@ -23,10 +23,20 @@ export default function StarsPage() {
     if (me) summaryApi.kid().then(setMonth).catch(() => {});
   }, [me]);
   if (!me) return <Loading />;
-  const sample = kids[me.displayName];
+  const sample = me.demo ? kids[me.displayName] : undefined;
   const kid = month ? { stars: month.starsTotal, starsThisMonth: month.starsThisMonth } : sample;
   const race = month?.saver?.race ?? (month ? [] : saverOfTheMonth);
   const young = me.ageBand === "CHILD_6_9";
+  const pct = month?.goalName ? month.goalPercent ?? 0 : null;
+  const stickers = me.demo ? badges : [
+    { art: "camel" as const, name: "First star", earned: (month?.starsTotal ?? 0) > 0, hint: "Tell me what you bought" },
+    ...(pct === null ? [] : [
+      { art: "quarter" as const, name: "A quarter there", earned: pct >= 25 },
+      { art: "half" as const, name: "Halfway", earned: pct >= 50 },
+      { art: "threequarter" as const, name: "Nearly there", earned: pct >= 75 },
+      { art: "trophy" as const, name: "Goal reached", earned: pct >= 100 },
+    ]),
+  ];
 
   return (
     <div className={`stack${young ? " young" : ""}`}>
@@ -47,11 +57,11 @@ export default function StarsPage() {
       <section className="stack" style={{ gap: 10 }}>
         <h2 className="first">My sticker book</h2>
         <div className="badges">
-          {badges.map((b) => (
+          {stickers.map((b) => (
             <div key={b.name} className={`badge${b.earned ? "" : " locked"}`}>
               <StickerArt kind={b.art} earned={b.earned} />
               <span className="badge-name">{b.name}</span>
-              <span>{b.earned ? "Got it" : b.hint ?? "Not yet"}</span>
+              <span>{b.earned ? "Got it" : ("hint" in b && b.hint) || "Not yet"}</span>
             </div>
           ))}
         </div>
@@ -82,7 +92,6 @@ export default function StarsPage() {
       <BuddySays>
         <p>Stars are for keeping track and saving. They are not money, and nobody loses them.</p>
       </BuddySays>
-      <SampleNote />
     </div>
   );
 }

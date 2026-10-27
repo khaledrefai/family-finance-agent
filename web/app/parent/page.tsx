@@ -9,7 +9,7 @@ import { Chit } from "../chit";
 import { BellLink } from "../live-ui";
 import { notifyApi, WeekPlan } from "@/lib/push";
 import { useLiveEvents } from "@/lib/live-stream";
-import { CardWarning, Icon, Loading, Masthead, PayFrom, Progress, SampleNote, TRUST, WhySheet } from "../ui";
+import { CardWarning, Icon, Loading, Masthead, PayFrom, Progress, TRUST, WhySheet } from "../ui";
 import { useSession } from "../use-session";
 
 // Today answers one question: does anything need me? In this order: what is free this month (with the three
@@ -37,8 +37,9 @@ export default function TodayPage() {
   // Which account a parent would pay a request from. Sample default until requests carry it.
   const [payFrom, setPayFrom] = useState<Record<string, string>>({});
   const [allDecided, setAllDecided] = useState(false);
+  const [freeWhy, setFreeWhy] = useState(false);
 
-  const { monthly, bills, live: moneyLive } = useMoney(!!me);
+  const { monthly, bills, raw: cashflow, live: moneyLive } = useMoney(!!me);
   const { accounts, live: accountsLive } = useAccounts(!!me);
   const { data: goals } = useLive<Goal[] | null>(() => core.goals(), null, !!me);
   const { data: budgetMonth } = useLive<BudgetMonth | null>(() => adviceApi.budgets(), null, !!me);
@@ -103,9 +104,9 @@ export default function TodayPage() {
   const alerts: { key: string; href: string; tone: "warn" | "bad"; icon: "calendar" | "card" | "warn"; title: string; text?: string }[] = [];
   if (moneyLive && nextBill?.state === "short") {
     alerts.push({
-      key: "bill", href: "/parent/money#bills", tone: "bad", icon: "calendar",
+      key: "bill", href: "/parent/money#bills", tone: (nextBill.daysLeft ?? 0) > 14 ? "warn" : "bad", icon: "calendar",
       title: `${nextBill.name} due ${nextBill.daysLeft === 1 ? "tomorrow" : `in ${nextBill.daysLeft} days`}`,
-      text: `${aed(nextBill.amountMinor)} short: the reserve won't be full by then.`,
+      text: `${aed(nextBill.amountMinor)} still to put aside before ${nextBill.due}. Money shows the month by month plan.`,
     });
   }
   if (tightCard?.bill) {
@@ -119,6 +120,9 @@ export default function TodayPage() {
     key: b.category, href: "/parent/money/budgets", tone: b.state === "OVER" ? "bad" : "warn", icon: "warn", title: b.alert ?? b.label,
   }));
   const needsYou = pending.length + alerts.length;
+  // Without a bank balance typed in, "free until pay day" would only count bills against nothing, so it goes
+  // below zero. Then Today leads with the month and asks for the balance instead.
+  const noBalance = accountsLive && !accounts.some((a) => a.kind === "BANK" || a.kind === "CASH");
 
   return (
     <div className="stack">
@@ -134,10 +138,25 @@ export default function TodayPage() {
       />
       {error && <p className="error" role="alert">{error}</p>}
 
-      <section className="hero" aria-label="This month">
-        <p className="hero-label">Free this month, after commitments</p>
-        <p className="hero-amount"><span className="cur">AED</span>{plain(monthly.freeMinor)}</p>
-        <p className="hero-sub">{aed(monthly.freeUntilPaydayMinor)} free until pay day on {monthly.payday}.</p>
+      <section className="hero" aria-label="Free money">
+        {noBalance ? (
+          <>
+            <p className="hero-label">Free this month, after bills and budgets</p>
+            <p className="hero-amount"><span className="cur">AED</span>{plain(monthly.freeMinor)}</p>
+            <p className="hero-sub">
+              <Link href="/parent/money/accounts" className="hero-link">Type today&apos;s bank balance</Link> to see what is free until pay day.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="hero-label">Free to spend until pay day</p>
+            <p className="hero-amount"><span className="cur">AED</span>{plain(monthly.freeUntilPaydayMinor)}</p>
+            <p className="hero-sub">
+              {monthly.payday ? `Pay day is ${monthly.payday}. ` : ""}The whole of {THIS_MONTH}: {aed(monthly.freeMinor)} after bills and budgets.
+            </p>
+          </>
+        )}
+        <button type="button" className="hero-link text" onClick={() => setFreeWhy(true)}>What does free mean?</button>
         <nav className="quick" aria-label="Quick actions">
           <Link href="/parent/money/add"><Icon name="plus" />Add spending</Link>
           <Link href="/parent/money#uploads"><Icon name="upload" />Upload receipt</Link>
@@ -145,6 +164,15 @@ export default function TodayPage() {
           <Link href="/parent/ask"><Icon name="ask" />Ask</Link>
         </nav>
       </section>
+
+      {!me.demo && (
+        <StartHere
+          familyId={me.familyId}
+          hasBalance={accountsLive && !noBalance}
+          hasSpending={(budgetMonth?.spent.minor ?? 0) > 0}
+          kids={members.filter((m) => m.role === "CHILD").map((m) => m.displayName)}
+        />
+      )}
 
       <section>
         <h2 className="first section-head">
@@ -196,7 +224,7 @@ export default function TodayPage() {
           <span className="card-title">Coming up</span>
           {week && <span className="muted">{week.label}</span>}
         </div>
-        {week && <p style={{ fontSize: 15 }}>{week.headline}</p>}
+        {week && !noBalance && <p style={{ fontSize: 15 }}>{week.headline}</p>}
         <div className="rows">
           {bills.slice(0, 3).map((b) => (
             <div className="row" key={b.name + b.due}>
@@ -288,7 +316,31 @@ export default function TodayPage() {
 
       <Link href="/parent/summary" className="link">See {THIS_MONTH}&apos;s family summary so far</Link>
       <p className="trust">{TRUST}</p>
-      {me.demo && <SampleNote live={false} />}
+      {freeWhy && (
+        <WhySheet
+          title="What free means"
+          groups={[
+            {
+              heading: `The whole of ${THIS_MONTH}`,
+              rows: [
+                { label: "Coming in", value: aed(monthly.incomeMinor) },
+                { label: "Bills and reserves", value: aed(-monthly.commitmentsMinor) },
+                { label: "Everyday budgets", value: aed(-monthly.everydayMinor) },
+                { label: "Free this month", value: aed(monthly.freeMinor), good: monthly.freeMinor >= 0 },
+              ],
+            },
+            ...(cashflow && !noBalance ? [{
+              heading: monthly.payday ? `Until pay day, ${monthly.payday}` : "Until pay day",
+              rows: [
+                ...cashflow.untilNextIncome.why.map((l) => ({ label: l.label, value: l.amount.text })),
+                { label: "Free to spend now", value: aed(monthly.freeUntilPaydayMinor), good: monthly.freeUntilPaydayMinor >= 0, over: monthly.freeUntilPaydayMinor < 0 },
+              ],
+            }] : []),
+          ]}
+          footer="Free until pay day is what you can spend now without touching money the bills need. The month figure is what the plan leaves for goals and fun once every bill and budget is paid."
+          onClose={() => setFreeWhy(false)}
+        />
+      )}
 
       {ideaWhy && (
         <WhySheet
@@ -298,6 +350,61 @@ export default function TodayPage() {
         />
       )}
     </div>
+  );
+}
+
+// A new family's first week: three things that make the rest of the app make sense. Each one ticks itself when
+// the app can see it is done (a bank balance, one spending); the kids' logins are ticked by hand. The card goes
+// when all three are done, or when the parent closes it. Kept per browser: it is only a hint.
+function StartHere({ familyId, hasBalance, hasSpending, kids }: { familyId: string; hasBalance: boolean; hasSpending: boolean; kids: string[] }) {
+  const key = `ffa.start.${familyId}`;
+  const [state, setState] = useState<{ logins?: boolean; closed?: boolean } | null>(null);
+  useEffect(() => {
+    try {
+      setState(JSON.parse(localStorage.getItem(key) ?? "{}"));
+    } catch {
+      setState({});
+    }
+  }, [key]);
+  const save = (next: { logins?: boolean; closed?: boolean }) => {
+    setState(next);
+    try {
+      localStorage.setItem(key, JSON.stringify(next));
+    } catch {
+      /* only a hint: fine if it comes back */
+    }
+  };
+  if (!state || state.closed) return null;
+  const steps = [
+    { id: "balance", done: hasBalance, title: "Type today's bank balance", text: "Then Today can say what is free until pay day.", href: "/parent/money/accounts" },
+    { id: "spend", done: hasSpending, title: "Add one spending", text: "A receipt photo, or type it: \"groceries 240\".", href: "/parent/money/add" },
+    ...(kids.length ? [{
+      id: "logins", done: !!state.logins, title: `Give ${kids.join(" and ")} their logins`,
+      text: "They log in on their own phone and tell the camel what they buy.", href: null,
+    }] : []),
+  ];
+  if (steps.every((x) => x.done)) return null;
+  return (
+    <section className="card start-here" aria-label="Start here">
+      <div className="row" style={{ padding: 0 }}>
+        <span className="card-title">Start here</span>
+        <button type="button" className="text" onClick={() => save({ ...state, closed: true })}>Hide</button>
+      </div>
+      <ol className="start-steps">
+        {steps.map((x) => (
+          <li key={x.id} className={x.done ? "done" : undefined}>
+            <span className="tick" aria-hidden="true">{x.done ? "✓" : ""}</span>
+            <span>
+              {x.href && !x.done ? <Link href={x.href} className="link"><b>{x.title}</b></Link> : <b>{x.title}</b>}
+              <span className="muted" style={{ display: "block" }}>{x.text}</span>
+              {x.id === "logins" && !x.done && (
+                <button type="button" className="text" onClick={() => save({ ...state, logins: true })}>Done</button>
+              )}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }
 

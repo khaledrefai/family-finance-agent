@@ -130,8 +130,9 @@ public class SpendService {
     }
 
     private SpendSummary summary(UUID family, Member subject, YearMonth month) {
-        Period p = period(month);
-        Period prev = previousPeriod(p, month);
+        Period full = period(month);
+        Period prev = previousPeriod(full, month);
+        Period p = sinceJoined(full, family, subject.getId());
         LocalDate lastLogged = ledger.findFirstByFamilyIdAndMemberIdAndDirectionOrderByOccurredOnDesc(
                 family, subject.getId(), LedgerEntry.DEBIT).map(LedgerEntry::getOccurredOn).orElse(null);
         return SpendSummaryCalculator.summarise(new Facts(subject.getId(), subject.getDisplayName(), currency(family),
@@ -162,6 +163,23 @@ public class SpendService {
         return members.findById(id)
                 .filter(m -> m.getFamilyId().equals(me.familyId()))
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Member not found"));
+    }
+
+    /**
+     * A kid who joined part way through the month is counted from the day they joined, so a family that signs up on
+     * the 27th doesn't hear that a kid "logged on 0 of 27 days". The demo family's dates are seeded, so it keeps the
+     * whole month.
+     */
+    private Period sinceJoined(Period p, UUID family, UUID memberId) {
+        List<LocalDate> joined = jdbc.queryForList("""
+                SELECT (m.created_at AT TIME ZONE 'Asia/Dubai')::date FROM member m JOIN family f ON f.id = m.family_id
+                WHERE m.id = ? AND m.family_id = ? AND NOT f.is_demo
+                """, LocalDate.class, memberId, family);
+        if (joined.isEmpty()) {
+            return p;
+        }
+        LocalDate day = joined.get(0);
+        return day.isAfter(p.from()) && !day.isAfter(p.to()) ? new Period(day, p.to(), p.label(), p.monthToDate()) : p;
     }
 
     private Period period(YearMonth month) {

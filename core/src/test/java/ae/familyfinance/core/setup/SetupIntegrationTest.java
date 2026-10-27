@@ -153,6 +153,11 @@ class SetupIntegrationTest extends PostgresIntegrationTest {
                 UUID.fromString(mariamId))).isEqualTo(45_000L);
         getAs("/api/plan/buckets", huda).andExpect(jsonPath("$.status").value("ACTIVE"))
                 .andExpect(jsonPath("$.income.text").value("AED 24,000"));
+
+        // A kid who joined today is counted from today: one day so far, not the whole month, and her goal is on her page
+        getAs("/api/summary/kid?memberId=" + mariamId, huda).andExpect(status().isOk())
+                .andExpect(jsonPath("$.daysInPeriod").value(1))
+                .andExpect(jsonPath("$.goalName").value("Bike"));
     }
 
     @Test

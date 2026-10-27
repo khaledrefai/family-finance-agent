@@ -6,7 +6,7 @@ import { aed } from "@/lib/api";
 import { advice, BudgetMonth, useLive } from "@/lib/live";
 import { MealsBoard, mealsApi } from "@/lib/meals";
 import { budgets } from "@/lib/sample";
-import { BudgetBar, Loading, MonthColumns, SampleNote } from "../../../ui";
+import { BudgetBar, Loading, MonthColumns } from "../../../ui";
 import { useSession } from "../../../use-session";
 import { MoneyHeader } from "../money-tabs";
 
@@ -64,7 +64,6 @@ export default function BudgetsPage() {
         <span style={{ flex: 1 }}><b>Advice:</b> cut entertainment to AED 600 for November and December.</span>
         <span aria-hidden="true">›</span>
       </Link>
-      <SampleNote />
       </>}
     </div>
   );

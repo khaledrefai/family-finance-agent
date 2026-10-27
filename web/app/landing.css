@@ -328,3 +328,13 @@ html:has(.landing) { scroll-behavior: smooth; }
 .lp-foot-in { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; }
 .lp-foot-in p { flex: 1 1 320px; }
 .lp-foot .lp-brand { font-size: 15px; }
+
+/* Phones: two features per group until "See every feature" is pressed, so the page is shorter */
+.lp-more-toggle { position: absolute; opacity: 0; pointer-events: none; }
+.lp-more { display: none; }
+@media (max-width: 640px) {
+  .lp-groups .lp-group li:nth-child(n + 3) { display: none; }
+  .lp-more { display: inline-flex; justify-self: start; margin-top: 8px; }
+  .lp-more-toggle:checked ~ .lp-groups .lp-group li { display: grid; }
+  .lp-more-toggle:checked ~ .lp-more { display: none; }
+}

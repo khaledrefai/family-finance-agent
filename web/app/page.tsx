@@ -162,7 +162,7 @@ export default function LandingPage() {
               </p>
               <div className="lp-cta">
                 <a href="#demo" className="btn">Try the demo family</a>
-                <Link href="/login" className="btn quiet">Log in</Link>
+                <Link href="/signup" className="btn quiet">Start your family</Link>
               </div>
               <p className="lp-small">A prototype with demo money. No bank connection and no real payments.</p>
             </div>
@@ -278,6 +278,8 @@ export default function LandingPage() {
             </div>
             <div className="lp-parents">
               <PhoneToday />
+              {/* On a phone each group shows its first two; the toggle opens the rest (no script needed) */}
+              <input type="checkbox" id="lp-more" className="lp-more-toggle" />
               <div className="lp-groups">
                 {FEATURES.map((g) => (
                   <div className="lp-group" key={g.title}>
@@ -296,6 +298,7 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
+              <label htmlFor="lp-more" className="lp-more btn quiet">See every feature</label>
             </div>
           </div>
         </section>

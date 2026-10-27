@@ -20,7 +20,7 @@ const ACTIONS: Record<Finding["kind"], { yes: "DUPLICATE" | "ADD"; yesLabel: str
   SUBSCRIPTION: { yes: "ADD", yesLabel: "Add it", no: "IGNORE", noLabel: "Ignore", done: "Added to your commitments. The plan counts it from now on." },
 };
 
-export function Uploads({ enabled }: { enabled: boolean }) {
+export function Uploads({ enabled, demo }: { enabled: boolean; demo: boolean }) {
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const [kind, setKind] = useState<"RECEIPT" | "STATEMENT">("RECEIPT");
@@ -104,10 +104,11 @@ export function Uploads({ enabled }: { enabled: boolean }) {
               {kind === "RECEIPT" ? "Take a photo or choose a file" : "Choose the statement (PDF or CSV)"}
             </button>
             <p className="est">Photos and PDFs are read by the AI. A bank's CSV export is read exactly, even with the AI off. Up to 5 MB.</p>
-            <div className="chips" style={{ marginBottom: 0 }}>
+            {/* The demo files are dated and priced for the demo family; a real family uploads its own */}
+            {demo && <div className="chips" style={{ marginBottom: 0 }}>
               <button type="button" className="chip" disabled={!!busy} onClick={async () => send(await docs.sampleFile("receipt"), "RECEIPT")}>Try the demo receipt</button>
               <button type="button" className="chip" disabled={!!busy} onClick={async () => send(await docs.sampleFile("statement"), "STATEMENT")}>Try the demo Visa statement</button>
-            </div>
+            </div>}
             {busy && <p className="muted" role="status">{busy}</p>}
             {error && <p className="error" role="alert">{error}</p>}
           </div>

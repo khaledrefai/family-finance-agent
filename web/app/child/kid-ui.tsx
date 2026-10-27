@@ -99,7 +99,7 @@ export function GoalJar({ percent, size = 140 }: { percent: number; size?: numbe
   );
 }
 
-// The coin buddy who says the nudges. Same face for every kid.
+// The coin face. The camel says the nudges now, so the kids meet one mascot; this face is not on their screens.
 export function Buddy({ size = 56 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" className="buddy">
@@ -121,7 +121,7 @@ export function Buddy({ size = 56 }: { size?: number }) {
 export function BuddySays({ children }: { children: React.ReactNode }) {
   return (
     <div className="buddy-says">
-      <Buddy />
+      <Camel size={64} />
       <div className="bubble">{children}</div>
     </div>
   );

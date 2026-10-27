@@ -159,7 +159,9 @@ public final class StarterBudgetEngine {
                 + text(month) + " a month), rounded up to the next AED 1,000");
     }
 
+    /** Whole dirhams in a sentence ("AED 4,593", not "AED 4,593.33"); the exact amounts stay in the fields. */
     private static String text(Money m) {
-        return MoneyView.of(m).text();
+        long whole = m.toMajor().setScale(0, java.math.RoundingMode.HALF_UP).longValueExact();
+        return m.currency() + " " + String.format(java.util.Locale.ROOT, "%,d", whole);
     }
 }

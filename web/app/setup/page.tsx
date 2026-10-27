@@ -2,9 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { api, ApiError, getToken, Me, MemberView } from "@/lib/api";
-import { Buckets, core, fromBuckets, Goal, MoneyView, PlanOptions } from "@/lib/live";
+import { aed, api, ApiError, getToken, Me, MemberView } from "@/lib/api";
+import { Buckets, core, day, fromBuckets, Goal, MoneyView, PlanOptions } from "@/lib/live";
 import { CommitmentView, IncomeView, setupApi, SetupStatus, Starter, typed } from "@/lib/setup";
+import { MemberForm } from "../member-form";
 import { BucketFlow, Loading, TRUST } from "../ui";
 
 // First-run setup for a new family, one step at a time:
@@ -16,7 +17,6 @@ import { BucketFlow, Loading, TRUST } from "../ui";
 // Every amount shown comes from the core. The Planner only drafts the buckets and writes the words; a parent confirms.
 
 const TITLES = ["Who is in the family", "Money coming in", "Big regular bills", "First budgets", "Your first plan"];
-const AGES = Array.from({ length: 12 }, (_, k) => k + 6);
 const AGE_BAND: Record<string, string> = { CHILD_6_9: "6 to 9", PRETEEN_10_12: "10 to 12", TEEN_13_17: "13 to 17" };
 
 function today(plusDays = 0) {
@@ -128,102 +128,6 @@ function FamilyStep({ me, onNext }: { me: Me; onNext: () => void }) {
   );
 }
 
-function MemberForm({ role, onCancel, onAdded }: { role: "PARENT" | "CHILD"; onCancel: () => void; onAdded: () => void }) {
-  const kid = role === "CHILD";
-  const [f, setF] = useState({ displayName: "", age: "", username: "", password: "", email: "", goalName: "", goalPrice: "" });
-  const [consent, setConsent] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      await setupApi.addMember({
-        role, displayName: f.displayName, username: f.username, password: f.password,
-        ...(kid
-          ? { age: Number(f.age), consent, goalName: f.goalName || undefined, goalPrice: f.goalPrice || undefined }
-          : { email: f.email || undefined }),
-      });
-      onAdded();
-    } catch (err) {
-      setError((err as Error).message);
-      setBusy(false);
-    }
-  }
-
-  return (
-    <form className="panel setup-form" onSubmit={submit}>
-      <strong>{kid ? "Add a child" : "Add the other parent"}</strong>
-      <div className={kid ? "two" : undefined}>
-        <label>
-          First name
-          <input value={f.displayName} onChange={set("displayName")} maxLength={80} required />
-        </label>
-        {kid && (
-          <label>
-            Age
-            <select value={f.age} onChange={set("age")} required>
-              <option value="" disabled>Pick</option>
-              {AGES.map((a) => <option key={a} value={a}>{a}</option>)}
-            </select>
-          </label>
-        )}
-      </div>
-      <div className="two">
-        <label>
-          Username
-          <input value={f.username} onChange={set("username")} autoCapitalize="none" maxLength={30} required
-            placeholder={kid ? "mariam.n" : "khalid.n"} />
-        </label>
-        <label>
-          Password
-          <input type="password" value={f.password} onChange={set("password")} autoComplete="new-password"
-            minLength={kid ? 6 : 8} required />
-        </label>
-      </div>
-      <span className="muted" style={{ fontSize: 13, marginTop: -6 }}>
-        {kid ? "At least 6 characters. Give them the username and password yourself." : "At least 8 characters. They can log in straight away."}
-      </span>
-      {!kid && (
-        <label>
-          Their email (optional)
-          <input type="email" value={f.email} onChange={set("email")} maxLength={160} />
-        </label>
-      )}
-      {kid && (
-        <>
-          <div className="two">
-            <label>
-              Saving for (optional)
-              <input value={f.goalName} onChange={set("goalName")} placeholder="A bike" maxLength={120} />
-            </label>
-            <label>
-              It costs (AED)
-              <input inputMode="decimal" value={f.goalPrice} onChange={set("goalPrice")} placeholder="450" maxLength={12}
-                required={!!f.goalName} />
-            </label>
-          </div>
-          <label className="check">
-            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} required />
-            <span>
-              I am this child&apos;s parent. I agree to them having their own account, and to the app&apos;s AI reading what
-              they type so it can answer them. We keep only their first name, age group and login.
-            </span>
-          </label>
-        </>
-      )}
-      <div className="actions">
-        <button type="submit" disabled={busy}>{busy ? "Adding…" : "Add"}</button>
-        <button type="button" className="text" onClick={onCancel}>Cancel</button>
-      </div>
-      {error && <p className="error" role="alert">{error}</p>}
-    </form>
-  );
-}
-
 // ---------------------------------------------------------------- 2. income
 
 function IncomeStep({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
@@ -270,8 +174,8 @@ function IncomeStep({ onNext, onBack }: { onNext: () => void; onBack: () => void
           {incomes.map((i) => (
             <div className="setup-line" key={i.id}>
               <span><b>{i.name}</b>{i.memberName ? ` · ${i.memberName}` : ""}</span>
-              <b className="num">{i.plannedMonthly.text}</b>
-              <span className="muted">{i.kind === "VARIABLE" ? "Commission or sales, planned on a careful month" : "Fixed, every month"} · next on {i.nextOn}</span>
+              <b className="num">{aed(i.plannedMonthly.minor)}</b>
+              <span className="muted">{i.kind === "VARIABLE" ? "Commission or sales, planned on a careful month" : "Fixed, every month"} · next on {day(i.nextOn)}</span>
             </div>
           ))}
         </section>
@@ -361,7 +265,7 @@ function BankBalance({ parents }: { parents: MemberView[] }) {
       {banks.length === 0 && (
         <>
           <span className="muted" style={{ fontSize: 14, marginTop: -6 }}>
-            Typed by hand, never linked to your bank. It lets the app say what is free until the next pay day.
+            Typed by hand, never linked to your bank. Without it, Today can only show the month, not what is free until pay day.
           </span>
           <div className="two">
             <label>
@@ -433,7 +337,7 @@ function BillsStep({ onNext, onBack }: { onNext: () => void; onBack: () => void 
             <div className="setup-line" key={b.id}>
               <span><b>{b.name}</b> · {b.kindLabel}</span>
               <b className="num">{b.amount.text}</b>
-              <span className="muted">{HOW_OFTEN[b.frequency] ?? b.frequency} · next on {b.nextDueOn}</span>
+              <span className="muted">{HOW_OFTEN[b.frequency] ?? b.frequency} · next on {day(b.nextDueOn)}</span>
             </div>
           ))}
         </section>
@@ -757,8 +661,8 @@ function BucketsDraft({ buckets, words }: { buckets: Buckets; words: string | nu
         {buckets.buckets.map((b) => (
           <div className="setup-line" key={b.kind}>
             <span><b>{b.label}</b></span>
-            <b className="num">{b.amount.text}</b>
-            {b.items.length > 0 && <span className="muted">{b.items.map((i) => `${i.label} ${i.amount.text}`).join(" · ")}</span>}
+            <b className="num">{aed(b.amount.minor)}</b>
+            {b.items.length > 0 && <span className="muted">{b.items.map((i) => `${i.label} ${aed(i.amount.minor)}`).join(" · ")}</span>}
           </div>
         ))}
       </div>
