@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { aed, api, MemberView } from "@/lib/api";
-import { Assessment, core, dayLongMonth, dayMonth, useAccounts } from "@/lib/live";
+import { Assessment, core, dayLongMonth, dayMonth, jarLabel, useAccounts } from "@/lib/live";
 import { cardCheck, headphones } from "@/lib/sample";
 import { Chit } from "../../chit";
 import { AccountPicker, Back, CardWarning, Loading, SampleNote, WhySheet } from "../../ui";
@@ -71,7 +71,7 @@ function Why() {
   const kidSide = a?.kid
     ? [
         { label: "Price asked", value: a.amount.text },
-        ...(a.kid.jar && a.kid.jarName ? [{ label: `From the ${a.kid.jarName.toLowerCase()} jar first`, value: a.kid.jar.text }] : []),
+        ...(a.kid.jar && a.kid.jarName ? [{ label: `From the ${jarLabel(a.kid.jarName)} jar first`, value: a.kid.jar.text }] : []),
         { label: "In the demo wallet", value: a.kid.wallet.text },
         { label: "Wallet after this", value: a.kid.walletAfter.text, over: !a.kid.walletCovers },
       ]

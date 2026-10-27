@@ -44,9 +44,9 @@ class WeeklyPlanEngineTest {
     }
 
     @Test
-    void pay_day_inside_the_week_gives_all_of_it_and_rounds_down_to_ten() {
+    void pay_day_inside_the_week_gives_all_of_it_to_the_dirham_like_today() {
         WeekPlan p = WeeklyPlanEngine.plan(SUNDAY, "AED", untilPay(1234, 4), List.of(), budgets(25));
-        assertThat(p.freeThisWeek().text()).isEqualTo("AED 1,230");
+        assertThat(p.freeThisWeek().text()).isEqualTo("AED 1,234");
         assertThat(p.headline()).endsWith("until pay day on 29 Oct.");
     }
 

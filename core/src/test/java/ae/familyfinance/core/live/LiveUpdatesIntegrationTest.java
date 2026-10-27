@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -42,6 +45,8 @@ class LiveUpdatesIntegrationTest extends PostgresIntegrationTest {
     @Autowired JdbcTemplate jdbc;
     @Autowired OutboxDispatcher dispatcher;
     @Autowired AlertService alerts;
+    @Autowired JdbcClient db;
+    @Autowired PlatformTransactionManager tx;
 
     @BeforeEach
     void drain() {
@@ -324,5 +329,25 @@ class LiveUpdatesIntegrationTest extends PostgresIntegrationTest {
                         .content("{\"email\":\"layla@example.com\"}"))
                 .andExpect(status().isForbidden());
         jdbc.update("UPDATE member SET email = 'sara@demo.local' WHERE id = ?", DemoFamily.SARA);
+    }
+
+    @Test
+    void push_keys_are_made_at_start_so_a_read_only_request_can_use_them() {
+        // A database with no keys yet, like a brand-new server. Put the real ones back afterwards.
+        List<Map<String, Object>> saved = jdbc.queryForList("SELECT key, value FROM app_setting WHERE key LIKE 'vapid.%'");
+        jdbc.update("DELETE FROM app_setting WHERE key LIKE 'vapid.%'");
+        try {
+            VapidKeys keys = new VapidKeys(db, "", "");
+            keys.warmUp();
+            TransactionTemplate readOnly = new TransactionTemplate(tx);
+            readOnly.setReadOnly(true);
+            String publicKey = readOnly.execute(s -> keys.publicKey());
+            assertThat(publicKey).isNotBlank();
+            assertThat(jdbc.queryForObject("SELECT value FROM app_setting WHERE key = 'vapid.public'", String.class))
+                    .isEqualTo(publicKey);
+        } finally {
+            jdbc.update("DELETE FROM app_setting WHERE key LIKE 'vapid.%'");
+            saved.forEach(r -> jdbc.update("INSERT INTO app_setting (key, value) VALUES (?, ?)", r.get("key"), r.get("value")));
+        }
     }
 }

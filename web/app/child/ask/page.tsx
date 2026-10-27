@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
+import { jarLabel } from "@/lib/live";
 import { Comparison, findPrices, Offer } from "@/lib/prices";
 import { AgentChat } from "../../agent-chat";
 import { PriceResults, useSearchStep } from "../../price-results";
@@ -195,7 +196,7 @@ export default function ChildAsk() {
             <p className="turn-agent">
               The best price I found is <b>{c.best.total.text}</b> at {c.best.store}.
               {wallet && (wallet.jar && wallet.jarName
-                ? ` Your ${wallet.jarName.toLowerCase()} jar has ${wallet.jar.text} and your wallet ${wallet.wallet.text}${wallet.walletCovers ? ": together enough, and the jar is used first." : ", so you'd need a bit more saving."}`
+                ? ` Your ${jarLabel(wallet.jarName)} jar has ${wallet.jar.text} and your wallet ${wallet.wallet.text}${wallet.walletCovers ? ": together enough, and the jar is used first." : ", so you'd need a bit more saving."}`
                 : wallet.walletCovers ? ` Your wallet has ${wallet.wallet.text}, enough for this.` : ` Your wallet has ${wallet.wallet.text}, so you'd need some help or a bit more saving.`)}
               {c.assessment?.needsParent ? " A parent says yes first." : ""}
             </p>

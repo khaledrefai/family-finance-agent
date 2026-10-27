@@ -373,7 +373,7 @@ public final class MonthSummaryEngine {
         }
         if (goal != null) {
             highlights.add(goal.percent() >= 100 ? "You reached your " + lower(goal.name()) + " goal!"
-                    : "Your " + lower(goal.name()) + " jar is " + goal.percent() + "% full.");
+                    : "Your " + jar(goal.name()) + " jar is " + goal.percent() + "% full.");
             facts.add("Own goal " + goal.name() + ": " + goal.percent() + "% full, " + goal.saved().text() + " of "
                       + goal.target().text());
         }
@@ -405,9 +405,9 @@ public final class MonthSummaryEngine {
         if (won) {
             camel = k.name() + ", what a month. You are Saver of the Month"
                     + (goal == null ? "." : goal.percent() >= 100 ? ", and you reached your " + lower(goal.name()) + " goal."
-                       : ", and your " + lower(goal.name()) + " jar is " + goal.percent() + "% full.");
+                       : ", and your " + jar(goal.name()) + " jar is " + goal.percent() + "% full.");
         } else if (goal != null && goal.percent() > 0) {
-            camel = k.name() + ", your " + lower(goal.name()) + " jar is " + goal.percent() + "% full. Every dirham you keep gets it closer.";
+            camel = k.name() + ", your " + jar(goal.name()) + " jar is " + goal.percent() + "% full. Every dirham you keep gets it closer.";
         } else if (logged > 0) {
             camel = k.name() + ", thank you for telling me what you bought. Want to pick a goal to save for next month?";
         } else {
@@ -492,6 +492,11 @@ public final class MonthSummaryEngine {
     }
 
     /** "Summer trip" -> "summer trip", but "Robux gift card" keeps its brand ("Robux"), and "DEWA" stays. */
+    /** "A scooter" -> "scooter", so a line reads "Your scooter jar", not "Your a scooter jar". */
+    static String jar(String name) {
+        return lower(name.replaceFirst("(?i)^(a|an|the|my)\\s+(?=\\S)", ""));
+    }
+
     static String lower(String name) {
         if (name.isEmpty()) {
             return name;

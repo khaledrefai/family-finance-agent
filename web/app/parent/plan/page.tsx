@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { aed } from "@/lib/api";
-import { core, Goal, PlanOptions, useAccounts, useBuckets, useMoney } from "@/lib/live";
+import { core, Goal, PlanOptions, shortText, useAccounts, useBuckets, useMoney } from "@/lib/live";
 import { planOptions as samplePlanOptions, planSplit, planSteps as sampleSteps } from "@/lib/sample";
 import { Loading, Masthead, SampleNote, StackBar, TRUST, WhySheet } from "../../ui";
 import { useSession } from "../../use-session";
@@ -20,7 +20,7 @@ function toOptions(o: PlanOptions): Option[] {
     monthlyMinor: x.monthly.minor,
     monthlyText: x.monthly.text,
     text: `Ready by ${x.readyMonth}.${x.meetsDate ? "" : " Misses the date you set."} ${
-      x.fits ? `Leaves ${x.spareInTightest.text} spare in ${x.tightestMonth}, the tightest month.` : `Does not fit in ${x.tightestMonth}.`}`,
+      x.fits ? `Leaves ${x.spareInTightest.text} spare in ${x.tightestMonth}, the tightest month.` : shortText(x)}`,
     pick: x.id === o.recommended,
   }));
 }

@@ -163,6 +163,10 @@ class MonthSummaryEngineTest {
         assertThat(MonthSummaryEngine.lower("Summer trip")).isEqualTo("summer trip");
         assertThat(MonthSummaryEngine.lower("Robux gift card")).isEqualTo("Robux gift card");
         assertThat(MonthSummaryEngine.lower("DEWA bill")).isEqualTo("DEWA bill");
+        assertThat(MonthSummaryEngine.jar("A scooter")).isEqualTo("scooter");
+        assertThat(MonthSummaryEngine.jar("an iPad")).isEqualTo("iPad");
+        assertThat(MonthSummaryEngine.jar("Headphones")).isEqualTo("headphones");
+        assertThat(MonthSummaryEngine.jar("A")).isEqualTo("a");
         assertThat(MonthSummaryEngine.names(List.of("a", "b", "c"))).isEqualTo("a, b and c");
     }
 }
