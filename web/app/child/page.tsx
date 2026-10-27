@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { agent, aed } from "@/lib/api";
 import { useLiveEvents } from "@/lib/live-stream";
 import { notifyApi, Wallet } from "@/lib/push";
+import { mealsApi, SavedWeek } from "@/lib/meals";
 import { outingsApi, SavedPlan } from "@/lib/outings";
 import { kids } from "@/lib/sample";
 import { Chit } from "../chit";
@@ -14,8 +15,8 @@ import { useSession } from "../use-session";
 import { artFor, Avatar, BuddySays, Camel, GoalArt, GoalJar, SmallStar } from "./kid-ui";
 
 // Kid Home: my goal jar, my demo wallet, my requests (a parent's answer lands here), the coin buddy's nudge,
-// the family's next outings (once a parent saves a plan: the places only, never the prices), and where my pocket
-// money went.
+// the family's next outings and this week's dinners (once a parent saves a plan: never the prices), and where my
+// pocket money went.
 // Kids only ever see their own money. Requests, the wallet and the nudge are live: when a parent says yes, the
 // answer and the new wallet balance arrive on this screen by themselves. Goal and the chart are still sample
 // figures until the goals endpoint exists. Adam (6 to 9) gets bigger type and fewer words.
@@ -51,6 +52,14 @@ export default function ChildHome() {
     if (me) loadFun();
   }, [me, loadFun]);
   useLiveEvents(["OUTINGS_PLANNED"], loadFun, !!me);
+  const [dinners, setDinners] = useState<SavedWeek | null>(null);
+  const loadDinners = useCallback(() => {
+    mealsApi.saved().then(setDinners).catch(() => {});
+  }, []);
+  useEffect(() => {
+    if (me) loadDinners();
+  }, [me, loadDinners]);
+  useLiveEvents(["MEALS_PLANNED"], loadDinners, !!me);
   useEffect(() => {
     if (!changed) return;
     const t = setTimeout(() => setChanged(false), 2400);
@@ -138,6 +147,23 @@ export default function ChildHome() {
         </section>
       )}
 
+      {dinners && (
+        <section className="card" style={{ display: "grid", gap: 10 }} aria-label="Dinners this week">
+          <div className="row" style={{ padding: 0, alignItems: "center" }}>
+            <p className="card-title" style={{ margin: 0 }}>Dinners this week</p>
+            <Camel size={young ? 64 : 56} />
+          </div>
+          <ul className="meal-list">
+            {dinners.nights.filter((n) => n.date >= today()).slice(0, young ? 3 : 7).map((n, i) => (
+              <li key={n.date} className={i === 0 && n.date === today() ? "today" : undefined}>
+                <span className="muted">{n.date === today() ? "Tonight" : n.label.split(" ")[0]}</span>
+                <b>{n.kind === "COOK" ? n.name : `Order in: ${n.name}`}</b>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section>
         <h2 className="first">My requests</h2>
         {requests.length === 0 && <p className="empty">When you ask for something, it shows up here with your parent's answer.</p>}
@@ -171,4 +197,9 @@ export default function ChildHome() {
       {kid && <SampleNote />}
     </div>
   );
+}
+
+/** Today's date in the UAE, as the core writes dates (2026-10-27). */
+function today(): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dubai" }).format(new Date());
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { aed, api, MemberView, plain } from "@/lib/api";
 import { FamilyRule, rulesApi } from "@/lib/live";
+import { FoodProfile, mealsApi } from "@/lib/meals";
 import { kids } from "@/lib/sample";
 import { AgentChat } from "../../agent-chat";
 import { NotifyCard } from "../../live-ui";
@@ -126,16 +127,98 @@ export default function FamilyPage() {
 
       <NotifyCard parent />
 
-      <section className="card" style={{ display: "grid", gap: 6 }}>
-        <p className="card-title">Food profiles</p>
-        <p style={{ fontSize: 14 }}>Whole family: halal only</p>
-        <p style={{ fontSize: 14 }}>Adam: peanut allergy</p>
-        <p className="muted" style={{ marginTop: 4 }}>
-          Used for ask-to-buy. The app flags products but never certifies them: always check the halal mark and the pack label.
-        </p>
-      </section>
+      <FoodProfiles />
 
       <SampleNote />
     </div>
   );
+}
+
+// Who eats what: halal, vegetarian, vegan and foods someone doesn't like, used by the weekly dinners. Allergies are
+// family rules above, so one "no peanuts for Adam" covers ask-to-buy and dinners.
+function FoodProfiles() {
+  const [profiles, setProfiles] = useState<FoodProfile[] | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<Record<string, { halal: boolean; vegetarian: boolean; vegan: boolean; dislikes: string }>>({});
+  const [note, setNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    mealsApi.board().then((b) => setProfiles(b.profiles)).catch(() => setProfiles([]));
+  }, []);
+
+  function edit() {
+    const d: typeof draft = {};
+    profiles?.forEach((p) => { d[p.memberId] = { halal: p.halal, vegetarian: p.vegetarian, vegan: p.vegan, dislikes: p.dislikes.join(", ") }; });
+    setDraft(d);
+    setEditing(true);
+    setNote(null);
+  }
+
+  async function save() {
+    try {
+      const next = await mealsApi.profiles(Object.entries(draft).map(([memberId, v]) => ({ memberId, ...v })));
+      setProfiles(next);
+      setEditing(false);
+      setNote("Saved. The weekly dinners follow it from now on.");
+    } catch (e) {
+      setNote((e as Error).message);
+    }
+  }
+
+  const set = (id: string, change: Partial<(typeof draft)[string]>) => setDraft((d) => ({ ...d, [id]: { ...d[id], ...change } }));
+
+  return (
+    <section className="card" id="food" style={{ display: "grid", gap: 8 }}>
+      <div className="row" style={{ padding: 0 }}>
+        <span className="card-title">Food profiles</span>
+        {!editing && profiles && profiles.length > 0 && <button type="button" className="text" onClick={edit}>Change</button>}
+      </div>
+      {profiles === null && <p className="muted">Loading…</p>}
+      {!editing && profiles?.map((p) => (
+        <p key={p.memberId} style={{ fontSize: 14, margin: 0 }}>
+          <b>{p.name}</b>: {describe(p)}
+        </p>
+      ))}
+      {editing && profiles?.map((p) => (
+        <fieldset key={p.memberId} className="food-edit">
+          <legend><b>{p.name}</b></legend>
+          <div className="chips" style={{ marginBottom: 0 }}>
+            {(["halal", "vegetarian", "vegan"] as const).map((k) => (
+              <button key={k} type="button" className={`chip${draft[p.memberId]?.[k] ? " on" : ""}`} aria-pressed={!!draft[p.memberId]?.[k]}
+                onClick={() => set(p.memberId, k === "vegan" && !draft[p.memberId]?.vegan ? { vegan: true, vegetarian: true } : { [k]: !draft[p.memberId]?.[k] })}>
+                {k[0].toUpperCase() + k.slice(1)}
+              </button>
+            ))}
+          </div>
+          <label style={{ fontSize: 14 }}>
+            Doesn&apos;t like
+            <input value={draft[p.memberId]?.dislikes ?? ""} placeholder="mushrooms, olives" maxLength={200}
+              onChange={(e) => set(p.memberId, { dislikes: e.target.value })} />
+          </label>
+          {p.allergies.length > 0 && <span className="muted" style={{ fontSize: 13 }}>Allergy rule: no {p.allergies.join(", ")}</span>}
+        </fieldset>
+      ))}
+      {editing && (
+        <div className="actions">
+          <button type="button" onClick={save}>Save food profiles</button>
+          <button type="button" className="text" onClick={() => setEditing(false)}>Cancel</button>
+        </div>
+      )}
+      {note && <p className="muted" role="status" style={{ margin: 0 }}>{note}</p>}
+      <p className="muted" style={{ margin: 0 }}>
+        Used for the weekly dinners; allergies are family rules, used for ask-to-buy too. The app flags food but never certifies it:
+        always check the halal mark and the pack label.
+      </p>
+    </section>
+  );
+}
+
+function describe(p: FoodProfile): string {
+  const parts: string[] = [];
+  if (p.halal) parts.push("halal");
+  if (p.vegan) parts.push("vegan");
+  else if (p.vegetarian) parts.push("vegetarian");
+  p.allergies.forEach((a) => parts.push(`no ${a} (allergy rule)`));
+  if (p.dislikes.length) parts.push(`doesn't like ${p.dislikes.join(", ")}`);
+  return parts.length ? parts.join(", ") : "eats anything";
 }

@@ -1,18 +1,25 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { aed } from "@/lib/api";
 import { advice, BudgetMonth, useLive } from "@/lib/live";
-import { budgets, food } from "@/lib/sample";
+import { MealsBoard, mealsApi } from "@/lib/meals";
+import { budgets } from "@/lib/sample";
 import { BudgetBar, Loading, MonthColumns, SampleNote } from "../../../ui";
 import { useSession } from "../../../use-session";
 import { MoneyHeader } from "../money-tabs";
 
 // Budgets: spent so far against each limit, and six months of everyday spending against the budget.
-// The bars and the overspend alerts are live from the budget engine; the food week and the history are samples.
+// The bars and the overspend alerts are live from the budget engine, and this week's food from the saved dinner plan;
+// the history is a sample.
 export default function BudgetsPage() {
   const { me } = useSession("PARENT");
   const { data: month, live } = useLive<BudgetMonth | null>(() => advice.budgets(), null, !!me);
+  const [meals, setMeals] = useState<MealsBoard | null>(null);
+  useEffect(() => {
+    if (me) mealsApi.board().then(setMeals).catch(() => {});
+  }, [me]);
   if (!me) return <Loading />;
   const h = budgets.history;
   const bars = live && month
@@ -36,19 +43,7 @@ export default function BudgetsPage() {
         <p className="trust" style={{ marginTop: 6 }}>All amounts in AED, from receipts, statements and payments you added.</p>
       </section>
 
-      <section className="card" style={{ display: "grid", gap: 6 }}>
-        <div className="row" style={{ padding: 0 }}>
-          <span className="card-title">This week's food</span>
-          <span className="muted">{aed(food.budgetMinor)}</span>
-        </div>
-        <p className="muted">{food.week}</p>
-        <div className="rows">
-          {food.lines.map((l) => (
-            <div className="row" key={l.label}><span>{l.label}</span><b>{aed(l.amountMinor)}</b></div>
-          ))}
-        </div>
-        <p style={{ fontSize: 14 }}>{food.note}</p>
-      </section>
+      {meals && <FoodWeek meals={meals} />}
 
       <section className="card">
         <p className="card-title">Everyday spending, last 6 months</p>
@@ -69,5 +64,37 @@ export default function BudgetsPage() {
       </Link>
       <SampleNote />
     </div>
+  );
+}
+
+// This week's food: the saved dinner plan's shopping list against the week's grocery money, and its delivery nights
+function FoodWeek({ meals }: { meals: MealsBoard }) {
+  const saved = meals.saved;
+  const deliveries = saved ? saved.nights.filter((n) => n.kind === "DELIVERY").length : 0;
+  return (
+    <section className="card" style={{ display: "grid", gap: 6 }}>
+      <div className="row" style={{ padding: 0 }}>
+        <span className="card-title">This week&apos;s food</span>
+        {meals.groceryWeek && <span className="muted">{meals.groceryWeek.text} for groceries</span>}
+      </div>
+      {saved ? (
+        <>
+          <p className="muted">{saved.weekLabel}</p>
+          <div className="rows">
+            <div className="row"><span>Dinner shopping list</span><b>{saved.shopping?.text}</b></div>
+            {saved.plan?.weekLeft && <div className="row"><span>Left for breakfasts, lunch boxes and the house</span><b>{saved.plan.weekLeft.text}</b></div>}
+            {deliveries > 0 && (
+              <div className="row"><span>Delivery {deliveries === 1 ? "night" : "nights"}, {deliveries} planned (eating out)</span><b>{saved.delivery?.text}</b></div>
+            )}
+          </div>
+          <Link href="/parent/plan/meals" className="link">See the week&apos;s dinners</Link>
+        </>
+      ) : (
+        <>
+          <p style={{ fontSize: 14, margin: 0 }}>No dinners planned for this week yet. A plan picks dinners that suit everyone and makes the shopping list.</p>
+          <Link href="/parent/plan/meals" className="link">Plan this week&apos;s dinners</Link>
+        </>
+      )}
+    </section>
   );
 }

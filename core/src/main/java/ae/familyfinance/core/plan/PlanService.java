@@ -11,11 +11,13 @@ import ae.familyfinance.core.plan.CashflowEngine.Dated;
 import ae.familyfinance.core.plan.CashflowEngine.GoalFact;
 import ae.familyfinance.core.plan.MoneyFacts.Snapshot;
 import ae.familyfinance.core.plan.PlanOptionsEngine.PlanOptions;
+import ae.familyfinance.core.plan.SavingsCalculator.Projection;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -87,6 +89,17 @@ public class PlanService {
     }
 
     public record EffectLine(UUID goalId, String goal, String fullBefore, String fullAfter, int monthsSooner) {
+    }
+
+    /** What the calculator starts from: a family goal, the Set aside for investing bucket, or only what was typed. */
+    public enum CalculatorFrom { GOAL, INVEST_ASIDE, TYPED }
+
+    /** Every field is optional: what is left out comes from the goal or the bucket. */
+    public record CalculatorAsk(UUID goalId, boolean fromInvestBucket, String start, String monthly, String rate,
+                                Integer years, String target) {
+    }
+
+    public record Calculator(CalculatorFrom from, UUID goalId, String goalName, String fromLine, Projection projection) {
     }
 
     private final MoneyFacts facts;
@@ -428,6 +441,84 @@ public class PlanService {
         }
         return new OneOffEffect(MoneyView.of(amount), lines,
                 "One-off money is never planned in advance. These show each goal if all of it went there.");
+    }
+
+    // ------------------------------------------------------------------ long-term savings calculator
+
+    /**
+     * What saving the same amount each month comes to over 1, 5 and 10 years at a rate the parent picks.
+     * Starts from a goal (saved so far, its monthly amount, its target) or the Set aside for investing bucket;
+     * anything typed replaces those. Education only: the rate is an example and no product is ever named.
+     */
+    @Transactional(readOnly = true)
+    public Calculator calculator(CurrentMember me, CalculatorAsk ask) {
+        requireParent(me);
+        Snapshot s = facts.load(me.familyId());
+        String cur = s.currency();
+        CalculatorFrom from = CalculatorFrom.TYPED;
+        Money start = Money.zero(cur);
+        Money monthly = Money.zero(cur);
+        Money target = null;
+        String goalName = null;
+        String fromLine = null;
+        if (ask.goalId() != null) {
+            GoalFact g = goal(s, ask.goalId());
+            from = CalculatorFrom.GOAL;
+            goalName = g.name();
+            start = new Money(g.savedMinor(), cur);
+            monthly = g.monthlyMinor() == null ? Money.zero(cur) : new Money(g.monthlyMinor(), cur);
+            target = new Money(g.targetMinor(), cur);
+            fromLine = g.name() + ": " + MoneyView.of(start).text() + " saved of " + MoneyView.of(target).text() + ", "
+                    + (monthly.isPositive() ? MoneyView.of(monthly).text() + " a month" : "nothing a month yet") + ".";
+        } else if (ask.fromInvestBucket()) {
+            from = CalculatorFrom.INVEST_ASIDE;
+            monthly = buckets(me).buckets().stream().filter(b -> b.kind() == BucketKind.INVEST_ASIDE).findFirst()
+                    .map(b -> new Money(b.amount().minor(), cur)).orElse(Money.zero(cur));
+            fromLine = "Set aside for investing: " + MoneyView.of(monthly).text() + " a month in your money buckets.";
+        }
+        start = orZero(ask.start(), cur, "starting amount", start);
+        monthly = orZero(ask.monthly(), cur, "amount a month", monthly);
+        if (ask.target() != null && !ask.target().isBlank()) {
+            target = Amounts.parse(ask.target(), cur, "target");
+        }
+        // A goal with nothing saved and nothing a month yet still answers "how much a month to get there"
+        if (!start.isPositive() && !monthly.isPositive() && target == null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Give an amount a month or a starting amount");
+        }
+        int years = ask.years() == null ? SavingsCalculator.DEFAULT_YEARS : ask.years();
+        if (years < 1 || years > SavingsCalculator.MAX_YEARS) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Pick from 1 to " + SavingsCalculator.MAX_YEARS + " years");
+        }
+        Projection p = SavingsCalculator.project(new SavingsCalculator.Input(start, monthly, rateBp(ask.rate()), years, target));
+        return new Calculator(from, ask.goalId(), goalName, fromLine, p);
+    }
+
+    /** "5", "4.5%", "4.25" as basis points. Left out, the example rate is 5%. */
+    static int rateBp(String text) {
+        if (text == null || text.isBlank()) {
+            return 500;
+        }
+        BigDecimal rate;
+        try {
+            rate = new BigDecimal(text.trim().replaceFirst("(?i)\\s*(a|per) year$", "").replaceFirst("\\s*%$", ""));
+        } catch (NumberFormatException e) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "I couldn't read the rate \"" + text + "\"");
+        }
+        if (rate.stripTrailingZeros().scale() > 2) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Give the rate with at most 2 decimals, like 4.25");
+        }
+        if (rate.signum() < 0 || rate.movePointRight(2).compareTo(BigDecimal.valueOf(SavingsCalculator.MAX_RATE_BP)) > 0) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Pick a rate from 0% to "
+                    + SavingsCalculator.rateText(SavingsCalculator.MAX_RATE_BP) + " a year");
+        }
+        return rate.movePointRight(2).intValueExact();
+    }
+
+    private static Money orZero(String text, String cur, String what, Money fallback) {
+        if (text == null || text.isBlank()) {
+            return fallback;
+        }
+        return text.trim().matches("0+([.]0+)?") ? Money.zero(cur) : Amounts.parse(text, cur, what);
     }
 
     // ------------------------------------------------------------------ money buckets

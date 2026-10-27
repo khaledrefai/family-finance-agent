@@ -11,7 +11,7 @@ from .graph import orchestrator
 from .spend_story import nudge
 from .core_client import CoreError, WaysToSave
 from .ways_to_save import write as write_ways_to_save
-from . import outings, shopper, summary
+from . import meals, outings, shopper, summary
 
 app = FastAPI(title="Family Finance Coach - agent service", version="0.1.0")
 
@@ -101,6 +101,24 @@ def plan_outings(body: OutingsIn, core: CoreClient = Depends(core_for_caller)) -
     when = body.when if body.when in ("THIS_MONTH", "NEXT_MONTH") else None
     plan, reply = outings.plan(core, core.me(), body.text[:300] or "cheaper outings", None, when)
     return OutingsOut(plan=plan, reply=reply)
+
+
+class MealsIn(BaseModel):
+    text: str = ""
+    deliveryDays: list[str] | None = None   # busy nights picked in the app (ISO dates); None = read them from the words
+
+
+class MealsOut(BaseModel):
+    plan: dict | None         # the core's plan as it sent it; the app draws the nights and the list from it
+    reply: str
+
+
+@app.post("/meals", response_model=MealsOut)
+def plan_meals(body: MealsIn, core: CoreClient = Depends(core_for_caller)) -> MealsOut:
+    """'Dinners this week, Tuesday is busy' -> the week's dinners and shopping list. The Planner reads; the core plans."""
+    plan, reply = meals.plan(core, core.me(), body.text[:300] or "plan this week's dinners", None,
+                             body.deliveryDays[:7] if body.deliveryDays is not None else None)
+    return MealsOut(plan=plan, reply=reply)
 
 
 @app.get("/nudge", response_model=NudgeOut)

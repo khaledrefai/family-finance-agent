@@ -574,6 +574,12 @@ class CoreClient:
         _raise_for_core(resp)
         return PlanOptions.model_validate(resp.json())
 
+    def calculator(self, ask: dict) -> dict:
+        """The long-term savings calculator: 1, 5 and 10 years at the parent's example rate. Saves nothing."""
+        resp = self._http.post("/api/plan/calculator", json=ask)
+        _raise_for_core(resp)
+        return resp.json()
+
     def bucket_suggestion(self) -> list[Share]:
         return [Share.model_validate(s) for s in self._get("/api/plan/buckets/suggestion")]
 
@@ -614,6 +620,18 @@ class CoreClient:
     def outings_plan(self, when: str, kinds: list[str] | None = None, keys: list[str] | None = None) -> dict:
         """THIS_MONTH or NEXT_MONTH. `keys` empty: the engine picks, of `kinds`. Else the core checks our pick."""
         resp = self._http.post("/api/outings/plan", json={"when": when, "kinds": kinds or [], "keys": keys or []})
+        _raise_for_core(resp)
+        return resp.json()
+
+    # ------------------------------------------------------------ weekly dinners
+
+    def meals_board(self) -> dict:
+        """The week's nights, the grocery money, who eats what, and the saved recipes with this family's cost."""
+        return self._get("/api/meals")
+
+    def meals_plan(self, keys: list[str] | None = None, delivery_days: list[str] | None = None) -> dict:
+        """Dinners for the cooking nights (empty: the engine picks) and busy nights as ISO dates. The core checks it."""
+        resp = self._http.post("/api/meals/plan", json={"keys": keys or [], "deliveryDays": delivery_days or []})
         _raise_for_core(resp)
         return resp.json()
 

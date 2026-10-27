@@ -56,6 +56,9 @@ class FakeCore:
         self.month_summary = load("month_summary.json")
         self.summary_words: list[dict] = []
         self.summary_months: list[str | None] = []
+        self.meal_plans: list[dict] = []
+        self.meal_headers: list[str] = []
+        self.calculator_bodies: list[dict] = []
 
     def handler(self, request: httpx.Request) -> httpx.Response:
         path = request.url.path
@@ -98,6 +101,9 @@ class FakeCore:
             return httpx.Response(200, json=load("goals.json"))
         if path == "/api/plan/buckets/suggestion":
             return httpx.Response(200, json=load("bucket_suggestion.json"))
+        if path == "/api/plan/calculator":
+            self.calculator_bodies.append(json.loads(request.content))
+            return httpx.Response(200, json=load("calculator_1000_6pc.json"))
         if path == "/api/plan/options":
             return httpx.Response(200, json=load("options_trip.json"))
         if path == "/api/plan/buckets/draft":
@@ -123,6 +129,12 @@ class FakeCore:
                                                            if not f.split(":")[0] in {p["name"] for p in plan["picks"]}
                                                            or f.split(":")[0] in {p["name"] for p in picks}]}
             return httpx.Response(200, json=plan)
+        if path == "/api/meals":
+            return httpx.Response(200, json=load("meals_board.json"))
+        if path == "/api/meals/plan":
+            self.meal_plans.append(json.loads(request.content))
+            self.meal_headers.append(request.headers.get("X-Agent-Run-Id", ""))
+            return httpx.Response(200, json=load("meals_plan.json"))
         if path == "/api/rules/drafts":
             body = json.loads(request.content)
             self.rule_drafts.append(body)

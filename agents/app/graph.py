@@ -17,6 +17,10 @@ Week 6: the Shopper compares prices (shopper.py): it reads what someone wants fr
 and the core searches the shops, ranks the offers by payable total and checks the best one like any request.
 Week 7: the Planner plans cheaper family outings (outings.py): it reads the month and the kind of outing, may pick
 from the core's list, and the core prices them for the family and checks them against the entertainment budget.
+Dinners (2026-10-26): the Planner plans the week's dinners (meals.py): it reads the busy nights and wishes, may pick
+from the core's saved recipes that suit everyone, and the core prices the shopping list and checks the grocery money.
+Savings calculator: the Planner reads a what-if ("AED 1,000 a month at 6% for 15 years") into the core's calculator
+ask (calculator.py) and repeats the core's 1, 5 and 10 year figures. Learning only, no product is ever named.
 Later weeks replace route_message() with an LLM classifier and fill in each agent with tools
 that call the core API (core_client.py). Agents never calculate money themselves.
 """
@@ -28,7 +32,7 @@ from typing import TypedDict
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
-from . import bookkeeper, documents, gatekeeper, outings, planner, rules, shopper
+from . import bookkeeper, calculator, documents, gatekeeper, meals, outings, planner, rules, shopper
 from .spend_parser import looks_like_spend
 
 
@@ -52,7 +56,7 @@ class ChatState(TypedDict, total=False):
 _KEYWORDS: list[tuple[Agent, tuple[str, ...]]] = [
     (Agent.BOOKKEEPER, ("receipt", "invoice", "statement", "upload", "duplicate", "subscription", "bill", "charge")),
     (Agent.PLANNER, ("gold", "apartment", "rent or buy", "mortgage", "insurance", "invest", "10 years", "5 years")),
-    (Agent.SHOPPER, ("compare", "cheaper", "meal", "recipe", "shopping list", "groceries", "warranty")),
+    (Agent.SHOPPER, ("compare", "cheaper", "warranty")),
     (Agent.COACH, ("save", "saving", "challenge", "points", "lesson", "goal", "reward")),
     (Agent.GATEKEEPER, ("buy", "can i", "want", "noon", "amazon", "allerg", "peanut", "money for")),
 ]
@@ -65,7 +69,7 @@ _PLACEHOLDER = {
     Agent.SHOPPER: "Tell me what you'd like to buy, like \"wireless headphones\" or \"Sony WH-CH720N\", "
                    "and I'll compare the shops' prices.",
     Agent.COACH: "Savings challenges and lessons aren't ready yet. They're coming soon.",
-    Agent.PLANNER: "Long-term what-ifs, like gold or renting against buying, are coming soon. Ask me to make this month's plan.",
+    Agent.PLANNER: "Ask me to make this month's plan, or try a what-if like \"AED 1,000 a month at 5% for 10 years\".",
 }
 
 
@@ -75,7 +79,8 @@ _ASKING = re.compile(r"\b(can i|could i|may i|i want|i wanna|please|buy me)\b", 
 
 def is_spend_log(state: ChatState) -> bool:
     text = state.get("message", "")
-    return state.get("role") == "CHILD" and looks_like_spend(text) and not _ASKING.search(text)
+    return (state.get("role") == "CHILD" and looks_like_spend(text) and not _ASKING.search(text)
+            and not calculator.is_calculator_question(text))
 
 
 def route_message(state: ChatState) -> ChatState:
@@ -86,7 +91,7 @@ def route_message(state: ChatState) -> ChatState:
         return {"agent": Agent.GATEKEEPER}
     if gatekeeper.amount_in(text) and _ASKING.search(text) or "afford" in text:
         return {"agent": Agent.GATEKEEPER}
-    if outings.is_outings_question(text):
+    if meals.is_meals_question(text) or outings.is_outings_question(text) or calculator.is_calculator_question(text):
         return {"agent": Agent.PLANNER}
     if shopper.is_price_question(text):
         return {"agent": Agent.SHOPPER}
@@ -135,8 +140,12 @@ def planner_node(state: ChatState, config: RunnableConfig) -> ChatState:
     ctx = config.get("configurable", {})
     core, me = ctx.get("core"), ctx.get("me")
     message = state.get("message", "")
+    if core is not None and me is not None and meals.is_meals_question(message):
+        return {"reply": meals.handle(core, me, message, ctx.get("llm"))}
     if core is not None and me is not None and outings.is_outings_question(message):
         return {"reply": outings.handle(core, me, message, ctx.get("llm"))}
+    if core is not None and me is not None and calculator.is_calculator_question(message):
+        return {"reply": calculator.handle(core, me, message)}
     if core is not None and me is not None and planner.is_plan_question(message):
         return {"reply": planner.handle(core, me, message, ctx.get("llm"))}
     return {"reply": _PLACEHOLDER[Agent.PLANNER]}

@@ -14,7 +14,7 @@ def test_routes_to_the_right_agent():
     assert route("Can I buy these headphones from noon?") == Agent.GATEKEEPER
     assert route("I uploaded the bank statement") == Agent.BOOKKEEPER
     assert route("Gold or an apartment over 10 years?") == Agent.PLANNER
-    assert route("Make a meal plan for this week") == Agent.SHOPPER
+    assert route("Make a meal plan for this week") == Agent.PLANNER
     assert route("I want to start a saving challenge") == Agent.COACH
 
 

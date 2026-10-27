@@ -98,6 +98,14 @@ export default function PlanPage() {
         />
       </Link>
 
+      <Link href="/parent/plan/meals" className="card" style={{ display: "grid", gap: 4, color: "inherit", textDecoration: "none" }}>
+        <div className="row" style={{ padding: 0 }}>
+          <span className="card-title">Weekly dinners</span>
+          <span className="link">Plan the week ›</span>
+        </div>
+        <span className="muted">What to cook and the shopping list, inside the grocery budget and the family&apos;s food rules.</span>
+      </Link>
+
       <Link href="/parent/plan/outings" className="card" style={{ display: "grid", gap: 4, color: "inherit", textDecoration: "none" }}>
         <div className="row" style={{ padding: 0 }}>
           <span className="card-title">Family outings</span>
@@ -105,6 +113,22 @@ export default function PlanPage() {
         </div>
         <span className="muted">Days out that fit the entertainment budget, priced for the whole family.</span>
       </Link>
+
+      <section id="goals-long-term" className="card" style={{ display: "grid", gap: 6 }}>
+        <div className="row" style={{ padding: 0 }}>
+          <span className="card-title">Savings calculator</span>
+          <Link href="/parent/plan/calculator?from=invest" className="link">Investing bucket ›</Link>
+        </div>
+        <span className="muted">See any goal over 1, 5 and 10 years at a rate you pick. Learning only.</span>
+        <div className="rows">
+          {(goals ?? []).map((g) => (
+            <Link key={g.id} href={`/parent/plan/calculator?goal=${g.id}`} className="row calc-link">
+              <span>{g.name} <span className="muted">· {g.saved.text} of {g.target.text}</span></span>
+              <span aria-hidden="true">›</span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <section className="stack" style={{ gap: 10 }}>
         <div>

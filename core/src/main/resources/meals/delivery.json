@@ -1,0 +1,15 @@
+{
+ "note": "Typical delivery dinners for a family of 4 in Dubai, for busy nights in the weekly plan. Prices are MY ESTIMATES with delivery and fees, not from any app (verify). No app or restaurant is named or linked in Phase 1.",
+ "meals": [
+  {"key": "falafel-box", "name": "Falafel and hummus box", "price": "70", "vegetarian": true, "vegan": true, "allergens": ["SESAME", "WHEAT_GLUTEN"],
+   "about": "Falafel, hummus, salad and bread for 4."},
+  {"key": "chicken-biryani", "name": "Chicken biryani for 4", "price": "90", "vegetarian": false, "vegan": false, "allergens": ["MILK"],
+   "about": "A family tray of chicken biryani with raita."},
+  {"key": "shawarma-meal", "name": "Chicken shawarma meal for 4", "price": "95", "vegetarian": false, "vegan": false, "allergens": ["WHEAT_GLUTEN", "SESAME"],
+   "about": "Four shawarma sandwiches with fries and garlic sauce."},
+  {"key": "pizza-two", "name": "Two large margherita pizzas", "price": "105", "vegetarian": true, "vegan": false, "allergens": ["MILK", "WHEAT_GLUTEN"],
+   "about": "Two large cheese and tomato pizzas."},
+  {"key": "mixed-grill", "name": "Mixed grill for 4", "price": "140", "vegetarian": false, "vegan": false, "allergens": ["WHEAT_GLUTEN", "SESAME"],
+   "about": "Kebabs, chicken tikka and kofta with rice, bread and salad."}
+ ]
+}
