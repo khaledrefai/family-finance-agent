@@ -151,6 +151,34 @@ public final class StarterBudgetEngine {
                 MoneyView.of(total), cut, note, List.copyOf(lines), List.copyOf(pocket));
     }
 
+    /**
+     * The family's budgets as they are now, to change after setup: the same lines as the start, each with the amount
+     * saved (0 where it was left out) and the app's starting point as the guide. Pocket money is weekly, by child.
+     */
+    public static Starter current(Starter guide, Map<String, Long> monthlyMinor, Map<UUID, Long> weeklyMinor) {
+        String cur = guide.income().currency();
+        Money total = Money.zero(cur);
+        List<Line> lines = new ArrayList<>();
+        for (Line l : guide.lines()) {
+            Money now = new Money(monthlyMinor.getOrDefault(l.category(), 0L), cur);
+            total = total.plus(now);
+            lines.add(new Line(l.category(), l.label(), l.bucket(), MoneyView.of(now),
+                    "The app's guide: " + text(new Money(l.amount().minor(), cur)) + " a month"));
+        }
+        List<Pocket> pocket = new ArrayList<>();
+        for (Pocket p : guide.pocket()) {
+            Money now = new Money(weeklyMinor.getOrDefault(p.memberId(), 0L), cur);
+            total = total.plus(now.scaled(52, 12));
+            pocket.add(new Pocket(p.memberId(), p.name(), MoneyView.of(now), MoneyView.of(now.scaled(52, 12)),
+                    "The app's guide: " + text(new Money(p.weekly().minor(), cur)) + " a week"));
+        }
+        Money room = new Money(guide.room().minor(), cur);
+        String note = "Your budgets and pocket money come to " + text(total) + " a month, out of " + text(room)
+                + " left after commitments.";
+        return new Starter(guide.income(), guide.commitments(), guide.room(), guide.cap(), MoneyView.of(total),
+                false, note, List.copyOf(lines), List.copyOf(pocket));
+    }
+
     /** The first family goal: an emergency buffer of 3 months of commitments and everyday spending. */
     public static Buffer buffer(Money commitments, Money everyday) {
         Money month = commitments.plus(everyday);

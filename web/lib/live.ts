@@ -100,6 +100,7 @@ interface Bucket {
   amount: MoneyView;
   fromBp: number;
   toBp: number;
+  needed: MoneyView | null;
   items: { label: string; amount: MoneyView; shareBp: number; tierLabel: string | null; note: string | null }[];
 }
 

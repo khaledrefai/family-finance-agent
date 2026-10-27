@@ -58,6 +58,19 @@ public class PlanService {
     public record NewDate(LocalDate dueOn, String amount, String label) {
     }
 
+
+    /** A parent changes an income after setup. {@code baseOverride} only counts for commission or sales. */
+    public record IncomeEdit(String name, String amount, LocalDate nextOn, String baseOverride) {
+    }
+
+    /** A parent changes a bill after setup. A bill with its own list of dates can only be renamed. */
+    public record CommitmentEdit(String name, String amount, Frequency frequency, LocalDate nextDueOn, String reserved) {
+    }
+
+    /** A parent changes a family goal. Every field is replaced: a null {@code targetDate} means no date. */
+    public record GoalEdit(String name, String target, LocalDate targetDate) {
+    }
+
     // ------------------------------------------------------------------ views
 
     public record IncomeView(UUID id, UUID memberId, String memberName, String name, IncomeKind kind, MoneyView amount,
@@ -166,6 +179,44 @@ public class PlanService {
             }
         }
         return incomeViews(me.familyId(), id).get(0);
+    }
+
+    /** A parent changes an income's name, amount, next pay day or careful month. A parent's tap only. */
+    @Transactional
+    public IncomeView updateIncome(CurrentMember me, UUID id, IncomeEdit in) {
+        requireParent(me);
+        String cur = currency(me.familyId());
+        IncomeKind kind = db.sql("SELECT kind FROM income WHERE id = ? AND family_id = ? AND status <> 'ARCHIVED'")
+                .params(id, me.familyId()).query(String.class).optional().map(IncomeKind::valueOf)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Income not found"));
+        if (in.nextOn() == null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, kind == IncomeKind.ONE_OFF
+                    ? "When did the money arrive?" : "When is the next pay day?");
+        }
+        if (kind == IncomeKind.ONE_OFF && in.nextOn().isAfter(LocalDate.now(clock))) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "One-off money only counts once it has arrived");
+        }
+        Money amount = Amounts.parse(in.amount(), cur, kind == IncomeKind.ONE_OFF ? "amount" : "take-home pay");
+        Money base = kind == IncomeKind.VARIABLE ? Amounts.parseOptional(in.baseOverride(), cur, "planning base") : null;
+        db.sql("UPDATE income SET name = ?, amount_minor = ?, next_on = ?, base_override_minor = ? WHERE id = ? AND family_id = ?")
+                .params(name(in.name(), "Income"), amount.minor(), in.nextOn(), base == null ? null : base.minor(),
+                        id, me.familyId()).update();
+        return incomeViews(me.familyId(), id).get(0);
+    }
+
+    /** An income stopped. It is kept as ARCHIVED for history; the plan stops counting it. */
+    @Transactional
+    public void removeIncome(CurrentMember me, UUID id) {
+        requireParent(me);
+        String status = db.sql("SELECT status FROM income WHERE id = ? AND family_id = ? AND status <> 'ARCHIVED'")
+                .params(id, me.familyId()).query(String.class).optional()
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Income not found"));
+        long active = db.sql("SELECT count(*) FROM income WHERE family_id = ? AND status = 'ACTIVE'").param(me.familyId())
+                .query(Long.class).single();
+        if ("ACTIVE".equals(status) && active <= 1) {
+            throw new ApiException(HttpStatus.CONFLICT, "The plan needs at least one income. Change its amount instead");
+        }
+        db.sql("UPDATE income SET status = 'ARCHIVED' WHERE id = ? AND family_id = ?").params(id, me.familyId()).update();
     }
 
     /** A variable income was paid: record it, and say straight away if it came in below the planning base. */
@@ -308,6 +359,55 @@ public class PlanService {
         return commitmentViews(me.familyId(), id).get(0);
     }
 
+    /**
+     * A parent changes a bill's name, amount, how often, next payment or what is put aside. A bill paid on its own
+     * list of dates (rent cheques typed one by one) can only be renamed here.
+     */
+    @Transactional
+    public CommitmentView updateCommitment(CurrentMember me, UUID id, CommitmentEdit in) {
+        requireParent(me);
+        String cur = currency(me.familyId());
+        record Was(Frequency frequency, CommitmentKind kind) {
+        }
+        Was was = db.sql("SELECT frequency, kind FROM commitment WHERE id = ? AND family_id = ? AND status <> 'ARCHIVED'")
+                .params(id, me.familyId())
+                .query((rs, n) -> new Was(Frequency.valueOf(rs.getString(1)), CommitmentKind.valueOf(rs.getString(2))))
+                .optional().orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Bill not found"));
+        String name = name(in.name(), was.kind().label());
+        if (was.frequency() == Frequency.CUSTOM) {
+            db.sql("UPDATE commitment SET name = ? WHERE id = ? AND family_id = ?").params(name, id, me.familyId()).update();
+            return commitmentViews(me.familyId(), id).get(0);
+        }
+        Frequency freq = in.frequency() == null ? was.frequency() : in.frequency();
+        if (freq == Frequency.CUSTOM || freq == Frequency.ONCE) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Pick how often: every month, every 3 months, each term or once a year");
+        }
+        if (in.nextDueOn() == null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "When is the next payment due?");
+        }
+        Money amount = Amounts.parse(in.amount(), cur, "amount");
+        Money reserved = freq.isRegular() || in.reserved() == null || in.reserved().isBlank()
+                || in.reserved().trim().matches("0+([.]0+)?")
+                ? Money.zero(cur) : Amounts.parse(in.reserved(), cur, "amount set aside");
+        db.sql("""
+                UPDATE commitment SET name = ?, amount_minor = ?, frequency = ?, next_due_on = ?, reserved_minor = ?
+                WHERE id = ? AND family_id = ?
+                """).params(name, amount.minor(), freq.name(), in.nextDueOn(), reserved.minor(), id, me.familyId())
+                .update();
+        return commitmentViews(me.familyId(), id).get(0);
+    }
+
+    /** A bill ended (the loan is paid off, the subscription cancelled). Kept as ARCHIVED for history. */
+    @Transactional
+    public void removeCommitment(CurrentMember me, UUID id) {
+        requireParent(me);
+        int changed = db.sql("UPDATE commitment SET status = 'ARCHIVED' WHERE id = ? AND family_id = ? AND status <> 'ARCHIVED'")
+                .params(id, me.familyId()).update();
+        if (changed == 0) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Bill not found");
+        }
+    }
+
     private List<CommitmentView> commitmentViews(UUID family, UUID only) {
         String cur = currency(family);
         Map<UUID, List<DateView>> dates = new java.util.HashMap<>();
@@ -412,6 +512,36 @@ public class PlanService {
                 .params(amount.minor(), targetDate, goalId, me.familyId()).update();
         Snapshot after = facts.load(me.familyId());
         return goalView(after, goal(after, goalId));
+    }
+
+    /** A parent changes a family goal's name, amount or date. Its pace and what is saved stay as they are. */
+    @Transactional
+    public GoalView updateGoal(CurrentMember me, UUID goalId, GoalEdit in) {
+        requireParent(me);
+        Snapshot before = facts.load(me.familyId());
+        goal(before, goalId);
+        if (in.name() == null || in.name().isBlank()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Please give the goal name");
+        }
+        if (in.name().trim().length() > 120) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "The goal name can have at most 120 characters");
+        }
+        Money target = Amounts.parse(in.target(), before.currency(), "goal amount");
+        if (in.targetDate() != null && !in.targetDate().isAfter(before.today())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "The target date has to be in the future");
+        }
+        db.sql("UPDATE goal SET name = ?, target_minor = ?, target_date = ? WHERE id = ? AND family_id = ?")
+                .params(in.name().trim(), target.minor(), in.targetDate(), goalId, me.familyId()).update();
+        Snapshot after = facts.load(me.familyId());
+        return goalView(after, goal(after, goalId));
+    }
+
+    /** The family dropped a goal. It is kept as CANCELLED; its monthly saving goes back to spare cash. */
+    @Transactional
+    public void removeGoal(CurrentMember me, UUID goalId) {
+        requireParent(me);
+        goal(facts.load(me.familyId()), goalId);
+        db.sql("UPDATE goal SET status = 'CANCELLED' WHERE id = ? AND family_id = ?").params(goalId, me.familyId()).update();
     }
 
     /**
@@ -570,6 +700,39 @@ public class PlanService {
             db.sql("INSERT INTO bucket_plan_line (plan_id, kind, share_bp, reason) VALUES (?, ?, ?, ?)")
                     .params(id, sh.kind().name(), sh.shareBp(), trim(sh.reason(), 240)).update();
         }
+        return buckets(me);
+    }
+
+    /**
+     * A parent types the split in AED instead of shares: what goes to each bucket, and Fun gets the rest. The engine
+     * turns the amounts into shares and saves them as the parent's draft, checked like any other.
+     */
+    @Transactional
+    public Buckets saveBucketAmounts(CurrentMember me, Map<BucketKind, String> typed) {
+        requireParent(me);
+        Snapshot s = facts.load(me.familyId());
+        Map<BucketKind, Money> amounts = new EnumMap<>(BucketKind.class);
+        typed.forEach((kind, text) -> {
+            if (kind != BucketKind.FUN) {
+                amounts.put(kind, text == null || text.isBlank() || text.trim().matches("0+([.]0+)?")
+                        ? Money.zero(s.currency()) : Amounts.parse(text, s.currency(), kind.label() + " amount"));
+            }
+        });
+        Money income = needs(s).income();
+        Money total = amounts.values().stream().reduce(Money.zero(s.currency()), Money::plus);
+        if (total.compareTo(income) > 0) {
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "These add up to " + MoneyView.of(total).text()
+                    + ", which is " + MoneyView.of(total.minus(income)).text() + " more than the income of "
+                    + MoneyView.of(income).text() + ". Take that off one of the buckets.");
+        }
+        return saveBucketDraft(me, BucketEngine.fromAmounts(income, amounts), "PARENT");
+    }
+
+    /** A parent keeps the confirmed split after all: the waiting draft is dropped. */
+    @Transactional
+    public Buckets discardBucketDraft(CurrentMember me) {
+        requireParent(me);
+        db.sql("DELETE FROM bucket_plan WHERE family_id = ? AND status = 'DRAFT'").param(me.familyId()).update();
         return buckets(me);
     }
 

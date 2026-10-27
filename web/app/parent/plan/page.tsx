@@ -42,13 +42,26 @@ export default function PlanPage() {
       try {
         const g = await core.goals();
         setGoals(g);
-        const goal = g.find((x) => x.tier === "GOOD_LIFE") ?? g[0];
+        // From Family goals, "Pick its pace" opens this page on that goal (?goal=…); otherwise the family goal
+        const asked = new URLSearchParams(window.location.search).get("goal");
+        const goal = g.find((x) => x.id === asked) ?? g.find((x) => x.tier === "GOOD_LIFE") ?? g[0];
         if (goal) setPlan(await core.options(goal.id));
+        if (asked && goal?.id === asked) document.getElementById("pace")?.scrollIntoView();
       } catch {
         /* sample stays */
       }
     })();
   }, [me]);
+
+  async function pickGoal(id: string) {
+    setPace(null);
+    setSaved(null);
+    try {
+      setPlan(await core.options(id));
+    } catch (e) {
+      setSaved((e as Error).message);
+    }
+  }
 
   if (!me) return <Loading />;
   const live = money.live && plan !== null;
@@ -88,6 +101,16 @@ export default function PlanPage() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="card" style={{ display: "grid", gap: 6 }}>
+        <span className="card-title">Change the plan</span>
+        <div className="rows">
+          <Link href="/parent/plan/goals" className="row calc-link"><span>Family goals <span className="muted">· amount, date, add or remove</span></span><span aria-hidden="true">›</span></Link>
+          <Link href="/parent/money/budgets/change" className="row calc-link"><span>Budgets and pocket money</span><span aria-hidden="true">›</span></Link>
+          <Link href="/parent/plan/income-bills" className="row calc-link"><span>Income and bills</span><span aria-hidden="true">›</span></Link>
+          <Link href="/parent/plan/buckets" className="row calc-link"><span>Money buckets <span className="muted">· the split</span></span><span aria-hidden="true">›</span></Link>
+        </div>
       </section>
 
       <Link href="/parent/plan/buckets" className="card bucket-link" style={{ display: "grid", gap: 10, color: "inherit", textDecoration: "none" }}>
@@ -133,7 +156,15 @@ export default function PlanPage() {
         </div>
       </section>
 
-      <section className="stack" style={{ gap: 10 }}>
+      <section id="pace" className="stack" style={{ gap: 10 }}>
+        {live && goals && goals.length > 1 && (
+          <label style={{ display: "grid", gap: 4, fontWeight: 600 }}>
+            How fast to save for
+            <select value={plan!.goalId} onChange={(e) => pickGoal(e.target.value)}>
+              {goals.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+            </select>
+          </label>
+        )}
         <div>
           <h2 className="first">{goalTitle}</h2>
           <p className="muted">{savedPace ? `Three ways to get there. Now on ${options.find((o) => o.id === savedPace)?.name.toLowerCase()}.` : "Three ways to get there"}</p>

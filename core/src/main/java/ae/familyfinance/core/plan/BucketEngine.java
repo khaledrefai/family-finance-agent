@@ -142,6 +142,43 @@ public final class BucketEngine {
                 new Share(BucketKind.GIVING, give, give > 0 ? "Optional. Turn it off any time" : "No room this month"));
     }
 
+    /**
+     * A parent's split typed in AED: each bucket gets the smallest share that holds what was typed, and Fun gets
+     * what is left. The caller checks first that the amounts don't add up to more than the income; if rounding the
+     * shares up takes Fun below zero, the overflow (a basis point or two) comes off the biggest bucket after
+     * Commitments, so Commitments always stays covered.
+     */
+    public static List<Share> fromAmounts(Money income, Map<BucketKind, Money> amounts) {
+        EnumMap<BucketKind, Integer> bp = new EnumMap<>(BucketKind.class);
+        for (BucketKind kind : BucketKind.values()) {
+            if (kind != BucketKind.FUN) {
+                bp.put(kind, minShare(amounts.getOrDefault(kind, Money.zero(income.currency())), income));
+            }
+        }
+        int over = bp.values().stream().mapToInt(Integer::intValue).sum() - WHOLE;
+        while (over > 0) {
+            BucketKind biggest = bp.entrySet().stream().filter(e -> e.getKey() != BucketKind.COMMITMENTS && e.getValue() > 0)
+                    .max(Map.Entry.comparingByValue()).map(Map.Entry::getKey).orElse(BucketKind.COMMITMENTS);
+            int take = Math.min(over, bp.get(biggest));
+            bp.put(biggest, bp.get(biggest) - take);
+            over -= take;
+            if (take == 0) {
+                break;
+            }
+        }
+        int fun = WHOLE - bp.values().stream().mapToInt(Integer::intValue).sum();
+        List<Share> shares = new ArrayList<>();
+        for (BucketKind kind : BucketKind.values()) {
+            if (kind == BucketKind.FUN) {
+                shares.add(new Share(kind, Math.max(0, fun), "What is left after the rest"));
+            } else {
+                int share = bp.get(kind);
+                shares.add(new Share(kind, share, share > 0 ? "Set by a parent" : "Nothing this month"));
+            }
+        }
+        return shares;
+    }
+
     public static Buckets view(UUID planId, RecordStatus status, String proposedBy, String month, List<Share> shares,
                                Needs needs) {
         Money income = needs.income();

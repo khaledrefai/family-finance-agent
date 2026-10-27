@@ -51,4 +51,28 @@ class BucketEngineTest {
         List<Share> s = List.of(new Share(BucketKind.COMMITMENTS, 5000, null), new Share(BucketKind.FUN, 4000, null));
         assertThat(BucketEngine.problems(s, needs(0, 0, 0))).contains("The shares add up to 90%, not 100%");
     }
+
+    @Test
+    void a_split_typed_in_aed_holds_each_amount_and_fun_gets_the_rest() {
+        Map<BucketKind, Money> typed = Map.of(BucketKind.COMMITMENTS, Money.aed(1_470_900), BucketKind.EVERYDAY, Money.aed(800_000),
+                BucketKind.GOALS, Money.aed(650_000), BucketKind.INVEST_ASIDE, Money.aed(100_000), BucketKind.GIVING, Money.aed(0));
+        List<Share> s = BucketEngine.fromAmounts(INCOME, typed);
+        assertThat(s.stream().mapToInt(Share::shareBp).sum()).isEqualTo(BucketEngine.WHOLE);
+        assertThat(BucketEngine.problems(s, needs(1_470_900, 739_333, 650_000))).isEmpty();
+        Map<BucketKind, Money> amounts = BucketEngine.amounts(INCOME, s);
+        typed.forEach((kind, m) -> assertThat(amounts.get(kind)).isGreaterThanOrEqualTo(m));
+        // 34,500 less 30,209 typed: about AED 4,291 of fun, give or take a dirham of rounding
+        assertThat(amounts.get(BucketKind.FUN).minor()).isBetween(428_000L, 429_200L);
+        assertThat(s).filteredOn(x -> x.kind() == BucketKind.GIVING).first().extracting(Share::shareBp).isEqualTo(0);
+    }
+
+    @Test
+    void a_split_typed_to_the_last_dirham_still_adds_up_to_100_percent() {
+        // Every share rounded up would come to more than 100%: the overflow comes off the biggest bucket after commitments
+        Map<BucketKind, Money> typed = Map.of(BucketKind.COMMITMENTS, Money.aed(1_000_100), BucketKind.EVERYDAY, Money.aed(1_000_100),
+                BucketKind.GOALS, Money.aed(1_449_800));
+        List<Share> s = BucketEngine.fromAmounts(INCOME, typed);
+        assertThat(s.stream().mapToInt(Share::shareBp).sum()).isEqualTo(BucketEngine.WHOLE);
+        assertThat(BucketEngine.amounts(INCOME, s).get(BucketKind.COMMITMENTS)).isGreaterThanOrEqualTo(Money.aed(1_000_100));
+    }
 }

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { aed } from "@/lib/api";
-import { core, fromBuckets, useBuckets } from "@/lib/live";
+import { Buckets, core, fromBuckets, useBuckets } from "@/lib/live";
+import { changeApi, typed } from "@/lib/setup";
 import { gold } from "@/lib/sample";
 import { Back, BucketFlow, Loading, Masthead, SampleNote, TRUST } from "../../../ui";
 import { useSession } from "../../../use-session";
@@ -11,12 +12,14 @@ import { useSession } from "../../../use-session";
 // Money buckets: every dirham of income gets a job. The flow chart shows how income splits into
 // the buckets, and each card below shows what is inside one bucket. The accountant suggests the
 // split, a parent confirms it, and the engine works out every amount (GET /api/plan/buckets).
-// Confirming is a parent's tap in the app; the agent can only save a draft.
+// Confirming is a parent's tap in the app; the agent can only save a draft. A parent can also change the split
+// by hand at any time: they type each bucket in AED, Fun gets the rest, and the engine checks it as a draft.
 export default function BucketsPage() {
   const { me } = useSession("PARENT");
   const { data: buckets, live, setData } = useBuckets(!!me);
   const [givingOn, setGivingOn] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [changing, setChanging] = useState(false);
   if (!me) return <Loading />;
   const confirmed = buckets.confirmed;
 
@@ -32,6 +35,15 @@ export default function BucketsPage() {
     }
   }
 
+  async function drop() {
+    setError(null);
+    try {
+      setData(fromBuckets(await changeApi.keepBuckets()));
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
   return (
     <div className="stack">
       <Back href="/parent/plan" label="Plan" />
@@ -39,20 +51,35 @@ export default function BucketsPage() {
 
       <section className={`draft${confirmed ? " done" : ""}`}>
         {confirmed ? (
-          <p role="status">
-            <span className="confirmed">Confirmed</span> Each pay day the app puts the money into these buckets on paper. No real money moves.
-          </p>
+          <>
+            <p role="status">
+              <span className="confirmed">Confirmed</span> Each pay day the app puts the money into these buckets on paper. No real money moves.
+            </p>
+            {live && !changing && (
+              <button type="button" className="quiet" style={{ justifySelf: "start", marginTop: 8 }} onClick={() => setChanging(true)}>
+                Change the split
+              </button>
+            )}
+          </>
         ) : (
           <>
             <p><b>{buckets.proposedBy === "PARENT" ? "Your changes." : "Suggested by the accountant."}</b> It counts once you confirm. You can change any bucket first.</p>
-            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-              <button onClick={confirm}>Confirm buckets</button>
-              <Link href="/parent/ask" className="link" style={{ alignSelf: "center" }}>Change in Ask</Link>
-            </div>
+            {!changing && (
+              <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+                <button onClick={confirm}>Confirm buckets</button>
+                {live && <button type="button" className="quiet" onClick={() => setChanging(true)}>Change</button>}
+                {live && buckets.proposedBy === "PARENT" && <button type="button" className="text" onClick={drop}>Drop my changes</button>}
+              </div>
+            )}
           </>
         )}
         {error && <p className="error" role="alert">{error}</p>}
       </section>
+
+      {changing && (
+        <SplitEditor onCancel={() => setChanging(false)}
+          onSaved={(b) => { setData(fromBuckets(b)); setChanging(false); window.scrollTo(0, 0); }} />
+      )}
 
       <section className="card" style={{ display: "grid", gap: 8 }}>
         <p className="card-title">How the money flows</p>
@@ -134,5 +161,71 @@ export default function BucketsPage() {
       ))}
       <SampleNote live={live} />
     </div>
+  );
+}
+
+// Change the split by hand: an AED box for each bucket, filled with what it gets now, and what the family's own
+// numbers say it needs under it. Fun is not typed: it gets the rest. The core turns the amounts into shares and
+// saves them as a draft (POST /api/plan/buckets/draft/amounts); it refuses a split over the income or short on bills.
+function SplitEditor({ onSaved, onCancel }: { onSaved: (b: Buckets) => void; onCancel: () => void }) {
+  const [now, setNow] = useState<Buckets | null>(null);
+  const [typedIn, setTypedIn] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    core.buckets().then((b) => {
+      setNow(b);
+      setTypedIn(Object.fromEntries(b.buckets.filter((x) => x.kind !== "FUN").map((x) => [x.kind, typed(x.amount)])));
+    }).catch((e) => setError((e as Error).message));
+  }, []);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      onSaved(await changeApi.bucketAmounts(typedIn));
+    } catch (err) {
+      setError((err as Error).message);
+      setBusy(false);
+    }
+  }
+
+  if (!now) return error ? <p className="error" role="alert">{error}</p> : <Loading />;
+  return (
+    <form className="panel setup-form" onSubmit={save} style={{ margin: 0 }}>
+      <strong>Change the split</strong>
+      <p className="muted" style={{ margin: 0, fontSize: 14 }}>
+        Out of {now.income.text} this month. Type what each bucket gets. Fun gets whatever is left.
+      </p>
+      {now.buckets.map((b) => (
+        <div className="setup-line" key={b.kind}>
+          <span><b>{b.label}</b></span>
+          {b.kind === "FUN" ? (
+            <span className="muted" style={{ gridColumn: "auto", fontSize: 14 }}>Gets the rest</span>
+          ) : (
+            <span className="money-input">
+              <span>AED</span>
+              <input inputMode="decimal" aria-label={`${b.label}, AED`} value={typedIn[b.kind] ?? ""}
+                onChange={(e) => setTypedIn({ ...typedIn, [b.kind]: e.target.value })} maxLength={12} />
+            </span>
+          )}
+          {b.needed && b.needed.minor > 0 && (
+            <span className="muted">
+              {b.kind === "COMMITMENTS" ? `Needs at least ${b.needed.text} for the bills due this month`
+                : b.kind === "EVERYDAY" ? `The budgets come to ${b.needed.text}`
+                : `The goal paces come to ${b.needed.text}`}
+            </span>
+          )}
+        </div>
+      ))}
+      <div className="actions">
+        <button type="button" className="text" onClick={onCancel}>Cancel</button>
+        <button type="submit" disabled={busy}>{busy ? "Checking…" : "Check this split"}</button>
+      </div>
+      <p className="trust" style={{ margin: 0 }}>{TRUST} It stays a draft until you confirm it.</p>
+      {error && <p className="error" role="alert">{error}</p>}
+    </form>
   );
 }
