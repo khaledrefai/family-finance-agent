@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { aed, api, ApiError, getToken, Me, MemberView } from "@/lib/api";
 import { Buckets, core, day, fromBuckets, Goal, MoneyView, PlanOptions } from "@/lib/live";
-import { CommitmentView, IncomeView, setupApi, SetupStatus, Starter, typed } from "@/lib/setup";
+import { CommitmentView, IncomeView, setupApi, SetupStatus, typed } from "@/lib/setup";
 import { MemberForm } from "../member-form";
+import { BillAddForm, BudgetsForm, HOW_OFTEN, IncomeAddForm, today } from "../plan-forms";
 import { BucketFlow, Loading, TRUST } from "../ui";
 
 // First-run setup for a new family, one step at a time:
@@ -18,12 +19,6 @@ import { BucketFlow, Loading, TRUST } from "../ui";
 
 const TITLES = ["Who is in the family", "Money coming in", "Big regular bills", "First budgets", "Your first plan"];
 const AGE_BAND: Record<string, string> = { CHILD_6_9: "6 to 9", PRETEEN_10_12: "10 to 12", TEEN_13_17: "13 to 17" };
-
-function today(plusDays = 0) {
-  const d = new Date();
-  d.setDate(d.getDate() + plusDays);
-  return d.toISOString().slice(0, 10);
-}
 
 export default function SetupPage() {
   const router = useRouter();
@@ -133,36 +128,11 @@ function FamilyStep({ me, onNext }: { me: Me; onNext: () => void }) {
 function IncomeStep({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const [incomes, setIncomes] = useState<IncomeView[]>([]);
   const [parents, setParents] = useState<MemberView[]>([]);
-  const [f, setF] = useState({ memberId: "", name: "Salary", kind: "FIXED" as "FIXED" | "VARIABLE", amount: "", baseOverride: "", nextOn: today(7) });
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
   const load = useCallback(() => setupApi.incomes().then(setIncomes).catch(() => {}), []);
   useEffect(() => {
     load();
-    api.members().then((m) => {
-      const p = m.filter((x) => x.role === "PARENT");
-      setParents(p);
-      setF((f) => ({ ...f, memberId: f.memberId || p[0]?.id || "" }));
-    }).catch(() => {});
+    api.members().then((m) => setParents(m.filter((x) => x.role === "PARENT"))).catch(() => {});
   }, [load]);
-  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
-
-  async function add(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      await setupApi.addIncome({
-        memberId: f.memberId || undefined, name: f.name, kind: f.kind, amount: f.amount, nextOn: f.nextOn,
-        baseOverride: f.kind === "VARIABLE" ? f.baseOverride || undefined : undefined,
-      });
-      setF({ ...f, name: "Salary", amount: "", baseOverride: "", memberId: parents.find((p) => !incomes.some((i) => i.memberName === p.displayName) && p.id !== f.memberId)?.id ?? f.memberId });
-      await load();
-    } catch (err) {
-      setError((err as Error).message);
-    }
-    setBusy(false);
-  }
 
   return (
     <>
@@ -180,48 +150,7 @@ function IncomeStep({ onNext, onBack }: { onNext: () => void; onBack: () => void
           ))}
         </section>
       )}
-      <form className="panel setup-form" onSubmit={add}>
-        <strong>{incomes.length ? "Add more income" : "Add income"}</strong>
-        <div className="two">
-          <label>
-            Whose
-            <select value={f.memberId} onChange={set("memberId")}>
-              {parents.map((p) => <option key={p.id} value={p.id}>{p.displayName}</option>)}
-              <option value="">The family</option>
-            </select>
-          </label>
-          <label>
-            Called
-            <input value={f.name} onChange={set("name")} maxLength={120} required />
-          </label>
-        </div>
-        <label>
-          What kind
-          <select value={f.kind} onChange={set("kind")}>
-            <option value="FIXED">Fixed salary, the same each month</option>
-            <option value="VARIABLE">Commission or sales, it changes</option>
-          </select>
-        </label>
-        <div className="two">
-          <label>
-            {f.kind === "VARIABLE" ? "A usual month (AED)" : "Take-home a month (AED)"}
-            <input inputMode="decimal" value={f.amount} onChange={set("amount")} placeholder="24,000" maxLength={14} required />
-          </label>
-          <label>
-            Next pay day
-            <input type="date" value={f.nextOn} onChange={set("nextOn")} min={today(0)} required />
-          </label>
-        </div>
-        {f.kind === "VARIABLE" && (
-          <label>
-            A careful month to plan on (AED)
-            <input inputMode="decimal" value={f.baseOverride} onChange={set("baseOverride")} placeholder="A low month, like 6,500" maxLength={14} required />
-            <span className="muted" style={{ fontWeight: 400 }}>The plan uses this, so a slow month doesn&apos;t break it. A good month is extra.</span>
-          </label>
-        )}
-        <button type="submit" className={incomes.length ? "quiet" : undefined} disabled={busy}>{busy ? "Adding…" : "Add this income"}</button>
-        {error && <p className="error" role="alert">{error}</p>}
-      </form>
+      <IncomeAddForm parents={parents} title={incomes.length ? "Add more income" : "Add income"} quiet={incomes.length > 0} onAdded={load} />
       <BankBalance parents={parents} />
       <div className="actions">
         <button type="button" className="text" onClick={onBack}>Back</button>
@@ -287,44 +216,12 @@ function BankBalance({ parents }: { parents: MemberView[] }) {
 
 // ---------------------------------------------------------------- 3. big regular bills
 
-const BILL_KINDS: { kind: string; label: string; name: string; frequency: string }[] = [
-  { kind: "RENT", label: "Rent", name: "Rent", frequency: "QUARTERLY" },
-  { kind: "SCHOOL_FEES", label: "School fees", name: "School fees", frequency: "TERMLY" },
-  { kind: "LOAN", label: "Loan (car, personal)", name: "Car loan", frequency: "MONTHLY" },
-  { kind: "UTILITY", label: "DEWA, cooling, gas", name: "DEWA", frequency: "MONTHLY" },
-  { kind: "TELECOM", label: "Phone and internet", name: "Phone and internet", frequency: "MONTHLY" },
-  { kind: "INSURANCE", label: "Insurance", name: "Insurance", frequency: "YEARLY" },
-  { kind: "SUBSCRIPTION", label: "Subscription", name: "Streaming", frequency: "MONTHLY" },
-  { kind: "OTHER", label: "Something else", name: "", frequency: "MONTHLY" },
-];
-const HOW_OFTEN: Record<string, string> = {
-  MONTHLY: "Every month", QUARTERLY: "Every 3 months (rent cheques)", TERMLY: "Each school term (3 a year)", YEARLY: "Once a year",
-};
-
 function BillsStep({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const [bills, setBills] = useState<CommitmentView[]>([]);
-  const [f, setF] = useState({ ...BILL_KINDS[0], amount: "", reserved: "", nextDueOn: today(30) });
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
   const load = useCallback(() => setupApi.commitments().then(setBills).catch(() => {}), []);
   useEffect(() => {
     load();
   }, [load]);
-
-  async function add(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      await setupApi.addCommitment({ name: f.name, kind: f.kind, amount: f.amount, frequency: f.frequency, nextDueOn: f.nextDueOn,
-        estimate: f.kind === "UTILITY", reserved: f.frequency !== "MONTHLY" ? f.reserved || undefined : undefined });
-      setF({ ...f, amount: "", reserved: "" });
-      await load();
-    } catch (err) {
-      setError((err as Error).message);
-    }
-    setBusy(false);
-  }
 
   return (
     <>
@@ -342,48 +239,7 @@ function BillsStep({ onNext, onBack }: { onNext: () => void; onBack: () => void 
           ))}
         </section>
       )}
-      <form className="panel setup-form" onSubmit={add}>
-        <strong>Add a bill</strong>
-        <label>
-          What
-          <select value={f.kind} onChange={(e) => {
-            const k = BILL_KINDS.find((x) => x.kind === e.target.value)!;
-            setF({ ...f, ...k });
-          }}>
-            {BILL_KINDS.map((k) => <option key={k.kind} value={k.kind}>{k.label}</option>)}
-          </select>
-        </label>
-        <div className="two">
-          <label>
-            Called
-            <input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} maxLength={120} required />
-          </label>
-          <label>
-            Each payment (AED)
-            <input inputMode="decimal" value={f.amount} onChange={(e) => setF({ ...f, amount: e.target.value })} placeholder="30,000" maxLength={14} required />
-          </label>
-        </div>
-        <div className="two">
-          <label>
-            How often
-            <select value={f.frequency} onChange={(e) => setF({ ...f, frequency: e.target.value })}>
-              {Object.entries(HOW_OFTEN).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-            </select>
-          </label>
-          <label>
-            Next payment
-            <input type="date" value={f.nextDueOn} onChange={(e) => setF({ ...f, nextDueOn: e.target.value })} min={today(0)} required />
-          </label>
-        </div>
-        {f.frequency !== "MONTHLY" && (
-          <label>
-            Already put aside for the next one (AED, optional)
-            <input inputMode="decimal" value={f.reserved} onChange={(e) => setF({ ...f, reserved: e.target.value })} placeholder="0" maxLength={14} />
-          </label>
-        )}
-        <button type="submit" className="quiet" disabled={busy}>{busy ? "Adding…" : "Add this bill"}</button>
-        {error && <p className="error" role="alert">{error}</p>}
-      </form>
+      <BillAddForm onAdded={load} />
       <div className="actions">
         <button type="button" className="text" onClick={onBack}>Back</button>
         <button type="button" onClick={onNext}>{bills.length ? "Next: first budgets" : "Skip for now"}</button>
@@ -395,86 +251,9 @@ function BillsStep({ onNext, onBack }: { onNext: () => void; onBack: () => void 
 // ---------------------------------------------------------------- 4. first budgets
 
 function BudgetsStep({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [starter, setStarter] = useState<Starter | null>(null);
-  const [lines, setLines] = useState<Record<string, string>>({});
-  const [pocket, setPocket] = useState<Record<string, string>>({});
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    setupApi.starter().then((s) => {
-      setStarter(s);
-      setLines(Object.fromEntries(s.lines.map((l) => [l.category, typed(l.amount)])));
-      setPocket(Object.fromEntries(s.pocket.map((p) => [p.memberId, typed(p.weekly)])));
-    }).catch((e) => setError((e as Error).message));
-  }, []);
-
-  async function confirm() {
-    setBusy(true);
-    setError(null);
-    try {
-      await setupApi.saveBudgets(
-        Object.entries(lines).map(([category, amount]) => ({ category, amount })),
-        Object.entries(pocket).map(([memberId, weekly]) => ({ memberId, weekly })));
-      onNext();
-    } catch (err) {
-      setError((err as Error).message);
-      setBusy(false);
-    }
-  }
-
-  if (!starter) return error ? <p className="error" role="alert">{error}</p> : <Loading />;
-
   return (
-    <>
-      <p className="lede" style={{ marginBottom: 0 }}>
-        The app&apos;s starting budgets for a family like yours. Change any of them, then confirm. Nothing counts until you do.
-      </p>
-      <section className="card" style={{ display: "grid", gap: 2 }}>
-        <div className="row"><span>Income this month</span><b>{starter.income.text}</b></div>
-        <div className="row"><span>Commitments this month</span><b>{starter.commitments.text}</b></div>
-        <div className="row total"><span>Left for everything else</span><b>{starter.room.text}</b></div>
-        <p className="muted" style={{ margin: "6px 0 0", fontSize: 13 }}>{starter.note}</p>
-      </section>
-
-      <section className="card" style={{ paddingTop: 4, paddingBottom: 4 }}>
-        <span className="card-title" style={{ display: "block", paddingTop: 10 }}>Each month</span>
-        {starter.lines.map((l) => (
-          <div className="setup-line" key={l.category}>
-            <span><b>{l.label}</b> · {l.bucket === "FUN" ? "fun" : "everyday"}</span>
-            <span className="money-input">
-              <span>AED</span>
-              <input inputMode="decimal" aria-label={`${l.label} a month, AED`} value={lines[l.category] ?? ""}
-                onChange={(e) => setLines({ ...lines, [l.category]: e.target.value })} maxLength={12} />
-            </span>
-            <span className="muted">{l.reason}</span>
-          </div>
-        ))}
-      </section>
-
-      {starter.pocket.length > 0 && (
-        <section className="card" style={{ paddingTop: 4, paddingBottom: 4 }}>
-          <span className="card-title" style={{ display: "block", paddingTop: 10 }}>Pocket money each week</span>
-          {starter.pocket.map((p) => (
-            <div className="setup-line" key={p.memberId}>
-              <span><b>{p.name}</b></span>
-              <span className="money-input">
-                <span>AED</span>
-                <input inputMode="decimal" aria-label={`${p.name}'s pocket money a week, AED`} value={pocket[p.memberId] ?? ""}
-                  onChange={(e) => setPocket({ ...pocket, [p.memberId]: e.target.value })} maxLength={8} />
-              </span>
-              <span className="muted">{p.reason}. Paid into their wallet as demo money.</span>
-            </div>
-          ))}
-        </section>
-      )}
-      <p className="trust">{TRUST} Type 0 to leave a budget out.</p>
-      <div className="actions">
-        <button type="button" className="text" onClick={onBack}>Back</button>
-        <button type="button" onClick={confirm} disabled={busy}>{busy ? "Saving…" : "Confirm budgets"}</button>
-      </div>
-      {error && <p className="error" role="alert">{error}</p>}
-    </>
+    <BudgetsForm load={setupApi.starter} saveLabel="Confirm budgets" onSaved={onNext} onBack={onBack}
+      lede="The app's starting budgets for a family like yours. Change any of them, then confirm. Nothing counts until you do." />
   );
 }
 

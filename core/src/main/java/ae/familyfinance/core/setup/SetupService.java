@@ -219,6 +219,25 @@ public class SetupService {
         return StarterBudgetEngine.starter(s.engine().plannedIncome(), s.engine().commitmentsDue(), adults, kids);
     }
 
+    /** The budgets and pocket money as they are now, with the engine's start as a guide: for changing them later. */
+    @Transactional(readOnly = true)
+    public Starter currentBudgets(CurrentMember me) {
+        Starter guide = starterBudgets(me);
+        java.util.Map<String, Long> monthly = new java.util.HashMap<>();
+        java.util.Map<UUID, Long> weekly = new java.util.HashMap<>();
+        db.sql("SELECT member_id, category, limit_minor FROM budget WHERE family_id = ?").param(me.familyId())
+                .query((rs, n) -> {
+                    UUID member = rs.getObject(1, UUID.class);
+                    if (member == null) {
+                        monthly.merge(rs.getString(2), rs.getLong(3), Long::sum);
+                    } else if ("POCKET_MONEY".equals(rs.getString(2))) {
+                        weekly.put(member, rs.getLong(3));
+                    }
+                    return null;
+                }).list();
+        return StarterBudgetEngine.current(guide, monthly, weekly);
+    }
+
     /**
      * A parent confirms the family's monthly budgets and each child's weekly pocket money. Replaces the ones there
      * were, so the same step can be gone through again. An amount of 0 leaves that budget out.

@@ -7,10 +7,13 @@ import ae.familyfinance.core.plan.BucketEngine.Share;
 import ae.familyfinance.core.plan.PlanOptionsEngine.PlanOptions;
 import ae.familyfinance.core.plan.PlanService.Calculator;
 import ae.familyfinance.core.plan.PlanService.CalculatorAsk;
+import ae.familyfinance.core.plan.PlanService.CommitmentEdit;
 import ae.familyfinance.core.plan.PlanService.CommitmentView;
 import ae.familyfinance.core.plan.PlanService.DraftType;
 import ae.familyfinance.core.plan.PlanService.Drafts;
+import ae.familyfinance.core.plan.PlanService.GoalEdit;
 import ae.familyfinance.core.plan.PlanService.GoalView;
+import ae.familyfinance.core.plan.PlanService.IncomeEdit;
 import ae.familyfinance.core.plan.PlanService.IncomeView;
 import ae.familyfinance.core.plan.PlanService.NewCommitment;
 import ae.familyfinance.core.plan.PlanService.NewDate;
@@ -26,9 +29,11 @@ import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** The family plan API. Parents only (checked in {@link PlanService}). */
@@ -87,6 +93,21 @@ public class PlanController {
     public record BucketDraftBody(@NotEmpty @Size(max = 6) List<@Valid ShareBody> shares) {
     }
 
+    public record IncomeEditBody(@Size(max = 120) String name, @Size(max = 20) String amount, LocalDate nextOn,
+                                 @Size(max = 20) String baseOverride) {
+    }
+
+    public record CommitmentEditBody(@Size(max = 120) String name, @Size(max = 20) String amount, Frequency frequency,
+                                     LocalDate nextDueOn, @Size(max = 20) String reserved) {
+    }
+
+    public record GoalEditBody(@Size(max = 160) String name, @Size(max = 20) String target, LocalDate targetDate) {
+    }
+
+    /** What a parent typed for each bucket, in AED. Fun is left out: it gets the rest. */
+    public record BucketAmountsBody(@NotNull @Size(max = 6) Map<BucketKind, @Size(max = 20) String> amounts) {
+    }
+
     /** Free cash, the 12-month calendar, upcoming bills and what is free until the next pay. */
     @GetMapping("/cashflow")
     public Cashflow cashflow(@AuthenticationPrincipal Jwt jwt) {
@@ -106,6 +127,21 @@ public class PlanController {
                 b.frequency(), b.nextOn(), b.baseOverride(),
                 b.receipts() == null ? null : b.receipts().stream().map(r -> new NewReceipt(r.receivedOn(), r.amount())).toList(),
                 b.draft()), AgentRunFilter.isAgentCall(http));
+    }
+
+    /** A parent changes an income after setup. Never through an agent: an agent can only add a draft. */
+    @PutMapping("/income/{id}")
+    public IncomeView updateIncome(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id, @Valid @RequestBody IncomeEditBody b,
+                                   HttpServletRequest http) {
+        AgentRunFilter.refuseAgentCall(http, "Only a parent can change the income, in the app");
+        return service.updateIncome(CurrentMember.from(jwt), id, new IncomeEdit(b.name(), b.amount(), b.nextOn(), b.baseOverride()));
+    }
+
+    @DeleteMapping("/income/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeIncome(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id, HttpServletRequest http) {
+        AgentRunFilter.refuseAgentCall(http, "Only a parent can remove an income, in the app");
+        service.removeIncome(CurrentMember.from(jwt), id);
     }
 
     /** What a commission or sales income paid this month. */
@@ -132,6 +168,21 @@ public class PlanController {
                 b.draft()), AgentRunFilter.isAgentCall(http));
     }
 
+    @PutMapping("/commitments/{id}")
+    public CommitmentView updateCommitment(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id,
+                                           @Valid @RequestBody CommitmentEditBody b, HttpServletRequest http) {
+        AgentRunFilter.refuseAgentCall(http, "Only a parent can change a bill, in the app");
+        return service.updateCommitment(CurrentMember.from(jwt), id,
+                new CommitmentEdit(b.name(), b.amount(), b.frequency(), b.nextDueOn(), b.reserved()));
+    }
+
+    @DeleteMapping("/commitments/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeCommitment(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id, HttpServletRequest http) {
+        AgentRunFilter.refuseAgentCall(http, "Only a parent can remove a bill, in the app");
+        service.removeCommitment(CurrentMember.from(jwt), id);
+    }
+
     /** Income and commitments waiting for a parent's Confirm. */
     @GetMapping("/drafts")
     public Drafts drafts(@AuthenticationPrincipal Jwt jwt) {
@@ -155,6 +206,21 @@ public class PlanController {
     @GetMapping("/goals")
     public List<GoalView> goals(@AuthenticationPrincipal Jwt jwt) {
         return service.goals(CurrentMember.from(jwt));
+    }
+
+    /** A parent changes a family goal's name, amount or date. New goals are added with POST /api/setup/goals. */
+    @PutMapping("/goals/{id}")
+    public GoalView updateGoal(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id, @Valid @RequestBody GoalEditBody b,
+                               HttpServletRequest http) {
+        AgentRunFilter.refuseAgentCall(http, "Only a parent can change a goal, in the app");
+        return service.updateGoal(CurrentMember.from(jwt), id, new GoalEdit(b.name(), b.target(), b.targetDate()));
+    }
+
+    @DeleteMapping("/goals/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeGoal(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id, HttpServletRequest http) {
+        AgentRunFilter.refuseAgentCall(http, "Only a parent can remove a goal, in the app");
+        service.removeGoal(CurrentMember.from(jwt), id);
     }
 
     /** Relaxed, steady and faster ways to reach a family goal, each checked against every month's spare cash. */
@@ -206,6 +272,20 @@ public class PlanController {
         return service.saveBucketDraft(CurrentMember.from(jwt),
                 b.shares().stream().map(s -> new Share(s.kind(), s.shareBp(), s.reason())).toList(),
                 AgentRunFilter.isAgentCall(http) ? "PLANNER" : "PARENT");
+    }
+
+    /** A parent types each bucket in AED (Fun gets the rest). Saved as the parent's draft to confirm. */
+    @PostMapping("/buckets/draft/amounts")
+    public Buckets saveBucketAmounts(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody BucketAmountsBody b,
+                                     HttpServletRequest http) {
+        AgentRunFilter.refuseAgentCall(http, "Only a parent can change the buckets by hand, in the app");
+        return service.saveBucketAmounts(CurrentMember.from(jwt), b.amounts());
+    }
+
+    /** Keep the confirmed split: drop the waiting draft. */
+    @DeleteMapping("/buckets/draft")
+    public Buckets discardBucketDraft(@AuthenticationPrincipal Jwt jwt) {
+        return service.discardBucketDraft(CurrentMember.from(jwt));
     }
 
     @PostMapping("/buckets/confirm")

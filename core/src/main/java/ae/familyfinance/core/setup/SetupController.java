@@ -113,6 +113,12 @@ public class SetupController {
         return setup.starterBudgets(CurrentMember.from(jwt));
     }
 
+    /** The family's budgets and pocket money now, with the engine's start as a guide. Saves nothing. */
+    @GetMapping("/api/setup/budgets/current")
+    public Starter currentBudgets(@AuthenticationPrincipal Jwt jwt) {
+        return setup.currentBudgets(CurrentMember.from(jwt));
+    }
+
     /** A parent confirms the first budgets (as the engine started them, or changed). */
     @PostMapping("/api/setup/budgets")
     @ResponseStatus(HttpStatus.NO_CONTENT)

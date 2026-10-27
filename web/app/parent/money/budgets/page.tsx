@@ -32,7 +32,10 @@ export default function BudgetsPage() {
       <MoneyHeader sub={live && month ? `${month.monthLabel} · ${month.daysLeft} days to go` : `October · ${budgets.daysLeft} days to go`} />
 
       <section className="card">
-        <p className="card-title">Spent so far against each budget</p>
+        <div className="row" style={{ padding: 0 }}>
+          <p className="card-title">Spent so far against each budget</p>
+          {live && <Link href="/parent/money/budgets/change" className="link">Change budgets ›</Link>}
+        </div>
         <p className="muted" style={{ margin: "2px 0 6px" }}>The dark line is the limit. Red is over it.</p>
         {bars.map((b) => (
           <BudgetBar key={b.name} {...b} />

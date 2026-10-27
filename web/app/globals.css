@@ -781,6 +781,10 @@ label.check input { width: 20px; height: 20px; min-height: 0; margin: 1px 0 0; f
 .setup-line { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; padding: 10px 0; }
 .setup-line + .setup-line { border-top: 1px solid var(--rule-soft); }
 .setup-line .muted { grid-column: 1 / -1; font-size: 13px; }
+/* Changing a line after setup: the button and its form sit under the line, full width */
+.setup-line > button.text, .setup-line > .edit-line { grid-column: 1 / -1; }
+.setup-line > .edit-line { margin: 4px 0 0; }
+.setup-line > .edit-line .muted { font-size: 13px; }
 .planner-words { white-space: pre-line; font-size: 15px; line-height: 1.5; margin: 0; }
 
 /* Start here: a new family's first three steps on Today, gone once done */
