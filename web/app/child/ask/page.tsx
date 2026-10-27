@@ -75,8 +75,11 @@ export default function ChildAsk() {
     }
   }
 
+  // One ask per search: once a shop's offer is sent, the other shops wait, so a parent never gets the same thing twice
+  const askedOne = Object.values(sentOffers).includes("Sent ✓");
+
   async function ask(o: Offer) {
-    if (!found?.comparison || sending) return;
+    if (!found?.comparison || sending || askedOne) return;
     setSending(true);
     setSent(null);
     try {
@@ -202,7 +205,7 @@ export default function ChildAsk() {
             </p>
           ) : null}
           <Notice at="offer" />
-          {!blocked && <PriceResults comparison={c} action={sending ? "Sending…" : "Ask for this one"} onPick={ask} busy={sending} done={sentOffers} />}
+          {!blocked && <PriceResults comparison={c} action={sending ? "Sending…" : "Ask for this one"} onPick={ask} busy={sending || askedOne} done={sentOffers} />}
           <p className="trust">Prices and totals are worked out by the app from the shops&apos; own prices. Your parent sees the same comparison.</p>
         </section>
       )}
