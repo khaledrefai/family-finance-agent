@@ -237,10 +237,14 @@ public class SpendService {
         return sum == null ? 0 : sum;
     }
 
+    /** The member's own goals: the active ones, and one reached this month (it shows at 100% until the month ends). */
     private List<Goal> goals(UUID family, UUID member) {
         return jdbc.query("""
                 SELECT name, target_minor, saved_minor FROM goal
-                WHERE family_id = ? AND member_id = ? AND status = 'ACTIVE' ORDER BY created_at
+                WHERE family_id = ? AND member_id = ?
+                  AND (status = 'ACTIVE' OR (status = 'REACHED'
+                       AND date_trunc('month', reached_at AT TIME ZONE 'Asia/Dubai') = date_trunc('month', now() AT TIME ZONE 'Asia/Dubai')))
+                ORDER BY status = 'ACTIVE', created_at
                 """, (rs, i) -> new Goal(rs.getString(1), rs.getLong(2), rs.getLong(3)), family, member);
     }
 

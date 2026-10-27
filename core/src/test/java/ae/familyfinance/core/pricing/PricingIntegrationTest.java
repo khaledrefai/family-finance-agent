@@ -102,7 +102,7 @@ class PricingIntegrationTest extends PostgresIntegrationTest {
         assertThat(c.get("assessment").get("freeUntilPay").isNull()).isTrue();
         assertThat(c.get("assessment").get("needsParent").asBoolean()).isTrue();
         assertThat(c.get("facts").toString()).contains("Best re-checked total: AED 289 at Amazon.ae (AED 289 + free delivery)",
-                "A different model, not the same item", "less than half the usual price", "Layla's wallet");
+                "A different model, not the same item", "less than half the usual price", "Your headphones jar has AED 120 and the wallet AED 305");
         assertThat(replay.searches).hasSize(4);                     // the search and three re-checks
     }
 
@@ -162,7 +162,8 @@ class PricingIntegrationTest extends PostgresIntegrationTest {
                 {"kind":"ASK_TO_BUY","title":"cheap!","amountMinor":100,"comparisonId":"%s","offerKey":"%s"}"""
                 .formatted(c.get("id").asText(), c.get("best").get("key").asText())).andExpect(status().isCreated()));
         assertThat(r.get("amountMinor").asLong()).isEqualTo(28_900);
-        assertThat(r.get("title").asText()).isEqualTo("Sony WH-CH720N Wireless Noise Cancelling Headphones");
+        assertThat(r.get("title").asText()).isEqualTo("Sony WH-CH720N headphones");
+        assertThat(r.get("offer").get("product").asText()).isEqualTo("Sony WH-CH720N Wireless Noise Cancelling Headphones");
         assertThat(r.get("status").asText()).isEqualTo("PENDING");
         assertThat(r.get("offer").get("store").asText()).isEqualTo("Amazon.ae");
         assertThat(r.get("offer").get("verified").asBoolean()).isTrue();

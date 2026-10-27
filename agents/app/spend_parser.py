@@ -26,6 +26,11 @@ _FILLER = {
     "a", "an", "the", "some", "on", "for", "of", "my", "me", "it", "was", "today", "yesterday", "this", "morning",
     "afternoon", "evening", "at", "from", "in", "with", "to",
 }
+# "Dad said yes I can buy Robux, 20 dirhams": who said yes is not part of what was bought
+PARENT_SAID = re.compile(
+    r"\b(?:my\s+)?(?:dad|daddy|baba|mum|mom|mummy|mommy|mama|mother|father|parents?)\s+(?:said|says)\s+"
+    r"(?:yes|ok|okay)?[\s,]*(?:(?:that\s+)?i\s+(?:can|could|may)\b)?", re.I)
+
 # "with friends" is worth keeping in a description; everything else above is noise
 _KEEP_PHRASES = ("with friends",)
 
@@ -101,7 +106,7 @@ def _describe(chunk: str) -> str:
 
 def parse_spend(message: str, today: date) -> ParsedSpend:
     """'12 dirhams shawarma and juice 3.50 at the canteen' -> two LogItems."""
-    chunks = [c for c in _SPLIT.split(message) if c and c.strip()]
+    chunks = [c for c in _SPLIT.split(PARENT_SAID.sub(" ", message)) if c and c.strip()]
     items: list[LogItem] = []
     pending: list[str] = []  # things named before their price: "sandwich and juice for 9"
 

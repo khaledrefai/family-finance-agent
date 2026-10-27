@@ -188,11 +188,15 @@ export default function ChildAsk() {
           {blocked ? (
             <p className="turn-agent">
               {c.assessment!.facts.find((f) => f.startsWith("Family rule")) ?? "That one is against a family rule."} I won&apos;t send it to a parent.
+              {c.assessment!.facts.some((f) => f.includes("you must not have")) &&
+                " How about some fruit, or a cheese sandwich from home? A grown-up can check the label with you."}
             </p>
           ) : c.best ? (
             <p className="turn-agent">
               The best price I found is <b>{c.best.total.text}</b> at {c.best.store}.
-              {wallet && (wallet.walletCovers ? ` Your wallet has ${wallet.wallet.text}, enough for this.` : ` Your wallet has ${wallet.wallet.text}, so you'd need some help or a bit more saving.`)}
+              {wallet && (wallet.jar && wallet.jarName
+                ? ` Your ${wallet.jarName.toLowerCase()} jar has ${wallet.jar.text} and your wallet ${wallet.wallet.text}${wallet.walletCovers ? ": together enough, and the jar is used first." : ", so you'd need a bit more saving."}`
+                : wallet.walletCovers ? ` Your wallet has ${wallet.wallet.text}, enough for this.` : ` Your wallet has ${wallet.wallet.text}, so you'd need some help or a bit more saving.`)}
               {c.assessment?.needsParent ? " A parent says yes first." : ""}
             </p>
           ) : null}

@@ -67,12 +67,17 @@ public class RequestController {
     public record RequestView(UUID id, UUID requesterId, RequestKind kind, String title, long amountMinor,
                               String currency, String category, String productUrl, RequestStatus status,
                               String agentSummary, OffsetDateTime createdAt, OffsetDateTime decidedAt,
-                              Map<String, Object> offer) {
+                              Map<String, Object> offer, String childPays) {
 
         static RequestView of(SpendingRequest r) {
+            return of(r, null);
+        }
+
+        /** {@code childPays}: for a child's waiting request, whose demo money pays on a yes ("Layla's wallet"). */
+        static RequestView of(SpendingRequest r, String childPays) {
             return new RequestView(r.getId(), r.getRequesterId(), r.getKind(), r.getTitle(), r.getAmountMinor(),
                     r.getCurrency(), r.getCategory(), r.getProductUrl(), r.getStatus(), r.getAgentSummary(),
-                    r.getCreatedAt(), r.getDecidedAt(), r.getOffer());
+                    r.getCreatedAt(), r.getDecidedAt(), r.getOffer(), childPays);
         }
     }
 
@@ -99,7 +104,8 @@ public class RequestController {
 
     @GetMapping
     public List<RequestView> list(@AuthenticationPrincipal Jwt jwt) {
-        return service.list(CurrentMember.from(jwt)).stream().map(RequestView::of).toList();
+        CurrentMember me = CurrentMember.from(jwt);
+        return service.list(me).stream().map(r -> RequestView.of(r, me.isParent() ? service.childPays(r) : null)).toList();
     }
 
     // hasRole('PARENT') is a first, coarse check; ApprovalPolicy inside the service is the real rule.

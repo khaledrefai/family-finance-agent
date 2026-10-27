@@ -138,18 +138,18 @@ class DocumentsGoldWealthIntegrationTest extends PostgresIntegrationTest {
         mvc.perform(multipart("/api/documents").file(new MockMultipartFile("file", "again.txt", "text/plain",
                 receiptText.getBytes(StandardCharsets.UTF_8))).header("Authorization", sara)).andExpect(status().isConflict());
 
-        // 2. The Visa statement: 14 lines; the receipt, the fuel and the dinner are already in
+        // 2. The Visa statement: 13 lines; the receipt, the fuel and the dinner are already in
         String csv = sample(sara, "statement");
         JsonNode statement = upload(sara, "visa-statement.csv", "text/csv", csv, "STATEMENT");
         String sid = statement.get("id").asText();
         JsonNode read = read(postJson("/api/documents/" + sid + "/extraction", sara, statementDraft(csv), run)
                 .andExpect(status().isOk()));
         assertThat(read.get("kind").asText()).isEqualTo("CARD_STATEMENT");
-        assertThat(read.get("counts").get("lines").asInt()).isEqualTo(14);
+        assertThat(read.get("counts").get("lines").asInt()).isEqualTo(13);
         assertThat(read.get("counts").get("alreadyLogged").asInt()).isEqualTo(3);
-        assertThat(read.get("counts").get("added").asInt()).isEqualTo(11);
+        assertThat(read.get("counts").get("added").asInt()).isEqualTo(10);
         assertThat(read.get("counts").get("possibleDuplicates").asInt()).isEqualTo(1);
-        assertThat(read.get("summary").asText()).startsWith("14 lines. 11 new").contains("For Omar's Visa ···7710");
+        assertThat(read.get("summary").asText()).startsWith("13 lines. 10 new").contains("For Omar's Visa ···7710");
         JsonNode carrefour = null;
         for (JsonNode l : read.get("lines")) {
             if (l.get("description").asText().startsWith("CARREFOUR")) {
@@ -165,7 +165,7 @@ class DocumentsGoldWealthIntegrationTest extends PostgresIntegrationTest {
                 .header("Authorization", omar))).get("line").asText();
         postJson("/api/documents/" + sid + "/confirm", sara, "{\"updateBalance\":true}", null).andExpect(status().isOk());
         assertThat(jdbc.queryForObject("SELECT count(*) FROM ledger_transaction WHERE source_document_id = ?::uuid",
-                Long.class, sid)).isEqualTo(11);
+                Long.class, sid)).isEqualTo(10);
         JsonNode after = read(mvc.perform(get("/api/accounts/" + VISA + "/card-check").param("amount", "300")
                 .header("Authorization", omar)));
         assertThat(after.get("fits").asBoolean()).isFalse();

@@ -16,6 +16,7 @@ import ae.familyfinance.core.rules.RuleEngine.Outcome;
 import ae.familyfinance.core.rules.RuleKind;
 import ae.familyfinance.core.rules.RuleService;
 import ae.familyfinance.core.spend.SpendCategory;
+import ae.familyfinance.core.wallet.WalletService;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,8 @@ public class AffordabilityService {
     }
 
     /** For a child: their demo wallet and what this does to it. */
-    public record KidSide(UUID memberId, String name, MoneyView wallet, boolean walletCovers, MoneyView walletAfter) {
+    public record KidSide(UUID memberId, String name, MoneyView wallet, boolean walletCovers, MoneyView walletAfter,
+                          String jarName, MoneyView jar) {
     }
 
     /**
@@ -68,11 +70,32 @@ public class AffordabilityService {
             List<String> own = new ArrayList<>();
             own.add(facts.get(0));
             facts.stream().filter(f -> f.contains("wallet") || f.startsWith("A parent says yes") || f.startsWith(RULE))
+                    .map(f -> kid == null ? f : toYou(f, kid.name()))
                     .forEach(own::add);
             Verdict v = kid != null && kid.walletCovers() ? Verdict.FITS : Verdict.DOES_NOT_FIT;
             return new Assessment(version, amount, v, null, null, null, null, needsParent, blocked, approvalLimit, kid,
                     rules, null, List.copyOf(own));
         }
+    }
+
+    /**
+     * The child reads about themselves as "you": "Adam must not have peanuts" becomes "you must not have peanuts",
+     * "Layla's wallet has" becomes "Your wallet has". The rule's own name ("No peanuts for Adam") stays as written.
+     */
+    static String toYou(String fact, String name) {
+        int at = fact.startsWith(RULE) ? fact.indexOf(". ") + 2 : 0;
+        if (at < 2) {
+            at = 0;
+        }
+        String head = fact.substring(0, at);
+        String rest = fact.substring(at)
+                .replace(name + " must not", "you must not")
+                .replace(name + " has a ", "you have a ")
+                .replace(name + "'s ", "your ");
+        if (rest.startsWith("your ")) {
+            rest = "Your " + rest.substring(5);
+        }
+        return head + rest;
     }
 
     /** Every fact about a family rule starts with this, so the child's view can keep them. */
@@ -82,8 +105,11 @@ public class AffordabilityService {
     private final AccountService accounts;
     private final RuleService rules;
     private final JdbcClient db;
+    private final WalletService wallets;
 
-    public AffordabilityService(MoneyFacts moneyFacts, AccountService accounts, RuleService rules, JdbcClient db) {
+    public AffordabilityService(MoneyFacts moneyFacts, AccountService accounts, RuleService rules, JdbcClient db,
+                                WalletService wallets) {
+        this.wallets = wallets;
         this.moneyFacts = moneyFacts;
         this.accounts = accounts;
         this.rules = rules;
@@ -128,10 +154,9 @@ public class AffordabilityService {
         String amountText = MoneyView.of(amount).text();
         facts.add("It costs " + amountText + ".");
         String until = flow.untilNextIncome().nextIncomeOn() == null ? "Free now: "
-                : "Free until pay day (" + flow.untilNextIncome().nextIncomeLabel() + ", "
-                  + day(flow.untilNextIncome().nextIncomeOn()) + "): ";
+                : "Free until pay day on " + day(flow.untilNextIncome().nextIncomeOn()) + ": ";
         facts.add(until + MoneyView.of(free).text() + (after.isNegative()
-                ? ". This would leave it " + MoneyView.of(after.negate()).text() + " short."
+                ? ". That is " + MoneyView.of(after.negate()).text() + " less than this costs."
                 : ", and " + MoneyView.of(after).text() + " after this."));
         String next = null;
         if (flow.nextCommitment() != null) {
@@ -146,12 +171,23 @@ public class AffordabilityService {
         boolean needsParent = false;
         boolean blocked = false;
         if (member.child()) {
-            Money wallet = new Money(walletMinor(who), cur);
-            boolean covers = wallet.compareTo(amount) >= 0;
-            kid = new KidSide(who, member.name(), MoneyView.of(wallet), covers, MoneyView.of(wallet.minus(amount)));
-            facts.add(member.name() + "'s wallet has " + MoneyView.of(wallet).text() + (covers
-                    ? ", enough for this."
-                    : ", " + MoneyView.of(amount.minus(wallet)).text() + " short."));
+            // The goal jar it was saved for pays first, then the wallet
+            WalletService.Cover c = wallets.cover(me.familyId(), who, text, amountMinor);
+            Money wallet = new Money(c.walletBalanceMinor(), cur);
+            boolean covers = c.covers();
+            MoneyView jar = c.jar() == null ? null : MoneyView.of(new Money(c.jarMinor(), cur));
+            kid = new KidSide(who, member.name(), MoneyView.of(wallet), covers,
+                    MoneyView.of(wallet.minus(new Money(c.walletMinor(), cur))), c.jar() == null ? null : c.jar().name(), jar);
+            if (c.jar() != null) {
+                facts.add(member.name() + "'s " + c.jar().name().toLowerCase(java.util.Locale.ROOT) + " jar has "
+                          + jar.text() + " and the wallet " + MoneyView.of(wallet).text() + (covers
+                        ? ": together enough for this, and the jar is used first."
+                        : ": together " + MoneyView.of(new Money(c.walletMinor() - c.walletBalanceMinor(), cur)).text() + " short."));
+            } else {
+                facts.add(member.name() + "'s wallet has " + MoneyView.of(wallet).text() + (covers
+                        ? ", enough for this."
+                        : ", " + MoneyView.of(amount.minus(wallet)).text() + " short."));
+            }
 
             RuleEngine.Result r = RuleEngine.check(rules.activeFor(me.familyId(), who),
                     new Ask(amountMinor, category, text), rules.spentBy(me.familyId(), who), member.name(), cur);
@@ -187,12 +223,5 @@ public class AffordabilityService {
     }
 
     private record Member(String name, boolean child) {
-    }
-
-    private long walletMinor(UUID member) {
-        return db.sql("""
-                SELECT COALESCE(SUM(e.amount_minor), 0) FROM demo_wallet_entry e
-                JOIN demo_wallet w ON w.id = e.wallet_id WHERE w.member_id = ?
-                """).param(member).query(Long.class).single();
     }
 }

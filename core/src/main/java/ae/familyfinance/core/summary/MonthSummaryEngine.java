@@ -372,7 +372,8 @@ public final class MonthSummaryEngine {
             facts.add("Stars this month: " + k.starsThisMonth() + ", stars in all: " + k.starsTotal());
         }
         if (goal != null) {
-            highlights.add("Your " + lower(goal.name()) + " jar is " + goal.percent() + "% full.");
+            highlights.add(goal.percent() >= 100 ? "You reached your " + lower(goal.name()) + " goal!"
+                    : "Your " + lower(goal.name()) + " jar is " + goal.percent() + "% full.");
             facts.add("Own goal " + goal.name() + ": " + goal.percent() + "% full, " + goal.saved().text() + " of "
                       + goal.target().text());
         }
@@ -403,7 +404,8 @@ public final class MonthSummaryEngine {
         String camel;
         if (won) {
             camel = k.name() + ", what a month. You are Saver of the Month"
-                    + (goal == null ? "." : ", and your " + lower(goal.name()) + " jar is " + goal.percent() + "% full.");
+                    + (goal == null ? "." : goal.percent() >= 100 ? ", and you reached your " + lower(goal.name()) + " goal."
+                       : ", and your " + lower(goal.name()) + " jar is " + goal.percent() + "% full.");
         } else if (goal != null && goal.percent() > 0) {
             camel = k.name() + ", your " + lower(goal.name()) + " jar is " + goal.percent() + "% full. Every dirham you keep gets it closer.";
         } else if (logged > 0) {

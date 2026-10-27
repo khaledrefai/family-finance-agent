@@ -67,8 +67,10 @@ public class RequestService {
     public SpendingRequest createFromOffer(CurrentMember me, UUID comparisonId, String offerKey) {
         ChosenOffer chosen = pricing.chosen(me, comparisonId, offerKey);
         OfferView o = chosen.offer();
-        String title = o.title().length() > 200 ? o.title().substring(0, 200) : o.title();
+        // The card, the notifications and the kid's list show a short name; the shop's full title stays with the offer
+        String title = ShortName.of(o.title().length() > 200 ? o.title().substring(0, 200) : o.title());
         Map<String, Object> offer = new HashMap<>();
+        offer.put("product", o.title());
         offer.put("comparisonId", comparisonId.toString());
         offer.put("store", o.store());
         offer.put("price", o.price().text());
@@ -160,6 +162,32 @@ public class RequestService {
                         RequestStatus.CANCELLED);
     }
 
+    /**
+     * Whose own demo money pays for a child's waiting request on a yes: "Layla's headphones jar and wallet",
+     * "Layla's wallet", or null when a parent pays (not enough, a reward, or not a child's request).
+     */
+    @Transactional(readOnly = true)
+    public String childPays(SpendingRequest r) {
+        if (r.getStatus() != RequestStatus.PENDING || r.getKind() == RequestKind.REWARD) {
+            return null;
+        }
+        boolean child = db.sql("SELECT role = 'CHILD' FROM member WHERE id = ?").param(r.getRequesterId())
+                .query(Boolean.class).single();
+        if (!child) {
+            return null;
+        }
+        WalletService.Cover c = wallets.cover(r.getFamilyId(), r.getRequesterId(), r.getTitle(), r.getAmountMinor());
+        if (!c.covers()) {
+            return null;
+        }
+        String name = nameOf(r.getRequesterId());
+        if (c.jar() == null) {
+            return name + "'s wallet";
+        }
+        String jar = c.jar().name().toLowerCase(java.util.Locale.ROOT) + " jar";
+        return name + "'s " + (c.walletMinor() > 0 ? jar + " and wallet" : jar);
+    }
+
     @Transactional
     public SpendingRequest decide(CurrentMember me, UUID requestId, Decision decision, String note) {
         SpendingRequest request = requests.findByIdAndFamilyId(requestId, me.familyId())
@@ -188,15 +216,24 @@ public class RequestService {
                 .query(Boolean.class).single();
         if (child && decision == Decision.APPROVED) {
             Money amount = new Money(request.getAmountMinor(), request.getCurrency());
-            Optional<Money> left = request.getKind() == RequestKind.REWARD ? Optional.empty()
+            Optional<WalletService.Paid> paid = request.getKind() == RequestKind.REWARD ? Optional.empty()
                     : wallets.payForRequest(request.getFamilyId(), request.getRequesterId(), request.getId(),
                     request.getTitle(), amount);
-            more.put("paidNote", left
-                    .map(after -> MoneyView.of(amount).text() + " came out of your wallet. You have " + MoneyView.of(after).text() + " left.")
-                    .orElse("A parent pays for this one."));
+            more.put("paidNote", paid.map(p -> paidNote(amount, p)).orElse("A parent pays for this one."));
         }
         outbox.publish(me.familyId(), LiveKind.REQUEST_DECIDED, request.getRequesterId(), me.memberId(), facts(request, more));
         return request;
+    }
+
+    static String paidNote(Money amount, WalletService.Paid p) {
+        String left = "You have " + MoneyView.of(p.walletAfter()).text() + " left in your wallet.";
+        if (p.goalReached() == null) {
+            return MoneyView.of(amount).text() + " came out of your wallet. " + left;
+        }
+        Money fromWallet = amount.minus(p.fromJar());
+        return "Goal reached! " + MoneyView.of(p.fromJar()).text() + " came out of your " + p.goalReached().toLowerCase(java.util.Locale.ROOT)
+               + " jar" + (fromWallet.minor() > 0 ? " and " + MoneyView.of(fromWallet).text() + " out of your wallet. " : ". ")
+               + left + " +5 stars.";
     }
 
     private String nameOf(UUID member) {

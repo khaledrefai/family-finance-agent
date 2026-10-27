@@ -196,10 +196,10 @@ class RulesBudgetsAdviceIntegrationTest extends PostgresIntegrationTest {
             }
         }
         assertThat(fun).isNotNull();
-        assertThat(fun.get("spent").get("minor").asLong()).isEqualTo(156_000);
+        assertThat(fun.get("spent").get("minor").asLong()).isEqualTo(152_500);
         assertThat(fun.get("usual").get("minor").asLong()).isEqualTo(152_000);
         assertThat(fun.get("state").asText()).isEqualTo("OVER");
-        assertThat(m.get("alerts").get(0).get("alert").asText()).startsWith("Entertainment is at 130% of its AED 1,200 budget");
+        assertThat(m.get("alerts").get(0).get("alert").asText()).startsWith("Entertainment is at 127% of its AED 1,200 budget");
         mvc.perform(get("/api/budgets").header("Authorization", login("layla"))).andExpect(status().isForbidden());
     }
 

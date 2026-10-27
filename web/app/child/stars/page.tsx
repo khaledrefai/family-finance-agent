@@ -28,7 +28,8 @@ export default function StarsPage() {
   const race = month?.saver?.race ?? (month ? [] : saverOfTheMonth);
   const young = me.ageBand === "CHILD_6_9";
   const pct = month?.goalName ? month.goalPercent ?? 0 : null;
-  const stickers = me.demo ? badges : [
+  // From my own goal, live (the demo family's sample stickers only while the core can't be reached)
+  const stickers = !month && me.demo ? badges : [
     { art: "camel" as const, name: "First star", earned: (month?.starsTotal ?? 0) > 0, hint: "Tell me what you bought" },
     ...(pct === null ? [] : [
       { art: "quarter" as const, name: "A quarter there", earned: pct >= 25 },
@@ -36,6 +37,8 @@ export default function StarsPage() {
       { art: "threequarter" as const, name: "Nearly there", earned: pct >= 75 },
       { art: "trophy" as const, name: "Goal reached", earned: pct >= 100 },
     ]),
+    ...(month?.familyGoal ? [{ art: "heart" as const, name: "Family badge", earned: month.familyGoal.percent >= 50,
+      hint: `${month.familyGoal.name} at ${month.familyGoal.percent}% of 50%` }] : []),
   ];
 
   return (

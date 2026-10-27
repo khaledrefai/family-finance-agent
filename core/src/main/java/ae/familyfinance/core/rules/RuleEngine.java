@@ -115,7 +115,8 @@ public final class RuleEngine {
         }
         if (ask.category() == null) {
             return new Hit(r.id(), r.kind(), r.label(), Outcome.NEEDS_PARENT,
-                    "I can't tell if this is food. " + child + " has a " + a.label() + " rule, so a parent checks first.");
+                    "I can't tell what kind of thing this is. If it is food, " + child + " must not have " + a.label()
+                    + ", so a parent checks first.");
         }
         if (FOOD.contains(ask.category())) {
             return new Hit(r.id(), r.kind(), r.label(), Outcome.NEEDS_PARENT,

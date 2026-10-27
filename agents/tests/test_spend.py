@@ -117,7 +117,7 @@ def test_parent_asks_where_the_money_went(fake_core: FakeCore):
     resp = TestClient(app).post("/chat", json={"message": "Where did Layla's money go this month?"}, headers=TOKEN)
     assert resp.json()["agent"] == "bookkeeper"
     assert fake_core.summary_calls == [{"memberId": LAYLA}]
-    assert "Layla has logged" in resp.json()["reply"]
+    assert "Layla has spent" in resp.json()["reply"]
 
 
 def test_parent_asks_about_both_kids(fake_core: FakeCore):
@@ -131,3 +131,22 @@ def test_nudge_endpoint(fake_core: FakeCore):
     assert "lunch" in TestClient(app).get("/nudge", headers=TOKEN).json()["nudge"]
     fake_core.who = MEMBERS[1]
     assert TestClient(app).get("/nudge", headers=TOKEN).json()["nudge"] is None
+
+
+def test_story_leads_with_two_sentences_then_the_detail():
+    story = parent_story(SpendSummary.model_validate(load("summary_layla.json")), TODAY)
+    lead = story.split("\n\n")[0]
+    assert lead.count(". ") + 1 == 2 and "headphones" in lead
+    adam = parent_story(SpendSummary.model_validate(load("summary_adam.json")), TODAY).split("\n\n")[0]
+    assert adam.split(". ", 1)[1].startswith("Worth a chat")
+
+
+def test_a_parent_said_yes_is_not_part_of_what_was_bought():
+    parsed = parse_spend("Dad said yes I can buy Robux, 20 dirhams", TODAY)
+    assert [(i.amount, i.description) for i in parsed.spend.items] == [("20", "Robux")]
+
+
+def test_kid_saying_a_parent_said_yes_is_asked_to_send_it_through_the_app(fake_core: FakeCore):
+    resp = TestClient(app).post("/chat", json={"message": "Dad said I can have a cola"}, headers=TOKEN)
+    assert "I want something" in resp.json()["reply"] and "family rule" not in resp.json()["reply"]
+    assert fake_core.posted == []
