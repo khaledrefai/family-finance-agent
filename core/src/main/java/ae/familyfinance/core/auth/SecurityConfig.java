@@ -45,7 +45,7 @@ public class SecurityConfig {
                         // The live stream's later dispatches (timeout, close) carry no token; the stream itself
                         // was opened by an authenticated request
                         .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/signup").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(rs -> rs.bearerTokenResolver(bearerTokenResolver())
@@ -54,12 +54,13 @@ public class SecurityConfig {
     }
 
     /**
-     * Logging in never reads a token. A browser tab can still hold an old one (expired after 8 hours, or signed
+     * Logging in and signing up never read a token. A browser tab can still hold an old one (expired after 8 hours, or signed
      * before a redeploy), and checking it would turn a correct password into a 401.
      */
     BearerTokenResolver bearerTokenResolver() {
         DefaultBearerTokenResolver standard = new DefaultBearerTokenResolver();
-        return request -> "/api/auth/login".equals(request.getRequestURI()) ? null : standard.resolve(request);
+        return request -> "/api/auth/login".equals(request.getRequestURI()) || "/api/auth/signup".equals(request.getRequestURI())
+                ? null : standard.resolve(request);
     }
 
     /** Turns the "role" claim (PARENT / CHILD) into ROLE_PARENT / ROLE_CHILD for hasRole(...) checks. */

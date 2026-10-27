@@ -23,7 +23,7 @@ public class FamilyController {
     }
 
     public record MeResponse(UUID memberId, String displayName, Role role, AgeBand ageBand,
-                             UUID familyId, String familyName, String currency) {
+                             UUID familyId, String familyName, String currency, boolean setupDone, boolean demo) {
     }
 
     public record MemberView(UUID id, String displayName, Role role, AgeBand ageBand) {
@@ -35,7 +35,7 @@ public class FamilyController {
         Member m = members.findById(current.memberId()).orElseThrow();
         Family f = families.findById(current.familyId()).orElseThrow();
         return new MeResponse(m.getId(), m.getDisplayName(), m.getRole(), m.getAgeBand(),
-                f.getId(), f.getName(), f.getCurrency());
+                f.getId(), f.getName(), f.getCurrency(), f.isSetupDone(), f.isDemo());
     }
 
     /** Everyone in the family can see who is in it; only names, roles and age bands are shown. */

@@ -42,7 +42,7 @@ export default function LoginPage() {
       setToken(null); // an old token (expired, or from before a redeploy) must not ride along with the login
       const res = await api.login(username, password);
       setToken(res.accessToken);
-      router.push(res.role === "PARENT" ? "/parent" : "/child");
+      router.push(res.role === "PARENT" ? "/parent" : "/child"); // a family still setting up is sent on to /setup
     } catch (err) {
       setError((err as Error).message);
       setBusy(false);
@@ -76,6 +76,10 @@ export default function LoginPage() {
         <button type="submit" disabled={busy}>{busy ? "Logging in…" : "Log in"}</button>
         {error && <p className="error" role="alert">{error}</p>}
       </form>
+
+      <p style={{ marginTop: 4 }}>
+        New here? <Link href="/signup" className="link">Start your family</Link>
+      </p>
 
       <h2>Try it as the demo family</h2>
       <p className="muted" style={{ marginTop: -6, marginBottom: 12 }}>Pick someone, then log in.</p>
