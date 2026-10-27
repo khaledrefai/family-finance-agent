@@ -140,7 +140,7 @@ public final class StarterBudgetEngine {
         String note;
         if (!room.isPositive()) {
             note = "Your commitments take all of this month's income, so there is no room for budgets yet. "
-                    + "Check the income and the bills before you go on.";
+                    + "Go back and check the income and the bills, or type at least a groceries amount to go on.";
         } else if (cut) {
             note = "The usual starting amounts came to more than " + text(cap) + ", 60% of the "
                     + text(room) + " left after commitments, so each one is cut by the same share.";

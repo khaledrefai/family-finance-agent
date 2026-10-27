@@ -283,7 +283,7 @@ public class SetupService {
             }
         }
         if (count("SELECT count(*) FROM budget WHERE family_id = ?", me.familyId()) == 0) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Keep at least one budget, even a small one");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Type an amount for at least one budget, groceries for example, before you go on");
         }
     }
 

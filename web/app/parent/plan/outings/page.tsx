@@ -287,7 +287,7 @@ function OutingCard({ o, action, onAction, closed = false }: { o: OutingOption; 
       {(!free || closed) && <p className="muted offer-parts">{free ? "Free to get in" : `For the family: ${o.costLine}`}{closed ? " · closed that month" : ""}</p>}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
         {action && onAction && <button type="button" className="quiet" onClick={onAction}>{action}</button>}
-        <a className="link" href={o.site} target="_blank" rel="noreferrer noopener">Check the price on the site</a>
+        <a className="link" href={o.site} target="_blank" rel="noreferrer noopener">{free ? "See it on the site" : "Check the price on the site"}</a>
       </div>
     </article>
   );
