@@ -614,6 +614,18 @@ class CoreClient:
         _raise_for_core(resp)
         return resp.json()
 
+    # ------------------------------------------------------------ weekly dinners
+
+    def meals_board(self) -> dict:
+        """The week's nights, the grocery money, who eats what, and the saved recipes with this family's cost."""
+        return self._get("/api/meals")
+
+    def meals_plan(self, keys: list[str] | None = None, delivery_days: list[str] | None = None) -> dict:
+        """Dinners for the cooking nights (empty: the engine picks) and busy nights as ISO dates. The core checks it."""
+        resp = self._http.post("/api/meals/plan", json={"keys": keys or [], "deliveryDays": delivery_days or []})
+        _raise_for_core(resp)
+        return resp.json()
+
     # ------------------------------------------------------------ family rules and ways to save
 
     def draft_rule(self, draft: RuleDraft) -> Rule:

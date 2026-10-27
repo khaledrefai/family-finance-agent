@@ -98,6 +98,14 @@ export default function PlanPage() {
         />
       </Link>
 
+      <Link href="/parent/plan/meals" className="card" style={{ display: "grid", gap: 4, color: "inherit", textDecoration: "none" }}>
+        <div className="row" style={{ padding: 0 }}>
+          <span className="card-title">Weekly dinners</span>
+          <span className="link">Plan the week ›</span>
+        </div>
+        <span className="muted">What to cook and the shopping list, inside the grocery budget and the family&apos;s food rules.</span>
+      </Link>
+
       <Link href="/parent/plan/outings" className="card" style={{ display: "grid", gap: 4, color: "inherit", textDecoration: "none" }}>
         <div className="row" style={{ padding: 0 }}>
           <span className="card-title">Family outings</span>

@@ -20,6 +20,7 @@ export type LiveKind =
   | "OVERSPEND"
   | "WEEKLY_PLAN"
   | "OUTINGS_PLANNED"
+  | "MEALS_PLANNED"
   | "TEST";
 
 /** What the core says to me about it, when there is something to say (the same words as the phone notification). */

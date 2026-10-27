@@ -17,6 +17,8 @@ Week 6: the Shopper compares prices (shopper.py): it reads what someone wants fr
 and the core searches the shops, ranks the offers by payable total and checks the best one like any request.
 Week 7: the Planner plans cheaper family outings (outings.py): it reads the month and the kind of outing, may pick
 from the core's list, and the core prices them for the family and checks them against the entertainment budget.
+Dinners (2026-10-26): the Planner plans the week's dinners (meals.py): it reads the busy nights and wishes, may pick
+from the core's saved recipes that suit everyone, and the core prices the shopping list and checks the grocery money.
 Savings calculator: the Planner reads a what-if ("AED 1,000 a month at 6% for 15 years") into the core's calculator
 ask (calculator.py) and repeats the core's 1, 5 and 10 year figures. Learning only, no product is ever named.
 Later weeks replace route_message() with an LLM classifier and fill in each agent with tools
@@ -30,7 +32,7 @@ from typing import TypedDict
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
-from . import bookkeeper, calculator, documents, gatekeeper, outings, planner, rules, shopper
+from . import bookkeeper, calculator, documents, gatekeeper, meals, outings, planner, rules, shopper
 from .spend_parser import looks_like_spend
 
 
@@ -54,7 +56,7 @@ class ChatState(TypedDict, total=False):
 _KEYWORDS: list[tuple[Agent, tuple[str, ...]]] = [
     (Agent.BOOKKEEPER, ("receipt", "invoice", "statement", "upload", "duplicate", "subscription", "bill", "charge")),
     (Agent.PLANNER, ("gold", "apartment", "rent or buy", "mortgage", "insurance", "invest", "10 years", "5 years")),
-    (Agent.SHOPPER, ("compare", "cheaper", "meal", "recipe", "shopping list", "groceries", "warranty")),
+    (Agent.SHOPPER, ("compare", "cheaper", "warranty")),
     (Agent.COACH, ("save", "saving", "challenge", "points", "lesson", "goal", "reward")),
     (Agent.GATEKEEPER, ("buy", "can i", "want", "noon", "amazon", "allerg", "peanut", "money for")),
 ]
@@ -89,7 +91,7 @@ def route_message(state: ChatState) -> ChatState:
         return {"agent": Agent.GATEKEEPER}
     if gatekeeper.amount_in(text) and _ASKING.search(text) or "afford" in text:
         return {"agent": Agent.GATEKEEPER}
-    if outings.is_outings_question(text) or calculator.is_calculator_question(text):
+    if meals.is_meals_question(text) or outings.is_outings_question(text) or calculator.is_calculator_question(text):
         return {"agent": Agent.PLANNER}
     if shopper.is_price_question(text):
         return {"agent": Agent.SHOPPER}
@@ -138,6 +140,8 @@ def planner_node(state: ChatState, config: RunnableConfig) -> ChatState:
     ctx = config.get("configurable", {})
     core, me = ctx.get("core"), ctx.get("me")
     message = state.get("message", "")
+    if core is not None and me is not None and meals.is_meals_question(message):
+        return {"reply": meals.handle(core, me, message, ctx.get("llm"))}
     if core is not None and me is not None and outings.is_outings_question(message):
         return {"reply": outings.handle(core, me, message, ctx.get("llm"))}
     if core is not None and me is not None and calculator.is_calculator_question(message):

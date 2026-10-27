@@ -708,6 +708,20 @@ body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
 .stamp-mini { font-size: 12px; font-weight: 700; letter-spacing: 0.02em; padding: 2px 10px; border-radius: 99px; border: 1.5px solid currentColor; }
 .stamp-mini.over { color: var(--declined); background: var(--declined-wash); }
 .offer.closed { opacity: 0.6; }
+
+/* Weekly dinners: a night card (dashed edge on delivery nights), the swap list and the shopping list */
+.dinner { display: grid; gap: 4px; }
+.dinner.delivery { border-style: dashed; background: var(--paper); }
+.swap-list { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; max-height: 280px; overflow-y: auto; }
+.swap-pick { width: 100%; display: flex; justify-content: space-between; gap: 12px; text-align: left; font-weight: 400;
+  background: var(--paper); color: var(--ink); border: 1px solid var(--rule); padding: 8px 10px; min-height: 44px; }
+.swap-pick span:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.shop-line { align-items: flex-start; }
+.shop-line > b { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.food-edit { border: 1px solid var(--rule-soft); border-radius: 10px; padding: 8px 12px 12px; margin: 0; display: grid; gap: 8px; }
+.meal-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.meal-list li { display: grid; grid-template-columns: 3.2em 1fr; gap: 8px; align-items: baseline; }
+.meal-list li.today b { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
 .fun-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .fun-list li { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: center; }
 .fun-list li b { font-size: 17px; }

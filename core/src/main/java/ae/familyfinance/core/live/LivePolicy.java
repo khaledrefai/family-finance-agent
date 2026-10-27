@@ -125,6 +125,15 @@ public final class LivePolicy {
                     }
                 }
             }
+            case MEALS_PLANNED -> {
+                for (Member m : family) {
+                    live.add(m.id());
+                    if (!m.id().equals(e.actor())) {
+                        notes.add(new Note(m.id(), "Dinners this week", e.get("dinners"),
+                                m.parent() ? "/parent/plan/meals" : "/child", false));
+                    }
+                }
+            }
             case TEST -> {
                 if (subject != null) {
                     live.add(subject.id());

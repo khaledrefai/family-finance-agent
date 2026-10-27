@@ -1,0 +1,482 @@
+{
+    "start": "2026-10-27",
+    "end": "2026-11-02",
+    "weekLabel": "Tue 27 Oct to Mon 2 Nov",
+    "nights": [
+        {
+            "date": "2026-10-27",
+            "label": "Tue 27 Oct",
+            "kind": "COOK",
+            "key": "bolognese",
+            "name": "Spaghetti bolognese",
+            "about": "Beef and tomato sauce with carrots hidden in it, over pasta.",
+            "minutes": 45,
+            "cost": {
+                "minor": 3759,
+                "currency": "AED",
+                "text": "AED 37.59"
+            }
+        },
+        {
+            "date": "2026-10-28",
+            "label": "Wed 28 Oct",
+            "kind": "DELIVERY",
+            "key": "falafel-box",
+            "name": "Falafel and hummus box",
+            "about": "Falafel, hummus, salad and bread for 4.",
+            "minutes": null,
+            "cost": {
+                "minor": 7000,
+                "currency": "AED",
+                "text": "AED 70"
+            }
+        },
+        {
+            "date": "2026-10-29",
+            "label": "Thu 29 Oct",
+            "kind": "COOK",
+            "key": "lentil-soup",
+            "name": "Red lentil soup with bread",
+            "about": "Thick lentil soup with cumin and lemon, and warm Arabic bread.",
+            "minutes": 35,
+            "cost": {
+                "minor": 940,
+                "currency": "AED",
+                "text": "AED 9.40"
+            }
+        },
+        {
+            "date": "2026-10-30",
+            "label": "Fri 30 Oct",
+            "kind": "DELIVERY",
+            "key": "chicken-biryani",
+            "name": "Chicken biryani for 4",
+            "about": "A family tray of chicken biryani with raita.",
+            "minutes": null,
+            "cost": {
+                "minor": 9000,
+                "currency": "AED",
+                "text": "AED 90"
+            }
+        },
+        {
+            "date": "2026-10-31",
+            "label": "Sat 31 Oct",
+            "kind": "COOK",
+            "key": "chicken-machboos",
+            "name": "Chicken machboos",
+            "about": "Spiced chicken and rice cooked in one pot, the Gulf way.",
+            "minutes": 75,
+            "cost": {
+                "minor": 3022,
+                "currency": "AED",
+                "text": "AED 30.22"
+            }
+        },
+        {
+            "date": "2026-11-01",
+            "label": "Sun 1 Nov",
+            "kind": "COOK",
+            "key": "mujaddara",
+            "name": "Mujaddara with cucumber yoghurt",
+            "about": "Lentils and rice with crispy onions, and a cool cucumber yoghurt on the side.",
+            "minutes": 50,
+            "cost": {
+                "minor": 1520,
+                "currency": "AED",
+                "text": "AED 15.20"
+            }
+        },
+        {
+            "date": "2026-11-02",
+            "label": "Mon 2 Nov",
+            "kind": "COOK",
+            "key": "tuna-pasta-bake",
+            "name": "Tuna pasta bake",
+            "about": "Pasta, tuna, tomato and peas baked under melted cheese.",
+            "minutes": 40,
+            "cost": {
+                "minor": 3362,
+                "currency": "AED",
+                "text": "AED 33.62"
+            }
+        }
+    ],
+    "list": [
+        {
+            "key": "carrots",
+            "name": "Carrots",
+            "pack": "1 kg bag",
+            "packs": 1,
+            "cost": {
+                "minor": 500,
+                "currency": "AED",
+                "text": "AED 5"
+            },
+            "uses": "You use 350 g of 1 kg",
+            "aisle": "FRUIT_VEG",
+            "halalMark": false
+        },
+        {
+            "key": "cucumbers",
+            "name": "Cucumbers",
+            "pack": "1 kg",
+            "packs": 1,
+            "cost": {
+                "minor": 600,
+                "currency": "AED",
+                "text": "AED 6"
+            },
+            "uses": "You use 300 g of 1 kg",
+            "aisle": "FRUIT_VEG",
+            "halalMark": false
+        },
+        {
+            "key": "garlic",
+            "name": "Garlic",
+            "pack": "250 g net",
+            "packs": 1,
+            "cost": {
+                "minor": 400,
+                "currency": "AED",
+                "text": "AED 4"
+            },
+            "uses": "You use 35 g of 250 g",
+            "aisle": "FRUIT_VEG",
+            "halalMark": false
+        },
+        {
+            "key": "lemons",
+            "name": "Lemons",
+            "pack": "500 g",
+            "packs": 1,
+            "cost": {
+                "minor": 500,
+                "currency": "AED",
+                "text": "AED 5"
+            },
+            "uses": "You use 200 g of 500 g",
+            "aisle": "FRUIT_VEG",
+            "halalMark": false
+        },
+        {
+            "key": "mint",
+            "name": "Mint",
+            "pack": "1 bunch",
+            "packs": 1,
+            "cost": {
+                "minor": 200,
+                "currency": "AED",
+                "text": "AED 2"
+            },
+            "uses": "All used this week",
+            "aisle": "FRUIT_VEG",
+            "halalMark": false
+        },
+        {
+            "key": "onions",
+            "name": "Onions",
+            "pack": "1 kg bag",
+            "packs": 2,
+            "cost": {
+                "minor": 800,
+                "currency": "AED",
+                "text": "AED 8"
+            },
+            "uses": "You use 1.3 kg of 2 kg",
+            "aisle": "FRUIT_VEG",
+            "halalMark": false
+        },
+        {
+            "key": "tomatoes",
+            "name": "Tomatoes",
+            "pack": "1 kg",
+            "packs": 1,
+            "cost": {
+                "minor": 600,
+                "currency": "AED",
+                "text": "AED 6"
+            },
+            "uses": "You use 300 g of 1 kg",
+            "aisle": "FRUIT_VEG",
+            "halalMark": false
+        },
+        {
+            "key": "beef-mince",
+            "name": "Beef mince",
+            "pack": "500 g tray",
+            "packs": 1,
+            "cost": {
+                "minor": 2300,
+                "currency": "AED",
+                "text": "AED 23"
+            },
+            "uses": "All used this week",
+            "aisle": "MEAT_FISH",
+            "halalMark": true
+        },
+        {
+            "key": "chicken-whole",
+            "name": "Whole chicken",
+            "pack": "1 kg bird",
+            "packs": 2,
+            "cost": {
+                "minor": 3400,
+                "currency": "AED",
+                "text": "AED 34"
+            },
+            "uses": "You use 1.2 kg of 2 kg",
+            "aisle": "MEAT_FISH",
+            "halalMark": true
+        },
+        {
+            "key": "mozzarella",
+            "name": "Grated mozzarella",
+            "pack": "200 g",
+            "packs": 1,
+            "cost": {
+                "minor": 1200,
+                "currency": "AED",
+                "text": "AED 12"
+            },
+            "uses": "You use 150 g of 200 g",
+            "aisle": "DAIRY_EGGS",
+            "halalMark": false
+        },
+        {
+            "key": "yoghurt",
+            "name": "Plain yoghurt",
+            "pack": "1 kg tub",
+            "packs": 1,
+            "cost": {
+                "minor": 850,
+                "currency": "AED",
+                "text": "AED 8.50"
+            },
+            "uses": "You use 400 g of 1 kg",
+            "aisle": "DAIRY_EGGS",
+            "halalMark": false
+        },
+        {
+            "key": "arabic-bread",
+            "name": "Arabic bread",
+            "pack": "bag of 6",
+            "packs": 1,
+            "cost": {
+                "minor": 300,
+                "currency": "AED",
+                "text": "AED 3"
+            },
+            "uses": "All used this week",
+            "aisle": "BAKERY_GRAINS",
+            "halalMark": false
+        },
+        {
+            "key": "rice",
+            "name": "Basmati rice",
+            "pack": "2 kg bag",
+            "packs": 1,
+            "cost": {
+                "minor": 2200,
+                "currency": "AED",
+                "text": "AED 22"
+            },
+            "uses": "You use 800 g of 2 kg",
+            "aisle": "BAKERY_GRAINS",
+            "halalMark": false
+        },
+        {
+            "key": "pasta",
+            "name": "Pasta",
+            "pack": "500 g",
+            "packs": 2,
+            "cost": {
+                "minor": 1000,
+                "currency": "AED",
+                "text": "AED 10"
+            },
+            "uses": "All used this week",
+            "aisle": "BAKERY_GRAINS",
+            "halalMark": false
+        },
+        {
+            "key": "brown-lentils",
+            "name": "Brown lentils",
+            "pack": "1 kg bag",
+            "packs": 1,
+            "cost": {
+                "minor": 900,
+                "currency": "AED",
+                "text": "AED 9"
+            },
+            "uses": "You use 300 g of 1 kg",
+            "aisle": "TINS_DRY",
+            "halalMark": false
+        },
+        {
+            "key": "tomatoes-tin",
+            "name": "Chopped tomatoes",
+            "pack": "400 g tin",
+            "packs": 3,
+            "cost": {
+                "minor": 1200,
+                "currency": "AED",
+                "text": "AED 12"
+            },
+            "uses": "All used this week",
+            "aisle": "TINS_DRY",
+            "halalMark": false
+        },
+        {
+            "key": "red-lentils",
+            "name": "Red lentils",
+            "pack": "1 kg bag",
+            "packs": 1,
+            "cost": {
+                "minor": 900,
+                "currency": "AED",
+                "text": "AED 9"
+            },
+            "uses": "You use 400 g of 1 kg",
+            "aisle": "TINS_DRY",
+            "halalMark": false
+        },
+        {
+            "key": "tuna-tin",
+            "name": "Tuna in water",
+            "pack": "160 g tin",
+            "packs": 2,
+            "cost": {
+                "minor": 1300,
+                "currency": "AED",
+                "text": "AED 13"
+            },
+            "uses": "All used this week",
+            "aisle": "TINS_DRY",
+            "halalMark": false
+        },
+        {
+            "key": "peas-frozen",
+            "name": "Frozen peas",
+            "pack": "900 g bag",
+            "packs": 1,
+            "cost": {
+                "minor": 1000,
+                "currency": "AED",
+                "text": "AED 10"
+            },
+            "uses": "You use 200 g of 900 g",
+            "aisle": "FROZEN",
+            "halalMark": false
+        }
+    ],
+    "staples": [
+        "Tomato paste",
+        "Olive oil",
+        "Ground cumin",
+        "Vegetable stock cubes",
+        "Mixed spice (baharat)",
+        "Turmeric",
+        "Cooking oil",
+        "Salt and pepper"
+    ],
+    "shopping": {
+        "minor": 20150,
+        "currency": "AED",
+        "text": "AED 201.50"
+    },
+    "dinners": {
+        "minor": 12603,
+        "currency": "AED",
+        "text": "AED 126.03"
+    },
+    "inPacks": {
+        "minor": 7547,
+        "currency": "AED",
+        "text": "AED 75.47"
+    },
+    "groceryWeek": {
+        "minor": 69000,
+        "currency": "AED",
+        "text": "AED 690"
+    },
+    "forDinners": {
+        "minor": 34500,
+        "currency": "AED",
+        "text": "AED 345"
+    },
+    "weekLeft": {
+        "minor": 48850,
+        "currency": "AED",
+        "text": "AED 488.50"
+    },
+    "over": null,
+    "swap": null,
+    "delivery": {
+        "minor": 16000,
+        "currency": "AED",
+        "text": "AED 160"
+    },
+    "eatingOutLeft": {
+        "minor": 126500,
+        "currency": "AED",
+        "text": "AED 1,265"
+    },
+    "cookInstead": {
+        "minor": 3669,
+        "currency": "AED",
+        "text": "AED 36.69"
+    },
+    "leftOut": [],
+    "facts": [
+        "Grocery budget: AED 3,000 a month, about AED 690 a week.",
+        "The plan keeps dinners to half of that, AED 345, leaving the rest for breakfasts, lunch boxes and the house.",
+        "Tue 27 Oct: Spaghetti bolognese, about AED 38 of the shopping.",
+        "Wed 28 Oct: delivery night, Falafel and hummus box, AED 70.",
+        "Thu 29 Oct: Red lentil soup with bread, about AED 9 of the shopping.",
+        "Fri 30 Oct: delivery night, Chicken biryani for 4, AED 90.",
+        "Sat 31 Oct: Chicken machboos, about AED 30 of the shopping.",
+        "Sun 1 Nov: Mujaddara with cucumber yoghurt, about AED 15 of the shopping.",
+        "Mon 2 Nov: Tuna pasta bake, about AED 34 of the shopping.",
+        "Shopping list: 19 items, AED 201.50 at our saved prices.",
+        "The dinners use about AED 126 of it; about AED 75 stays in the packs for next week.",
+        "That is AED 143.50 under the AED 345 for dinners, leaving AED 488.50 of the week's AED 690.",
+        "2 delivery nights (Wed and Fri): AED 160 from the eating-out budget (AED 1,265 left this month).",
+        "Cooking on those 2 nights instead would cost about AED 37 in groceries, about AED 123 less.",
+        "Buy meat and chicken with a halal mark. The app doesn't certify any product.",
+        "Dinners with peanuts are left out for Adam.",
+        "Always check the pack labels: the app can't be sure what is in a product.",
+        "Prices are from our saved list of 26 Oct, not live. Shop prices vary."
+    ],
+    "why": [
+        {
+            "label": "Grocery money, a week",
+            "value": "AED 690"
+        },
+        {
+            "label": "For dinners, half of it",
+            "value": "AED 345"
+        },
+        {
+            "label": "Shopping list, 19 items",
+            "value": "AED 201.50"
+        },
+        {
+            "label": "Used by the dinners",
+            "value": "about AED 126"
+        },
+        {
+            "label": "Left of the week's grocery money",
+            "value": "AED 488.50"
+        },
+        {
+            "label": "Delivery nights, 2",
+            "value": "AED 160"
+        },
+        {
+            "label": "Cooking those nights instead",
+            "value": "about AED 37"
+        }
+    ],
+    "pricesFrom": "2026-10-26"
+}
