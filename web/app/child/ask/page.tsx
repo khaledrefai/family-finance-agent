@@ -14,6 +14,8 @@ import { BuddySays, CamelSearching } from "../kid-ui";
 // (the core's price comparison). Picking an offer sends a request with the core's price, not a typed one.
 // While a request is on its way the buttons wait, and the answer shows right under the button that was pressed,
 // so nobody taps again thinking nothing happened. The core also treats a repeat of the same ask as the same request.
+// Two big choices first, "I bought something" and "I want something", so a 9-year-old only sees one job at a time.
+// Asking for something the shops don't have is folded under the search.
 const IDEAS = ["Sony WH-CH720N headphones", "wireless headphones", "LEGO building set", "Nintendo Switch game"];
 
 export default function ChildAsk() {
@@ -29,6 +31,12 @@ export default function ChildAsk() {
   const [sentOffers, setSentOffers] = useState<Record<string, string>>({});
   const notice = useRef<HTMLDivElement>(null);
   const step = useSearchStep(finding);
+  const [mode, setMode] = useState<"bought" | "want">("bought");
+  const [own, setOwn] = useState(false);
+  // Home's "Tell me in Ask" opens on what I bought; ?do=want opens on what I want
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("do") === "want") setMode("want");
+  }, []);
 
   // Bring the answer into view on a phone, where it could be below the fold
   useEffect(() => {
@@ -127,16 +135,30 @@ export default function ChildAsk() {
       <header className="kid-head">
         <h1>Ask</h1>
       </header>
+      <div className="kid-choice" role="group" aria-label="What do you want to tell me?">
+        <button type="button" className={mode === "bought" ? "on" : undefined} aria-pressed={mode === "bought"} onClick={() => setMode("bought")}>
+          I bought something
+        </button>
+        <button type="button" className={mode === "want" ? "on" : undefined} aria-pressed={mode === "want"} onClick={() => setMode("want")}>
+          I want something
+        </button>
+      </div>
       <BuddySays>
-        <p>Tell me what you bought and I&apos;ll keep your picture right. Or tell me what you want, and I&apos;ll find the best price.</p>
+        <p>{mode === "bought"
+          ? "Tell me what you bought and how much. I'll keep your picture right, and you get a star."
+          : "Tell me what you want. I'll find the best price, then you can ask a parent for it."}</p>
       </BuddySays>
 
+      {mode === "bought" && <>
       <AgentChat
         title="What did you buy?"
         placeholder="12 dirhams shawarma"
         suggestions={["12 dirhams shawarma", "8 dirhams chicken wrap", "5 dirhams juice"]}
       />
 
+      </>}
+
+      {mode === "want" && <>
       <section className="panel" aria-label="Something you want">
         <strong>Something you want</strong>
         <form
@@ -180,8 +202,9 @@ export default function ChildAsk() {
         </section>
       )}
 
+      {own ? (
       <form className="panel" onSubmit={submit}>
-        <strong>Ask for something else</strong>
+        <strong>Ask a parent for it yourself</strong>
         <label>
           What is it?
           <input value={title} onChange={(e) => setTitle(e.target.value)} required />
@@ -193,6 +216,12 @@ export default function ChildAsk() {
         <button type="submit" disabled={sending}>{sending ? "Sending…" : "Send to a parent"}</button>
         <Notice at="form" />
       </form>
+      ) : (
+        <button type="button" className="text" style={{ justifySelf: "start" }} onClick={() => setOwn(true)}>
+          Not in the shops? Ask a parent for it yourself
+        </button>
+      )}
+      </>}
       {error && <p className="error" role="alert">{error}</p>}
     </div>
   );

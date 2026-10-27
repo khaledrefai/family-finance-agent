@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api, getToken, setToken } from "@/lib/api";
 
-// The seeded demo family. Tapping a name fills in the form, which keeps the demo video short.
+// The seeded demo family. Tapping a name fills in the form, which keeps the demo video short. Each one says the first
+// thing to try, so a judge knows where to start without a walkthrough.
 const DEMO_FAMILY = [
-  { username: "omar", name: "Omar", who: "Parent", kid: false },
-  { username: "sara", name: "Sara", who: "Parent", kid: false },
-  { username: "layla", name: "Layla", who: "13 years old", kid: true },
-  { username: "adam", name: "Adam", who: "9 years old", kid: true },
+  { username: "omar", name: "Omar", who: "Parent", kid: false, tryThis: "Approve Adam's football" },
+  { username: "sara", name: "Sara", who: "Parent", kid: false, tryThis: "Ask where Layla's money went" },
+  { username: "layla", name: "Layla", who: "13 years old", kid: true, tryThis: "Find headphones and ask" },
+  { username: "adam", name: "Adam", who: "9 years old", kid: true, tryThis: "Tell the camel a snack" },
 ];
 const DEMO_PASSWORD = "demo1234";
 
@@ -98,6 +99,7 @@ export default function LoginPage() {
             <span className="who">
               {p.name}
               <span>{p.who}</span>
+              <span className="try">Try: {p.tryThis}</span>
             </span>
           </button>
         ))}

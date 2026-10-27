@@ -141,6 +141,11 @@ INSERT INTO family_rule (family_id, applies_to_member_id, kind, category, allerg
  ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'BLOCK_CATEGORY', 'SUGARY_DRINKS', NULL, NULL, 'No fizzy drinks for Adam', 'No fizzy drinks for Adam', 'ACTIVE', 'SEED', '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000a1', now()),
  ('00000000-0000-0000-0000-00000000f001', NULL, 'APPROVAL_LIMIT', NULL, NULL, 5000, 'Anything over AED 50 needs a parent', 'Anything over AED 50 needs a parent', 'ACTIVE', 'SEED', '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000a1', now());
 
+-- One request already waiting, so a judge who logs in as Omar or Sara has something to approve straight away
+INSERT INTO spending_request (family_id, requester_id, kind, title, amount_minor, currency, status, agent_summary, created_at) VALUES
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'ASK_TO_BUY', 'Football for the park', 6500, 'AED', 'PENDING',
+  'Over the AED 50 family limit, so a parent decides. No family rule blocks it.', now() - interval '2 hours');
+
 -- Demo wallets (DEMO MONEY) with an opening balance
 INSERT INTO demo_wallet (id, family_id, member_id) VALUES
  ('00000000-0000-0000-0000-0000000000d1', '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c1'),

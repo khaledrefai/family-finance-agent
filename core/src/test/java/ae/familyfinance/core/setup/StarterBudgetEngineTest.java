@@ -76,7 +76,7 @@ class StarterBudgetEngineTest {
         var b = StarterBudgetEngine.buffer(Money.aed(1_720_000), Money.aed(669_333));
 
         assertThat(b.target().text()).isEqualTo("AED 72,000"); // 3 × 23,893.33 = 71,679.99
-        assertThat(b.reason()).startsWith("3 months of commitments and everyday spending (AED 23,893.33 a month)");
+        assertThat(b.reason()).startsWith("3 months of commitments and everyday spending (AED 23,893 a month)");
     }
 
     @Test

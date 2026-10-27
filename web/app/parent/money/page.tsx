@@ -99,7 +99,7 @@ export default function MoneyPage() {
         <span aria-hidden="true">›</span>
       </Link>
 
-      <Uploads enabled={!!me} />
+      <Uploads enabled={!!me} demo={me.demo} />
       <SampleNote live={live} />
     </div>
   );

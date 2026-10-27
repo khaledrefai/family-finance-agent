@@ -5,14 +5,17 @@ import { aed, api, MemberView, plain } from "@/lib/api";
 import { FamilyRule, rulesApi } from "@/lib/live";
 import { FoodProfile, mealsApi } from "@/lib/meals";
 import { kids } from "@/lib/sample";
+import { KidMonth, summaryApi } from "@/lib/summary";
 import { AgentChat } from "../../agent-chat";
+import { MemberForm } from "../../member-form";
 import { NotifyCard } from "../../live-ui";
-import { Loading, Masthead, Progress, SampleNote } from "../../ui";
+import { Loading, Masthead, Progress } from "../../ui";
 import { useSession } from "../../use-session";
 
 // Family: who is in it, the rules the app checks on every request, food profiles, and notifications.
 // Members and rules are live. A parent writes a rule in their own words; the agent drafts it, and it only
-// counts once a parent presses Turn on here. Kids' goals are still sample content.
+// counts once a parent presses Turn on here. Each kid's goal comes from their own month page (the demo family
+// keeps its sample goals). Parents can add the other parent or a child here, the same way as in setup.
 const AGE: Record<string, string> = { CHILD_6_9: "6 to 9", PRETEEN_10_12: "10 to 12", TEEN_13_17: "13 to 17" };
 
 export default function FamilyPage() {
@@ -20,12 +23,20 @@ export default function FamilyPage() {
   const [members, setMembers] = useState<MemberView[]>([]);
   const [rules, setRules] = useState<FamilyRule[] | null>(null);
   const [ruleNote, setRuleNote] = useState<string | null>(null);
+  const [kidPages, setKidPages] = useState<Record<string, KidMonth>>({});
+  const [adding, setAdding] = useState<"PARENT" | "CHILD" | null>(null);
 
   const loadRules = () => rulesApi.list().then(setRules).catch(() => setRules([]));
+  const loadMembers = () => api.members().then((all) => {
+    setMembers(all);
+    all.filter((m) => m.role === "CHILD").forEach((m) =>
+      summaryApi.kid(null, m.id).then((k) => setKidPages((p) => ({ ...p, [m.id]: k }))).catch(() => {}));
+  }).catch(() => {});
   useEffect(() => {
     if (!me) return;
-    api.members().then(setMembers).catch(() => {});
+    loadMembers();
     loadRules();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [me]);
 
   async function turnOn(r: FamilyRule) {
@@ -57,7 +68,14 @@ export default function FamilyPage() {
       <section className="card" style={{ paddingTop: 4, paddingBottom: 4 }}>
         <div className="rows">
           {members.map((m) => {
-            const kid = kids[m.displayName];
+            const kid = me.demo ? kids[m.displayName] : undefined;
+            const page = kidPages[m.id];
+            const goalLine = kid
+              ? `${kid.goal[0].toUpperCase()}${kid.goal.slice(1)}: ${aed(kid.savedMinor)} of ${plain(kid.goalMinor)}, ${kid.percent}%`
+              : page?.goalName && page.goalTarget
+                ? `${page.goalName}: ${page.goalSaved?.text ?? "AED 0"} of ${page.goalTarget.text.replace("AED ", "")}, ${page.goalPercent ?? 0}%`
+                : "No goal yet";
+            const percent = kid?.percent ?? (page?.goalName ? page.goalPercent ?? 0 : null);
             return (
               <div className="row" key={m.id} style={{ alignItems: "center", gap: 12, padding: "10px 0" }}>
                 <span aria-hidden="true" style={{ flex: "none", width: 40, height: 40, borderRadius: 99, display: "grid", placeItems: "center", background: "var(--rule-soft)", fontWeight: 600 }}>
@@ -71,13 +89,11 @@ export default function FamilyPage() {
                       ? "You"
                       : m.role === "PARENT"
                         ? "Decides anything you ask for"
-                        : kid
-                          ? `${kid.goal[0].toUpperCase()}${kid.goal.slice(1)}: ${aed(kid.savedMinor)} of ${plain(kid.goalMinor)}, ${kid.percent}%`
-                          : "No goal yet"}
+                        : goalLine}
                   </span>
-                  {m.role === "CHILD" && kid && (
+                  {m.role === "CHILD" && percent !== null && (
                     <span style={{ display: "block", marginTop: 4 }}>
-                      <Progress percent={kid.percent} label={`${kid.percent} percent of the goal`} thin />
+                      <Progress percent={percent} label={`${percent} percent of the goal`} thin />
                     </span>
                   )}
                 </span>
@@ -86,6 +102,16 @@ export default function FamilyPage() {
           })}
         </div>
       </section>
+      {adding ? (
+        <MemberForm role={adding} onCancel={() => setAdding(null)} onAdded={() => { setAdding(null); loadMembers(); }} />
+      ) : (
+        <div className="actions" style={{ marginTop: -8 }}>
+          {members.filter((m) => m.role === "PARENT").length < 2 && (
+            <button type="button" className="quiet" onClick={() => setAdding("PARENT")}>Add the other parent</button>
+          )}
+          <button type="button" className="quiet" onClick={() => setAdding("CHILD")}>Add a child</button>
+        </div>
+      )}
 
       <section className="stack" style={{ gap: 10 }}>
         <div className="row" style={{ padding: 0, alignItems: "baseline" }}>
@@ -93,7 +119,7 @@ export default function FamilyPage() {
           <span className="muted">Checked by the app on every request</span>
         </div>
         {rules === null && <p className="muted">Loading the rules…</p>}
-        {rules?.length === 0 && <p className="empty">No rules yet. Write one below, like "no peanuts for Adam".</p>}
+        {rules?.length === 0 && <p className="empty">No rules yet. Write one below, like &quot;no energy drinks for the kids&quot;.</p>}
         {rules?.map((r) => {
           const on = r.status === "ACTIVE";
           return (
@@ -120,7 +146,7 @@ export default function FamilyPage() {
           title="Write a rule in your own words"
           placeholder="No energy drinks for the kids"
           suggestions={["No energy drinks for the kids", "Anything over AED 100 needs me",
-            `${members.find((m) => m.role === "CHILD")?.displayName ?? "Layla"}: snacks up to AED 50 a month`]}
+            `${members.find((m) => m.role === "CHILD")?.displayName ?? "The kids"}: snacks up to AED 50 a month`]}
           source="The app checks the typed rule on every request. The AI only reads your words."
           onReply={loadRules}
         />
@@ -130,7 +156,6 @@ export default function FamilyPage() {
 
       <FoodProfiles />
 
-      {me.demo && <SampleNote />}
     </div>
   );
 }

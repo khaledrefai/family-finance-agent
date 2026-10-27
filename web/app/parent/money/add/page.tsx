@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { aed } from "@/lib/api";
+import { aed, api, MemberView } from "@/lib/api";
 import { CardCheck, core, dayLongMonth, useAccounts } from "@/lib/live";
 import { spendCategories } from "@/lib/sample";
 import { AccountPicker, Back, CardWarning, Icon, Loading, Masthead } from "../../../ui";
@@ -11,7 +11,6 @@ import { useSession } from "../../../use-session";
 // Add spending: upload a receipt for anything, or type in a payment that has no receipt
 // (a restaurant, a hotel, a taxi). The core stores it with what paid for it (POST /api/payments),
 // and before saving, a card payment gets the engine's card check for that amount.
-const FOR_WHOM = ["Whole family", "Omar", "Sara", "A kid"];
 const CATEGORY: Record<string, string> = {
   Restaurant: "EATING_OUT", Hotel: "HOTEL", Transport: "TRANSPORT", Groceries: "GROCERIES", Shopping: "SHOPPING", Other: "OTHER",
 };
@@ -29,6 +28,10 @@ export default function AddSpendingPage() {
   const [added, setAdded] = useState<string | null>(null);
   const { accounts, live } = useAccounts(!!me);
   const [check, setCheck] = useState<CardCheck | null>(null);
+  const [members, setMembers] = useState<MemberView[]>([]);
+  useEffect(() => {
+    if (me) api.members().then(setMembers).catch(() => {});
+  }, [me]);
 
   // Start on the first card once the family's own accounts load
   useEffect(() => {
@@ -47,6 +50,10 @@ export default function AddSpendingPage() {
   }, [live, isCard, paidFrom, amount]);
 
   if (!me) return <Loading />;
+  // The family's own parents by name; the kids together, since a kid's own spending is logged by the kid
+  const forWhomChoices = ["Whole family", ...members.filter((m) => m.role === "PARENT").map((m) => m.displayName),
+    ...(members.some((m) => m.role === "CHILD") ? ["A kid"] : [])];
+  const noAccounts = live && accounts.length === 0;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -118,7 +125,14 @@ export default function AddSpendingPage() {
           Date
           <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         </label>
-        <AccountPicker value={paidFrom} onChange={setPaidFrom} accounts={accounts} />
+        {noAccounts ? (
+          <p className="muted" style={{ margin: 0 }}>
+            <b style={{ color: "var(--ink)" }}>Paid from:</b> nothing added yet. <Link href="/parent/money/accounts" className="link">Add your bank account, a card or cash</Link> first,
+            so the app knows what paid for it.
+          </p>
+        ) : (
+          <AccountPicker value={paidFrom} onChange={setPaidFrom} accounts={accounts} />
+        )}
         {live ? (
           <CardWarning accountId={paidFrom} hint={false} live={check && {
             card: check.card, due: dayLongMonth(check.dueOn), withMinor: check.billWith.minor, freeByDueMinor: check.freeByDue.minor, fits: check.fits,
@@ -130,14 +144,14 @@ export default function AddSpendingPage() {
         <fieldset style={{ border: 0, padding: 0, margin: 0, display: "grid", gap: 4 }}>
           <legend className="muted" style={{ marginBottom: 4 }}>Who was it for?</legend>
           <div className="chips" style={{ marginBottom: 0 }}>
-            {FOR_WHOM.map((w) => (
+            {forWhomChoices.map((w) => (
               <button key={w} type="button" className={`chip${w === forWhom ? " on" : ""}`} aria-pressed={w === forWhom} onClick={() => setForWhom(w)}>
                 {w}
               </button>
             ))}
           </div>
         </fieldset>
-        <button type="submit">Add it</button>
+        <button type="submit" disabled={noAccounts}>Add it</button>
         {error && <p className="error" role="alert">{error}</p>}
         {added && <p className="muted" role="status">{added}</p>}
       </form>

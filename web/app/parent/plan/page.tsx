@@ -53,9 +53,12 @@ export default function PlanPage() {
   if (!me) return <Loading />;
   const live = money.live && plan !== null;
   const options: Option[] = plan ? toOptions(plan) : samplePlanOptions;
-  const current = pace ?? options.find((o) => o.pick)?.id ?? options[0].id;
+  // The pace the family already saved (in setup or here) starts selected; otherwise the app's pick
+  const paceGoal = plan ? goals?.find((g) => g.id === plan.goalId) : undefined;
+  const savedPace = paceGoal?.monthly ? options.find((o) => o.monthlyMinor === paceGoal.monthly!.minor)?.id : undefined;
+  const current = pace ?? savedPace ?? options.find((o) => o.pick)?.id ?? options[0].id;
   const chosen = options.find((o) => o.id === current)!;
-  const steps = live ? liveSteps(money.monthly.commitmentsMinor, accounts, goals ?? []) : sampleSteps;
+  const steps = live ? liveSteps(money.monthly.commitmentsMinor, accounts, goals ?? [], paceGoal) : sampleSteps;
   const goalTitle = plan ? `${plan.goalName} · ${plan.target.text}` : "Summer trip · AED 12,000";
   const tightest = plan?.options.find((o) => o.id === current);
 
@@ -133,7 +136,7 @@ export default function PlanPage() {
       <section className="stack" style={{ gap: 10 }}>
         <div>
           <h2 className="first">{goalTitle}</h2>
-          <p className="muted">Three ways to get there</p>
+          <p className="muted">{savedPace ? `Three ways to get there. Now on ${options.find((o) => o.id === savedPace)?.name.toLowerCase()}.` : "Three ways to get there"}</p>
         </div>
         {options.map((o) => (
           <label className="option" key={o.id}>
@@ -161,7 +164,9 @@ export default function PlanPage() {
         </p>
       </section>}
 
-      <button onClick={savePace}>Use the {chosen.name.toLowerCase()} plan</button>
+      {current === savedPace && !saved
+        ? <p className="muted" style={{ textAlign: "center", margin: 0 }}>This is the pace you picked. Choose another to change it.</p>
+        : <button onClick={savePace}>Use the {chosen.name.toLowerCase()} plan</button>}
       {saved && <p role="status" className="muted">{saved}</p>}
       <p className="trust" style={{ textAlign: "center" }}>{TRUST}</p>
 
@@ -197,17 +202,20 @@ export default function PlanPage() {
 }
 
 // The four steps, worded from the family's own figures (each one is the engine's number).
-function liveSteps(commitmentsMinor: number, accounts: ReturnType<typeof useAccounts>["accounts"], goals: Goal[]) {
+function liveSteps(commitmentsMinor: number, accounts: ReturnType<typeof useAccounts>["accounts"], goals: Goal[], paceGoal?: Goal) {
   const card = accounts.find((a) => a.kind === "CREDIT_CARD" && a.bill);
   const buffer = goals.find((g) => g.tier === "SURVIVAL");
   return [
-    { title: "Protect the commitments.", text: `${aed(commitmentsMinor)} this month for rent and school fee reserves and the bills comes out first.`, done: true },
+    { title: "Protect the commitments.", text: `${aed(commitmentsMinor)} this month goes to the bills first, with a little put aside for the big ones.`, done: true },
     card?.bill
       ? { title: "Clear the card.", text: `${card.label}: ${aed(card.bill.soFarMinor)} due on ${card.bill.due}. Pay it in full, so no interest.`, done: card.bill.ok }
       : { title: "Clear the card.", text: "No card bill coming up.", done: true },
     buffer
       ? { title: "Build a buffer.", text: `${buffer.monthly ? `${buffer.monthly.text} a month` : "Nothing a month yet"} until it reaches ${buffer.target.text}${buffer.fullBy ? ` in ${buffer.fullBy}` : ""}. ${buffer.saved.text} saved so far.`, done: !!buffer.monthly }
       : { title: "Build a buffer.", text: "Add an emergency buffer goal first.", done: false },
-    { title: "Pick the family goal pace.", text: "", done: false },
-  ];
+    // With only the buffer, its pace is step 3; a family goal (a trip, a car) gets its own step once there is one
+    paceGoal && paceGoal.id !== buffer?.id
+      ? { title: "Pick the family goal pace.", text: paceGoal.monthly ? `${paceGoal.name}: ${paceGoal.monthly.text} a month.` : `${paceGoal.name}: pick a pace below.`, done: !!paceGoal.monthly }
+      : null,
+  ].filter((x): x is { title: string; text: string; done: boolean } => x !== null);
 }
