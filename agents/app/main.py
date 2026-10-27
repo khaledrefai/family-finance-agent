@@ -11,7 +11,7 @@ from .graph import orchestrator
 from .spend_story import nudge
 from .core_client import CoreError, WaysToSave
 from .ways_to_save import write as write_ways_to_save
-from . import meals, outings, shopper, summary
+from . import meals, outings, planner, shopper, summary
 
 app = FastAPI(title="Family Finance Coach - agent service", version="0.1.0")
 
@@ -146,3 +146,22 @@ def ways_to_save(core: CoreClient = Depends(core_for_caller)) -> WaysToSave:
         return write_ways_to_save(core, core.me())
     except CoreError as e:
         raise HTTPException(status_code=e.status, detail=e.detail)
+
+
+class SetupPlanOut(BaseModel):
+    reply: str
+
+
+# The words a new family's parent sends, in effect, by pressing "Make our first plan" at the end of the setup
+FIRST_PLAN = "Make our first family plan: split this month into money buckets."
+
+
+@app.post("/setup/plan", response_model=SetupPlanOut)
+def setup_plan(core: CoreClient = Depends(core_for_caller)) -> SetupPlanOut:
+    """The last setup step for a new family. The Planner saves a draft of the money buckets with one line per bucket
+    (the shares are the core engine's) and explains the month. The parent checks it and presses Confirm in the app;
+    the agent can never confirm it."""
+    me = core.me()
+    if me.role.value != "PARENT":
+        raise HTTPException(status_code=403, detail="Only a parent can set up the family's plan")
+    return SetupPlanOut(reply=planner.handle(core, me, FIRST_PLAN, first_plan=True))

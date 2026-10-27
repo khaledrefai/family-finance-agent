@@ -122,3 +122,26 @@ def test_gatekeeper_says_the_cores_facts_for_a_child():
 def test_router_sends_plans_to_the_planner_and_prices_to_the_gatekeeper():
     assert orchestrator.invoke({"message": "make our plan for this month", "role": "PARENT"})["agent"] == Agent.PLANNER
     assert orchestrator.invoke({"message": "can I buy a game for AED 60?", "role": "CHILD"})["agent"] == Agent.GATEKEEPER
+
+
+def test_the_setup_plan_endpoint_drafts_the_first_buckets(fake_core, monkeypatch):
+    from fastapi.testclient import TestClient
+    from app.main import app
+    monkeypatch.setattr(llm_module.settings, "llm", "off")
+    fake_core.who = {"id": "00000000-0000-0000-0000-0000000000a1", "displayName": "Sara", "role": "PARENT", "ageBand": "ADULT"}
+    r = TestClient(app).post("/setup/plan", headers={"Authorization": "Bearer t"})
+    assert r.status_code == 200
+    assert "draft" in r.json()["reply"] and "Confirm" in r.json()["reply"]
+    # A new family has typed no bank balance yet, so "free until pay day" is left out
+    assert "Until" not in r.json()["reply"]
+    assert len(fake_core.bucket_drafts) == 1
+    assert fake_core.runs[0]["agent"] == "PLANNER"
+
+
+def test_a_child_cannot_make_the_family_plan(fake_core):
+    from fastapi.testclient import TestClient
+    from app.main import app
+    fake_core.who = {"id": "00000000-0000-0000-0000-0000000000c1", "displayName": "Layla", "role": "CHILD", "ageBand": "TEEN_13_17"}
+    r = TestClient(app).post("/setup/plan", headers={"Authorization": "Bearer t"})
+    assert r.status_code == 403
+    assert fake_core.bucket_drafts == []

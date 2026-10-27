@@ -45,6 +45,8 @@ export default function BudgetsPage() {
 
       {meals && <FoodWeek meals={meals} />}
 
+      {/* The history and the advice are the demo family's sample; a real family doesn't see them */}
+      {me.demo && <>
       <section className="card">
         <p className="card-title">Everyday spending, last 6 months</p>
         <p className="muted" style={{ margin: "2px 0 10px" }}>Dashed line: the AED 7,390 monthly budget</p>
@@ -63,6 +65,7 @@ export default function BudgetsPage() {
         <span aria-hidden="true">›</span>
       </Link>
       <SampleNote />
+      </>}
     </div>
   );
 }

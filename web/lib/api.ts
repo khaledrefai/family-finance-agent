@@ -12,6 +12,8 @@ export interface Me {
   familyId: string;
   familyName: string;
   currency: string;
+  setupDone: boolean; // false while a new family is still going through /setup
+  demo: boolean; // the seeded demo family: only it ever sees the sample figures in lib/sample.ts
 }
 
 export interface SpendingRequest {

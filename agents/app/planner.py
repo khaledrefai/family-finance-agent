@@ -50,7 +50,8 @@ def is_plan_question(message: str) -> bool:
     return bool(_PLAN_WORDS.search(message))
 
 
-def handle(core: CoreClient, me: Me, message: str, model: Llm | None = None) -> str:
+def handle(core: CoreClient, me: Me, message: str, model: Llm | None = None, first_plan: bool = False) -> str:
+    """first_plan: a new family's setup. It has typed no bank balance yet, so "free until pay day" is left out."""
     if me.role is not Role.PARENT:
         return "Planning the family's money is a job for your parents. You can ask me about your own savings goal."
     model = model or default_llm
@@ -64,9 +65,9 @@ def handle(core: CoreClient, me: Me, message: str, model: Llm | None = None) -> 
         goal = next((g for g in goals if _mentions(message, g.name)), None)
         options = run.plan_options(goal.id) if goal else None
 
-        facts = _facts(cf, shares, options)
+        facts = _facts(cf, shares, options, first_plan)
         result = model.ask(SYSTEM, _prompt(message, facts), SCHEMA)
-        summary, reasons = _template(cf, options), {}
+        summary, reasons = _template(cf, options, first_plan), {}
         if result.used and result.data:
             words = [result.data.get("summary", "")] + list((result.data.get("reasons") or {}).values())
             if all(numbers_ok(w, facts + [message]) for w in words):
@@ -92,7 +93,7 @@ def _mentions(message: str, name: str) -> bool:
     return any(re.search(rf"\b{w}\b", message, re.I) for w in words)
 
 
-def _facts(cf, shares: list[Share], options) -> list[str]:
+def _facts(cf, shares: list[Share], options, first_plan: bool = False) -> list[str]:
     u = cf.untilNextIncome
     facts = [
         f"Planned income in {cf.monthLabel}: {cf.income.total.text}.",
@@ -100,7 +101,7 @@ def _facts(cf, shares: list[Share], options) -> list[str]:
         f"Everyday budgets: {cf.everyday.total.text}.",
         f"Free cash this month: {cf.free.text}. After goal saving of {cf.saving.total.text}, spare: {cf.spare.text}.",
     ]
-    if u.nextIncomeOn:
+    if u.nextIncomeOn and not first_plan:
         facts.append(f"Free until the next pay ({u.nextIncomeLabel}, {u.nextIncomeOn.day} {u.nextIncomeOn:%b}): {u.free.text}.")
     if cf.nextCommitment:
         n = cf.nextCommitment
@@ -122,11 +123,11 @@ def _prompt(message: str, facts: list[str]) -> str:
             + "\n\nWrite the summary and one line for each bucket.")
 
 
-def _template(cf, options) -> str:
+def _template(cf, options, first_plan: bool = False) -> str:
     """The rule-based answer: always right, a little plain."""
     u = cf.untilNextIncome
     parts = [f"This month {cf.free.text} is free after commitments and everyday budgets, and {cf.spare.text} is spare after goal saving."]
-    if u.nextIncomeOn:
+    if u.nextIncomeOn and not first_plan:
         parts.append(f"Until {u.nextIncomeLabel} arrives on {u.nextIncomeOn.day} {u.nextIncomeOn:%b}, {u.free.text} is free.")
     tight = [_month_name(m.month) for m in cf.months if m.tight]
     if tight:

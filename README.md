@@ -36,6 +36,12 @@ Demo logins (password `demo1234` for all):
 | `layla` | 13 years old | Child |
 | `adam` | 9 years old, peanut allergy | Child |
 
+A real new family starts at `/signup`: a parent makes the family, then `/setup` walks through five steps (the other
+parent and the kids with their own logins and consent, income and the bank balance, big bills, the first budgets the
+engine starts from, and a first goal, its pace and the Planner's money buckets to confirm). Until it is finished, the
+parent screens send that family back to `/setup`. The demo family is always set up. `APP_SIGNUP_ENABLED=false` turns
+sign-up off.
+
 Before every demo recording: `./deploy.sh reseed` resets the demo family to its starting state.
 
 ## Test server

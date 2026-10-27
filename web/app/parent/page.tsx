@@ -80,13 +80,14 @@ export default function TodayPage() {
 
   if (!me) return <Loading />;
 
+  // A real family never sees the demo family's sample advice, tips or goal
   const tips = (waysLive && ways
     ? ways.tips
-    : waysToSave.tips.map((t) => ({ key: t.id, title: t.title, text: t.text, why: t.why }))
+    : me.demo ? waysToSave.tips.map((t) => ({ key: t.id, title: t.title, text: t.text, why: t.why })) : []
   ).filter((t) => !tipState[t.key]);
   const tipMonth = waysLive && ways ? ways.monthLabel : waysToSave.month;
   const ideas: Idea[] = [
-    ...(adviceState === "open" ? [{ key: "advice", title: advice.title, text: advice.text, why: advice.why, advice: true }] : []),
+    ...(adviceState === "open" && me.demo ? [{ key: "advice", title: advice.title, text: advice.text, why: advice.why, advice: true }] : []),
     ...tips.map((t) => ({ key: t.key, title: t.title, text: t.text, why: t.why })),
   ];
   const idea = ideas.length ? ideas[ideaAt % ideas.length] : null;
@@ -95,7 +96,7 @@ export default function TodayPage() {
   const fresh = requests.find((r) => r.id === justDecided);
   const nextBill = bills[0];
   const tightCard = accounts.find((a) => a.bill && !a.bill.ok);
-  const goal = goals?.find((g) => g.tier === "GOOD_LIFE");
+  const goal = goals?.find((g) => g.tier === "GOOD_LIFE") ?? (me.demo ? undefined : goals?.[0]);
   const defaultCard = accounts.find((a) => a.kind === "CREDIT_CARD")?.id ?? "visa";
 
   // Only what needs a look: a bill the reserve won't cover, a card bill that won't be covered, budget alerts.
@@ -256,7 +257,7 @@ export default function TodayPage() {
         </section>
       )}
 
-      <Link href="/parent/plan" className="card" style={{ display: "grid", gap: 8 }}>
+      {(goal || me.demo) && <Link href="/parent/plan" className="card" style={{ display: "grid", gap: 8 }}>
         <div className="row" style={{ padding: 0 }}>
           <span className="card-title">{goal?.name ?? familyGoal.name}</span>
           <b>{goal?.percent ?? familyGoal.percent}% ›</b>
@@ -267,7 +268,7 @@ export default function TodayPage() {
             ? <>{goal.saved.text} of {goal.target.text.replace("AED ", "")} saved{goal.fullBy ? `, full by ${goal.fullBy}` : ""}</>
             : <>AED 3,600 of 12,000 saved, on track for {familyGoal.onTrackFor}</>}
         </span>
-      </Link>
+      </Link>}
 
       {decided.length > 0 && (
         <section>
@@ -287,7 +288,7 @@ export default function TodayPage() {
 
       <Link href="/parent/summary" className="link">See {THIS_MONTH}&apos;s family summary so far</Link>
       <p className="trust">{TRUST}</p>
-      <SampleNote live={false} />
+      {me.demo && <SampleNote live={false} />}
 
       {ideaWhy && (
         <WhySheet

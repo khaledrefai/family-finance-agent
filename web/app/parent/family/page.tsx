@@ -119,7 +119,8 @@ export default function FamilyPage() {
         <AgentChat
           title="Write a rule in your own words"
           placeholder="No energy drinks for the kids"
-          suggestions={["No energy drinks for the kids", "Anything over AED 100 needs me", "Layla: snacks up to AED 50 a month"]}
+          suggestions={["No energy drinks for the kids", "Anything over AED 100 needs me",
+            `${members.find((m) => m.role === "CHILD")?.displayName ?? "Layla"}: snacks up to AED 50 a month`]}
           source="The app checks the typed rule on every request. The AI only reads your words."
           onReply={loadRules}
         />
@@ -129,7 +130,7 @@ export default function FamilyPage() {
 
       <FoodProfiles />
 
-      <SampleNote />
+      {me.demo && <SampleNote />}
     </div>
   );
 }

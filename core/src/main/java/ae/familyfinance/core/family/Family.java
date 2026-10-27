@@ -27,6 +27,9 @@ public class Family {
     @Column(name = "is_demo", nullable = false)
     private boolean demo;
 
+    @Column(name = "setup_done_at", insertable = false, updatable = false)
+    private OffsetDateTime setupDoneAt;
+
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime createdAt;
 
@@ -37,4 +40,6 @@ public class Family {
     public String getName() { return name; }
     public String getCurrency() { return currency; }
     public boolean isDemo() { return demo; }
+    /** The demo family is always set up: a reseed recreates its row without the date. */
+    public boolean isSetupDone() { return demo || setupDoneAt != null; }
 }

@@ -39,6 +39,8 @@ app:
     secret: ${APP_JWT_SECRET:dev-only-secret-change-me-0123456789abcdef}
     issuer: family-finance-core
     ttl: 8h
+  # Anyone can make a new family at /signup. Set APP_SIGNUP_ENABLED=false to allow only the families already there.
+  signup-enabled: ${APP_SIGNUP_ENABLED:true}
   # Where the app is opened, for the link in alert emails, e.g. https://family.example.com (optional)
   public-url: ${APP_PUBLIC_URL:}
   mail:
