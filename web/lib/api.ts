@@ -28,10 +28,13 @@ export interface SpendingRequest {
   status: RequestStatus;
   agentSummary?: string;
   createdAt: string;
+  // A parent's list only: for a child's waiting request, whose demo money pays on a yes ("Layla's wallet"); null = a parent pays
+  childPays?: string | null;
   // The price comparison offer it was made from: shop, price, delivery, total, when checked
   offer?: {
     store: string; price: string; delivery: string | null; total: string; source: "LIVE" | "CACHE" | "SEEDED";
     verified: boolean; checkedAt: string; offersCompared: number;
+    product?: string; // the shop's full title (the request's title is a short name)
   } | null;
 }
 

@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * The monthly family summary through the real API, with the demo family's seeded month: entertainment AED 360 over
+ * The monthly family summary through the real API, with the demo family's seeded month: entertainment AED 325 over
  * its AED 1,200 budget, the summer trip AED 3,600 of 12,000, Layla's headphones 40% and Adam's building set 45%.
  */
 @AutoConfigureMockMvc
@@ -68,7 +68,7 @@ class SummaryIntegrationTest extends PostgresIntegrationTest {
         assertThat(s.get("budgetsWithin").asInt()).isEqualTo(3);
         JsonNode watch = s.get("toWatch");
         assertThat(watch.get(0).get("key").asText()).isEqualTo("budget-entertainment");
-        assertThat(watch.get(0).get("text").asText()).startsWith("Entertainment is AED 360 over its AED 1,200 budget (130%)");
+        assertThat(watch.get(0).get("text").asText()).startsWith("Entertainment is AED 325 over its AED 1,200 budget (127%)");
         // Adam logged a cola and a Robux card, both against family rules (other tests may log more for him)
         assertThat(watch.findValuesAsText("text")).anyMatch(t -> t.startsWith("Adam logged ")
                 && t.contains("things the family rules say no to:") && t.contains("Robux gift card") && t.contains("cola"));

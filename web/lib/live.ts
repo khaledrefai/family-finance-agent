@@ -143,7 +143,8 @@ export interface Assessment {
   nextCommitment: string | null;
   needsParent: boolean;
   approvalLimit: MoneyView | null;
-  kid: { name: string; wallet: MoneyView; walletCovers: boolean; walletAfter: MoneyView } | null;
+  // jar: what the goal jar it was saved for pays first (jarName "Headphones"), null when no goal matches
+  kid: { name: string; wallet: MoneyView; walletCovers: boolean; walletAfter: MoneyView; jarName: string | null; jar: MoneyView | null } | null;
   blocked: boolean;
   rules: RuleCheck | null;
   card: CardCheck | null;

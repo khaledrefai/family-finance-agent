@@ -116,11 +116,11 @@ export const budgets = {
 
 export const advice = {
   title: "Advice for November and December",
-  text: "The rent cheque on 1 January and school fees on 5 January leave AED 2,400 less than usual. Cut entertainment from AED 1,200 to AED 600 a month for November and December, and the summer trip stays on track.",
+  text: "The rent cheque and the term 2 school fees, both in early January, leave AED 2,400 less than usual. Cut entertainment from AED 1,200 to AED 600 a month for November and December, and the summer trip stays on track.",
   why: [
     { label: "Free cash in a usual month", value: "AED 9,910" },
     { label: "Free cash in December", value: "AED 7,510" },
-    { label: "Rent cheque, 1 January", value: "AED 30,000" },
+    { label: "Rent cheque, early January", value: "AED 30,000" },
     { label: "Rent reserve by then", value: "AED 27,600" },
     { label: "Entertainment, 3-month average", value: "AED 1,520" },
     { label: "Saved by the cut, 2 months", value: "AED 1,200" },
@@ -166,7 +166,6 @@ export const planSplit = [
 export const kids: Record<string, {
   goal: string; goalMinor: number; savedMinor: number; percent: number; plan: string;
   stars: number; starsThisMonth: number; weekly: string;
-  pocket?: { totalMinor: number; parts: { label: string; amountMinor: number; color: string }[]; note: string };
 }> = {
   Layla: {
     goal: "headphones",
@@ -174,19 +173,9 @@ export const kids: Record<string, {
     savedMinor: 12_000,
     percent: 40,
     plan: "Save AED 20 a week and do 2 chores, and they're yours by 20 November.",
-    stars: 14,
-    starsThisMonth: 6,
+    stars: 40,
+    starsThisMonth: 40,
     weekly: "AED 100 a week",
-    pocket: {
-      totalMinor: 43_000,
-      parts: [
-        { label: "Food", amountMinor: 21_000, color: "var(--s1)" },
-        { label: "Fun", amountMinor: 10_000, color: "var(--s2)" },
-        { label: "Saved", amountMinor: 8_000, color: "var(--s3)" },
-        { label: "Not spent yet", amountMinor: 4_000, color: "var(--s4)" },
-      ],
-      note: "Most went on lunch at school. That's normal, and logging it is what makes this picture right.",
-    },
   },
   Adam: {
     goal: "building set",
@@ -194,8 +183,8 @@ export const kids: Record<string, {
     savedMinor: 7_200,
     percent: 45,
     plan: "Almost half.",
-    stars: 11,
-    starsThisMonth: 5,
+    stars: 25,
+    starsThisMonth: 25,
     weekly: "AED 60 a week",
   },
 };

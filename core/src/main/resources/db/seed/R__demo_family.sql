@@ -7,7 +7,7 @@
 --
 --   Sara  (parent)  sara / demo1234
 --   Omar  (parent)  omar / demo1234
---   Layla (13)      layla / demo1234   -> wants AED 300 headphones from noon
+--   Layla (13)      layla / demo1234   -> saving for headphones; asks for them, the jar pays first
 --   Adam  (9)       adam / demo1234    -> peanut allergy, tries to buy peanut snacks
 
 -- "Today" is today in the UAE, as in the app (ClockConfig). Without this, current_date is the database's date (UTC),
@@ -142,8 +142,8 @@ INSERT INTO family_rule (family_id, applies_to_member_id, kind, category, allerg
  ('00000000-0000-0000-0000-00000000f001', NULL, 'APPROVAL_LIMIT', NULL, NULL, 5000, 'Anything over AED 50 needs a parent', 'Anything over AED 50 needs a parent', 'ACTIVE', 'SEED', '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000a1', now());
 
 -- One request already waiting, so a judge who logs in as Omar or Sara has something to approve straight away
-INSERT INTO spending_request (family_id, requester_id, kind, title, amount_minor, currency, status, agent_summary, created_at) VALUES
- ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'ASK_TO_BUY', 'Football for the park', 6500, 'AED', 'PENDING',
+INSERT INTO spending_request (family_id, requester_id, kind, title, amount_minor, currency, category, status, agent_summary, created_at) VALUES
+ ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000000000c2', 'ASK_TO_BUY', 'Football for the park', 6500, 'AED', 'TOYS_AND_HOBBIES', 'PENDING',
   'Over the AED 50 family limit, so a parent decides. No family rule blocks it.', now() - interval '2 hours');
 
 -- Demo wallets (DEMO MONEY) with an opening balance
@@ -195,7 +195,8 @@ INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, 
 
 -- Family outings (week 4), paid from the ENBD current account, so the Visa demo and the card warning are untouched.
 -- With the two Shahid VIP payments above, the last 3 months average AED 1,520 against the AED 1,200 entertainment budget, and this month is already
--- AED 1,560: the overspend alert and the "Outings" tip in Ways to save. Amounts differ every month on purpose,
+-- AED 1,525. Uploading the demo Visa statement adds this month's Shahid VIP (AED 35), so after the upload it is exactly AED 1,560,
+-- 130%, AED 360 over (the number the demo script says): the overspend alert and the "Outings" tip in Ways to save. Amounts differ every month on purpose,
 -- so none of them looks like a subscription. This month's dates never fall before the 1st.
 INSERT INTO ledger_transaction (family_id, member_id, occurred_on, description, merchant, category, direction, amount_minor,
                                 duplicate_hash, source, paid_from_account_id)
@@ -210,7 +211,7 @@ FROM (VALUES
  (0,  9, '00000000-0000-0000-0000-0000000000a1'::uuid, 'KidZania tickets',        'KidZania',           56000),
  (0,  6, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Theme park day',          'Dubai Parks',        64000),
  (0,  4, '00000000-0000-0000-0000-0000000000a1'::uuid, 'Cinema, family of four',  'VOX Cinemas',        18500),
- (0,  1, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Bowling',                 'Bowling alley',      17500),
+ (0,  1, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Bowling',                 'Bowling alley',      14000),
  -- last month and the two before: day = day of that month
  (1,  4, '00000000-0000-0000-0000-0000000000a2'::uuid, 'Ski Dubai',               'Ski Dubai',          69000),
  (1, 11, '00000000-0000-0000-0000-0000000000a1'::uuid, 'Cinema, family of four',  'VOX Cinemas',        22500),

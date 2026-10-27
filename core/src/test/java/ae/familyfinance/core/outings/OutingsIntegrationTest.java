@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Week 7 through the real API, with the demo family's seeded numbers: the fun budget is AED 360 over this month, the
+ * Week 7 through the real API, with the demo family's seeded numbers: the fun budget is AED 325 over this month, the
  * family's usual outing is about AED 374, and SerpApi's events search is replaced by a recorded answer.
  * (The outings in a plan depend on the month the test runs in, so it checks the rules, not the names.)
  */
@@ -122,8 +122,8 @@ class OutingsIntegrationTest extends PostgresIntegrationTest {
         JsonNode b = read(mvc.perform(get("/api/outings").header("Authorization", login("omar"))).andExpect(status().isOk()));
 
         assertThat(b.get("budget").get("text").asText()).isEqualTo("AED 1,200");
-        assertThat(b.get("spent").get("text").asText()).isEqualTo("AED 1,560");
-        assertThat(b.get("over").get("text").asText()).isEqualTo("AED 360");
+        assertThat(b.get("spent").get("text").asText()).isEqualTo("AED 1,525");
+        assertThat(b.get("over").get("text").asText()).isEqualTo("AED 325");
         assertThat(b.get("leftThisMonth").get("minor").asLong()).isZero();
         // 12 family outings in the 3 months before this one; the Shahid VIP subscription is not an outing
         assertThat(b.get("outingsCounted").asInt()).isEqualTo(12);
@@ -179,7 +179,7 @@ class OutingsIntegrationTest extends PostgresIntegrationTest {
         assertThat(now.get("picks")).isNotEmpty();
         assertThat(now.get("picks").findValues("cost")).allMatch(c -> c.get("minor").asLong() == 0);
         assertThat(now.get("facts").findValuesAsText("")).isEmpty();
-        assertThat(now.get("facts").toString()).contains("AED 360 over the budget", "not live");
+        assertThat(now.get("facts").toString()).contains("AED 325 over the budget", "not live");
 
         JsonNode next = read(send(post("/api/outings/plan"), sara, "{\"when\":\"NEXT_MONTH\"}").andExpect(status().isOk()));
         long total = next.get("total").get("minor").asLong();

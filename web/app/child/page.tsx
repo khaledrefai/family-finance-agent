@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { agent, aed } from "@/lib/api";
+import { agent, aed, call } from "@/lib/api";
 import { useLiveEvents } from "@/lib/live-stream";
 import { notifyApi, Wallet } from "@/lib/push";
 import { mealsApi, SavedWeek } from "@/lib/meals";
@@ -30,9 +30,16 @@ export default function ChildHome() {
   const [changed, setChanged] = useState(false);
   const [fun, setFun] = useState<SavedPlan[]>([]);
   const [month, setMonth] = useState<KidMonth | null>(null);
+  // My goal and stars from my month (live: a yes that pays from my goal jar reaches the goal), and where my
+  // pocket money went from the spend engine, the same numbers my parents see
+  const [pocket, setPocket] = useState<PocketSummary | null>(null);
+  const loadMonth = useCallback(() => {
+    summaryApi.kid().then(setMonth).catch(() => {});
+    call<PocketSummary>("/api/spend/summary").then(setPocket).catch(() => {});
+  }, []);
   useEffect(() => {
-    if (me && !me.demo) summaryApi.kid().then(setMonth).catch(() => {});
-  }, [me]);
+    if (me) loadMonth();
+  }, [me, loadMonth]);
 
   useEffect(() => {
     if (me) agent.nudge().then((n) => setNudge(n.nudge)).catch(() => {});
@@ -49,7 +56,10 @@ export default function ChildHome() {
   useEffect(() => {
     if (me) loadWallet();
   }, [me, loadWallet]);
-  useLiveEvents(["hello", "WALLET_CHANGED"], (e) => loadWallet(e.kind === "WALLET_CHANGED"), !!me);
+  useLiveEvents(["hello", "WALLET_CHANGED"], (e) => {
+    loadWallet(e.kind === "WALLET_CHANGED");
+    if (e.kind === "WALLET_CHANGED") loadMonth();
+  }, !!me);
   const loadFun = useCallback(() => {
     outingsApi.saved().then(setFun).catch(() => {});
   }, []);
@@ -72,14 +82,15 @@ export default function ChildHome() {
   }, [changed]);
 
   if (!me) return <Loading />;
-  // The demo kids' sample goal (with its saving plan); any other kid's own goal from the core
+  // My own goal and stars from the core. The demo kids keep their sample saving plan line until the goal is reached.
   const kid = me.demo ? kids[me.displayName] : undefined;
-  const goal = kid
-    ? { name: kid.goal, percent: kid.percent, saved: aed(kid.savedMinor), target: aed(kid.goalMinor), plan: kid.plan as string | null }
-    : month?.goalName && month.goalTarget
-      ? { name: month.goalName, percent: month.goalPercent ?? 0, saved: month.goalSaved?.text ?? "AED 0", target: month.goalTarget.text, plan: null }
-      : null;
-  const stars = kid?.stars ?? month?.starsTotal ?? null;
+  const reached = (month?.goalPercent ?? 0) >= 100;
+  const goal = month?.goalName && month.goalTarget
+    ? { name: month.goalName, percent: month.goalPercent ?? 0, saved: month.goalSaved?.text ?? "AED 0", target: month.goalTarget.text,
+        plan: reached ? "Goal reached! You saved for it, and it's yours." : kid?.plan ?? null }
+    : null;
+  const stars = month?.starsTotal ?? null;
+  const pocketParts = pocket ? pocketPartsOf(pocket) : [];
   const young = me.ageBand === "CHILD_6_9";
 
   return (
@@ -193,17 +204,19 @@ export default function ChildHome() {
         </BuddySays>
       )}
 
-      {kid?.pocket && (
+      {pocket && pocket.pocketMoney.minor > 0 && (
         <section className="card" style={{ display: "grid", gap: 10 }}>
           <div>
             <p className="card-title">Where my pocket money went</p>
-            <p className="muted">October so far · {aed(kid.pocket.totalMinor)} from your parents</p>
+            <p className="muted">{THIS_MONTH} so far · {aed(pocket.pocketMoney.minor)} from your parents</p>
           </div>
-          <StackBar
-            parts={kid.pocket.parts}
-            label={kid.pocket.parts.map((p) => `${p.label} ${aed(p.amountMinor)}`).join(", ")}
-          />
-          <p style={{ fontSize: 14 }}>{kid.pocket.note}</p>
+          <StackBar parts={pocketParts} label={pocketParts.map((p) => `${p.label} ${aed(p.amountMinor)}`).join(", ")} />
+          {pocket.categories[0] && (
+            <p style={{ fontSize: 14 }}>
+              Most went on {pocket.categories[0].label}.
+              {pocket.categories[0].category === "SCHOOL_CANTEEN" ? " That's normal, and logging it is what makes this picture right." : ""}
+            </p>
+          )}
         </section>
       )}
 
@@ -251,4 +264,27 @@ function CamelWelcome({ memberId, young }: { memberId: string; young: boolean })
       </div>
     </section>
   );
+}
+
+/** The parts of GET /api/spend/summary the kid's pocket money chart uses. */
+interface PocketSummary {
+  pocketMoney: { minor: number };
+  total: { minor: number };
+  categories: { category: string; label: string; total: { minor: number } }[];
+}
+
+const FOOD = ["SCHOOL_CANTEEN", "SNACKS", "SUGARY_DRINKS", "EATING_OUT"];
+const FUN = ["IN_GAME_PURCHASES", "TOYS_AND_HOBBIES"];
+
+/** Food, fun, other things, and what is not spent yet: adds up to the pocket money paid this month. */
+function pocketPartsOf(p: PocketSummary) {
+  const sum = (keys: string[] | null) => p.categories
+    .filter((c) => (keys ? keys.includes(c.category) : !FOOD.includes(c.category) && !FUN.includes(c.category)))
+    .reduce((t, c) => t + c.total.minor, 0);
+  return [
+    { label: "Food", amountMinor: sum(FOOD), color: "var(--s1)" },
+    { label: "Fun", amountMinor: sum(FUN), color: "var(--s2)" },
+    { label: "Other things", amountMinor: sum(null), color: "var(--s3)" },
+    { label: "Not spent yet", amountMinor: Math.max(0, p.pocketMoney.minor - p.total.minor), color: "var(--s4)" },
+  ].filter((x) => x.amountMinor > 0);
 }

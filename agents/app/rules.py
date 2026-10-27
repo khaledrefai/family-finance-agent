@@ -197,7 +197,7 @@ def handle(core: CoreClient, me: Me, message: str, model: Llm | None = None) -> 
             return reply
         rule = core.in_run(run_id).draft_rule(draft)
         reply = (f"I've written this down as a rule: \"{rule.label}\" ({', '.join(rule.chips)}). "
-                 "It isn't on yet: check it in Family and press Turn on.")
+                 "It isn't on yet: turn it on here, or later in Family.")
         core.finish_run(run_id, True, reply, result.model, result.used, result.fallback_reason, result.latency_ms,
                         result.input_tokens, result.output_tokens)
         return reply

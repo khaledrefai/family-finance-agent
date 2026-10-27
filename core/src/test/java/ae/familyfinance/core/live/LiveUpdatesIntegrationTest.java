@@ -201,7 +201,7 @@ class LiveUpdatesIntegrationTest extends PostgresIntegrationTest {
         jdbc.update("DELETE FROM family_event WHERE family_id = ? AND dedupe_key IS NOT NULL", DemoFamily.FAMILY);
 
         List<String> first = alerts.check(DemoFamily.FAMILY, true).sent();
-        // Seed: DEWA is due tomorrow, Entertainment is AED 360 over its AED 1,200 budget
+        // Seed: DEWA is due tomorrow, Entertainment is AED 325 over its AED 1,200 budget
         assertThat(first).contains("DEWA electricity and water due tomorrow", "Entertainment is over budget", "This week's plan");
         assertThat(alerts.check(DemoFamily.FAMILY, true).sent()).isEmpty();
 
@@ -210,7 +210,7 @@ class LiveUpdatesIntegrationTest extends PostgresIntegrationTest {
                 SELECT n.body FROM notification n JOIN family_event e ON e.id = n.event_id
                 WHERE e.dedupe_key LIKE 'budget:ENTERTAINMENT:%' AND n.member_id = ?
                 """, String.class, DemoFamily.SARA);
-        assertThat(body).contains("AED 360 over");
+        assertThat(body).contains("AED 325 over");
         // Parents only; the kids never hear about the family's bills
         assertThat(jdbc.queryForObject("""
                 SELECT count(*) FROM notification n JOIN family_event e ON e.id = n.event_id

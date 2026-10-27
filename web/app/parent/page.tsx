@@ -152,7 +152,7 @@ export default function TodayPage() {
             <p className="hero-label">Free to spend until pay day</p>
             <p className="hero-amount"><span className="cur">AED</span>{plain(monthly.freeUntilPaydayMinor)}</p>
             <p className="hero-sub">
-              {monthly.payday ? `Pay day is ${monthly.payday}. ` : ""}The whole of {THIS_MONTH}: {aed(monthly.freeMinor)} after bills and budgets.
+              {monthly.payday ? `Pay day is ${monthly.payday}. ` : ""}After bills, budgets and what is set aside for the big ones.
             </p>
           </>
         )}
@@ -186,7 +186,15 @@ export default function TodayPage() {
           return (
             <Chit key={r.id} request={r} from={`${nameOf(r.requesterId)} asks`} stamp={false}
               corner={<Link href={`/parent/why?id=${r.id}`} className="link">Why this?</Link>}>
-              {r.requesterId !== me.memberId ? (
+              {r.requesterId !== me.memberId && r.childPays ? (
+                <>
+                  <p className="chit-note">On a yes, it is paid from {r.childPays} (demo money).</p>
+                  <div className="chit-actions">
+                    <button onClick={() => decide(r.id, "approve")}>Approve</button>
+                    <button className="decline" onClick={() => decide(r.id, "reject")}>Decline</button>
+                  </div>
+                </>
+              ) : r.requesterId !== me.memberId ? (
                 <>
                   <PayFrom value={from} accounts={accounts} onChange={(id) => setPayFrom((p) => ({ ...p, [r.id]: id }))} />
                   {accountsLive
@@ -238,7 +246,7 @@ export default function TodayPage() {
         </div>
         {week && week.slowDown.length > 0 && (
           <>
-            <p className="label" style={{ margin: "6px 0 0" }}>Go easy on, this week</p>
+            <p className="label" style={{ margin: "6px 0 0" }}>Go easy on these this week</p>
             <div className="rows">
               {week.slowDown.map((b) => (
                 <div className="row" key={`slow-${b.label}`}>

@@ -29,7 +29,9 @@ function Why() {
 
   useEffect(() => {
     if (!live || !r) return;
-    core.assess((r.amountMinor / 100).toFixed(2), r.requesterId, account, r.title, r.category).then(setAssessment).catch(() => setAssessment(null));
+    // Paid from the child's own demo money: no card to check
+    core.assess((r.amountMinor / 100).toFixed(2), r.requesterId, r.childPays ? undefined : account, r.title, r.category)
+      .then(setAssessment).catch(() => setAssessment(null));
   }, [live, r, account]);
 
   if (!me) return <Loading />;
@@ -58,15 +60,18 @@ function Why() {
   const a = live ? assessment : null;
   const check = a ? (a.card && { due: dayLongMonth(a.card.dueOn), withMinor: a.card.billWith.minor, freeByDueMinor: a.card.freeByDue.minor, shortMinor: a.card.shortBy.minor, fits: a.card.fits })
     : sampleCheck && { ...sampleCheck, fits: false };
-  const paying = r.status === "PENDING" && r.requesterId !== me.memberId && (
+  const paying = r.status === "PENDING" && r.requesterId !== me.memberId && (r.childPays ? (
+    <p className="chit-note">On a yes, it is paid from {r.childPays} (demo money).</p>
+  ) : (
     <div style={{ display: "grid", gap: 8 }}>
       <AccountPicker label="Pay from" value={account} onChange={setPayFrom} accounts={accounts} />
       {a ? <CardWarning accountId={account} live={a.card && { card: a.card.card, ...check!, fits: a.card.fits }} /> : <CardWarning accountId={account} />}
     </div>
-  );
+  ));
   const kidSide = a?.kid
     ? [
         { label: "Price asked", value: a.amount.text },
+        ...(a.kid.jar && a.kid.jarName ? [{ label: `From the ${a.kid.jarName.toLowerCase()} jar first`, value: a.kid.jar.text }] : []),
         { label: "In the demo wallet", value: a.kid.wallet.text },
         { label: "Wallet after this", value: a.kid.walletAfter.text, over: !a.kid.walletCovers },
       ]
@@ -108,6 +113,7 @@ function Why() {
       )}
       {r.offer && (
         <p className="trust">
+          {r.offer.product && r.offer.product !== r.title ? `${r.offer.product}. ` : ""}
           {r.offer.source === "SEEDED" ? "From our saved price list" : `Best of ${r.offer.offersCompared} offers the app compared`}:{" "}
           {r.offer.total} at {r.offer.store} ({r.offer.price}{r.offer.delivery === null ? ", delivery not listed" : r.offer.delivery === "AED 0" ? " + free delivery" : ` + ${r.offer.delivery} delivery`}
           {r.offer.verified ? ", re-checked" : ""}).{" "}
@@ -120,12 +126,12 @@ function Why() {
       <SampleNote live={!!a} />
       {open && (
         <WhySheet
-          title={a ? (a.verdict === "DOES_NOT_FIT" ? "Why this needs a careful look" : "Why this looks fine") : "Why I suggested a yes"}
+          title={a ? (a.verdict === "DOES_NOT_FIT" ? "Why this needs a careful look" : a.needsParent ? "Why this comes to you" : "Why this looks fine") : "Why I suggested a yes"}
           groups={[
             { heading: `${name}'s side`, rows: kidSide },
             { heading: "The family's side", rows: familySide },
             ...(rules.length ? [{ heading: "Family rules checked", rows: rules }] : []),
-            ...(check && acct
+            ...(check && acct && !r.childPays
               ? [{
                   heading: "Card bill check",
                   rows: [

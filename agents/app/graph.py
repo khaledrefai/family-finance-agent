@@ -33,7 +33,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
 from . import bookkeeper, calculator, documents, gatekeeper, meals, outings, planner, rules, shopper
-from .spend_parser import looks_like_spend
+from .spend_parser import PARENT_SAID, looks_like_spend
 
 
 class Agent(str, Enum):
@@ -71,6 +71,14 @@ _PLACEHOLDER = {
     Agent.COACH: "Savings challenges and lessons aren't ready yet. They're coming soon.",
     Agent.PLANNER: "Ask me to make this month's plan, or try a what-if like \"AED 1,000 a month at 5% for 10 years\".",
 }
+
+
+# For a kid, with no price to check: what they can tell the camel. A parent's yes that only a kid reports is not a yes
+# the app can see, so it asks them to send it through the app instead.
+_KID_HELP = ("Tell me what you bought and the price, like \"12 dirhams shawarma\". "
+             "Want something? Tap \"I want something\" and I'll find the best price.")
+_KID_ASKED = ("Nice! So it counts, ask for it in the app: tap \"I want something\", "
+              "and the parent can say yes right there.")
 
 
 # A child asking for something ("can I buy...") goes to the Gatekeeper even if it has a price in it
@@ -133,6 +141,8 @@ def gatekeeper_node(state: ChatState, config: RunnableConfig) -> ChatState:
     if reply is None and core is not None and me is not None and shopper.is_want(message):
         # "I want wireless headphones" has no price yet: find the shops' prices first
         reply = shopper.handle(core, me, message, ctx.get("llm"))
+    if reply is None and me is not None and me.role.value == "CHILD":
+        reply = _KID_ASKED if PARENT_SAID.search(message) else _KID_HELP
     return {"reply": reply or _PLACEHOLDER[Agent.GATEKEEPER]}
 
 

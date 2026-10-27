@@ -71,7 +71,6 @@ public class DemoSamples {
                 {29, "NOON.COM DUBAI", "249.00"},
                 {26, "TALABAT DUBAI", "86.50"},
                 {23, "SALIK TOP UP", "50.00"},
-                {20, "VOX CINEMAS MALL OF THE EMIRATES", "210.00"},
                 {15, "PAYMENT RECEIVED - THANK YOU", "-3200.00"},
                 {14, "SPINNEYS JUMEIRAH", "189.00"},
                 {14, "SPINNEYS JUMEIRAH", "189.00"},
