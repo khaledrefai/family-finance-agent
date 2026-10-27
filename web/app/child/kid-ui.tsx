@@ -8,7 +8,8 @@ import { useShowOnScreen } from "../price-results";
 
 type Art = "headphones" | "blocks" | "gift";
 
-export function artFor(goal: string): Art {
+export function artFor(name: string): Art {
+  const goal = name.toLowerCase();
   if (goal.includes("headphone")) return "headphones";
   if (goal.includes("building") || goal.includes("lego")) return "blocks";
   return "gift";

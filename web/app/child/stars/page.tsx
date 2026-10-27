@@ -1,12 +1,15 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { badges, kids, saverOfTheMonth } from "@/lib/sample";
+import { KidMonth, summaryApi } from "@/lib/summary";
 import { Loading, SampleNote } from "../../ui";
 import { useSession } from "../../use-session";
 import { BigStar, BuddySays, Race, SmallStar, StickerArt } from "../kid-ui";
 
 // Stars and badges, never money. Saver of the Month is scored on how far each kid is toward their own goal,
-// so a 9-year-old and a 13-year-old compete fairly. Sample figures until the rewards endpoint exists.
+// so a 9-year-old and a 13-year-old compete fairly. The stars and the race are live from this month's summary;
+// the sticker book is still a sample until the rewards endpoint exists.
 const EARN = [
   ["Tell me what you bought", 1],
   ["A week you save as planned", 2],
@@ -15,8 +18,14 @@ const EARN = [
 
 export default function StarsPage() {
   const { me } = useSession("CHILD");
+  const [month, setMonth] = useState<KidMonth | null>(null);
+  useEffect(() => {
+    if (me) summaryApi.kid().then(setMonth).catch(() => {});
+  }, [me]);
   if (!me) return <Loading />;
-  const kid = kids[me.displayName];
+  const sample = kids[me.displayName];
+  const kid = month ? { stars: month.starsTotal, starsThisMonth: month.starsThisMonth } : sample;
+  const race = month?.saver?.race ?? (month ? [] : saverOfTheMonth);
   const young = me.ageBand === "CHILD_6_9";
 
   return (
@@ -51,7 +60,9 @@ export default function StarsPage() {
       <section className="card" style={{ display: "grid", gap: 8 }}>
         <p className="card-title">Saver of the Month</p>
         <p className="muted">A race to your own goal, so everyone has a fair chance</p>
-        <Race runners={saverOfTheMonth} me={me.displayName} />
+        {race.length > 0
+          ? <Race runners={race} me={me.displayName} />
+          : <p>Pick a goal and save towards it to join the race.</p>}
       </section>
 
       <section className="card" style={{ display: "grid", gap: 4 }}>

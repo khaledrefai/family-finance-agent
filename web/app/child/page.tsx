@@ -20,6 +20,8 @@ import { artFor, Avatar, BuddySays, Camel, GoalArt, GoalJar, SmallStar } from ".
 // Kids only ever see their own money. Requests, the wallet and the nudge are live: when a parent says yes, the
 // answer and the new wallet balance arrive on this screen by themselves. Goal and the chart are still sample
 // figures until the goals endpoint exists. Adam (6 to 9) gets bigger type and fewer words.
+const THIS_MONTH = new Intl.DateTimeFormat("en-GB", { month: "long", timeZone: "Asia/Dubai" }).format(new Date());
+
 export default function ChildHome() {
   const { me, requests, error, logout } = useSession("CHILD");
   const [nudge, setNudge] = useState<string | null>(null);
@@ -102,6 +104,15 @@ export default function ChildHome() {
         </section>
       )}
 
+
+      <Link href="/child/month" className="card month-link">
+        <Camel size={young ? 64 : 56} />
+        <span style={{ flex: 1 }}>
+          <span className="card-title" style={{ display: "block" }}>My {THIS_MONTH} with the camel</span>
+          <span className="muted">My goal, my stars and how my month went</span>
+        </span>
+        <span aria-hidden="true">›</span>
+      </Link>
 
       {(wallet || kid) && (
         <section className={`card wallet${changed ? " changed" : ""}`} aria-live="polite">

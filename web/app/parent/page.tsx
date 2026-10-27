@@ -20,6 +20,9 @@ import { useSession } from "../use-session";
 // Requests, bills, cards, free cash and the family goal come from the core's money engine.
 // Overspend alerts come from the budget engine, and "Ways to save" from the engine with the Planner's words.
 // The one piece of advice is still a sample figure.
+// The month the summary link names: today's month in the UAE, like the core's clock.
+const THIS_MONTH = new Intl.DateTimeFormat("en-GB", { month: "long", timeZone: "Asia/Dubai" }).format(new Date());
+
 export default function TodayPage() {
   const { me, requests, error, setError, reload, logout } = useSession("PARENT");
   const [members, setMembers] = useState<MemberView[]>([]);
@@ -282,7 +285,7 @@ export default function TodayPage() {
         </section>
       )}
 
-      <Link href="/parent/summary" className="link">See October&apos;s family summary</Link>
+      <Link href="/parent/summary" className="link">See {THIS_MONTH}&apos;s family summary so far</Link>
       <p className="trust">{TRUST}</p>
       <SampleNote live={false} />
 

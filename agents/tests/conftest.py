@@ -53,6 +53,9 @@ class FakeCore:
         self.outings_board = load("outings_board.json")
         self.outing_plans: list[dict] = []
         self.outing_headers: list[str] = []
+        self.month_summary = load("month_summary.json")
+        self.summary_words: list[dict] = []
+        self.summary_months: list[str | None] = []
         self.meal_plans: list[dict] = []
         self.meal_headers: list[str] = []
         self.calculator_bodies: list[dict] = []
@@ -142,6 +145,21 @@ class FakeCore:
             return httpx.Response(201, json={"id": "22222222-2222-2222-2222-%012d" % len(self.rule_drafts),
                                              "kind": body["kind"], "status": "DRAFT", "label": label,
                                              "chips": ["Typed", "All the kids"], "replaces": []})
+        if path == "/api/summary" and request.method == "GET":
+            self.summary_months.append(request.url.params.get("month"))
+            return httpx.Response(200, json=self.month_summary)
+        if path == "/api/summary/words":
+            words = json.loads(request.content)["words"]
+            self.summary_words.extend(words)
+            by = {w["key"]: w for w in words}
+
+            def put(w: dict) -> dict:
+                return {**w, "text": by[w["key"]]["text"], "writtenBy": by[w["key"]]["writtenBy"]} if w["key"] in by else w
+            page = self.month_summary
+            self.month_summary = {**page, "headline": put(page["headline"]), "story": put(page["story"]),
+                                  "kidPages": [{**k, "camel": put(k["camel"])} for k in page["kidPages"]],
+                                  "needsWords": False}
+            return httpx.Response(200, json=self.month_summary)
         if path == "/api/ways-to-save" and request.method == "GET":
             return httpx.Response(200, json=self.ways)
         if path == "/api/ways-to-save/words":

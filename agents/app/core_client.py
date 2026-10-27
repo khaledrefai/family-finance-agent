@@ -453,6 +453,15 @@ class WaysToSave(BaseModel):
     needsWords: bool
 
 
+class SummaryWriting(BaseModel):
+    """A piece of the monthly summary the Planner may reword (mirrors MonthSummaryEngine.Writing)."""
+    key: str              # headline, story, or kid:<member id>
+    about: str
+    text: str
+    writtenBy: str        # LLM, RULES, or ENGINE (the engine's own sentence)
+    facts: list[str]      # the only numbers the words may use
+
+
 # ---------------------------------------------------------------- documents (mirrors core/.../documents/)
 
 class DocLine(BaseModel):
@@ -644,6 +653,18 @@ class CoreClient:
         resp = self._http.post("/api/ways-to-save/words", json={"tips": words})
         _raise_for_core(resp)
         return WaysToSave.model_validate(resp.json())
+
+    # ------------------------------------------------------------ monthly family summary
+
+    def month_summary(self, month: str | None = None) -> dict:
+        """The parents' page for a month (2026-10; None = this month so far), as the core sent it."""
+        return self._get("/api/summary", {"month": month} if month else None)
+
+    def save_summary_words(self, month: str, words: list[dict]) -> dict:
+        """[{key, text, writtenBy}]. The core checks the numbers again and keeps its own sentence if one is wrong."""
+        resp = self._http.post("/api/summary/words", params={"month": month}, json={"words": words})
+        _raise_for_core(resp)
+        return resp.json()
 
     # ------------------------------------------------------------ documents
 

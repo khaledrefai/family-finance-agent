@@ -728,6 +728,30 @@ body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
 .fun-list li .fun-about { grid-column: 2; font-size: 14px; color: var(--ink-soft); }
 .fun-dot { width: 14px; height: 14px; border-radius: 99px; background: var(--kid-a, var(--ink)); grid-row: span 2; align-self: start; margin-top: 5px; }
 
+/* Monthly family summary: the parents' lead card, each kid's month, the camel's notes, and the kids' own page */
+.summary-headline { font-size: 1.25rem; font-weight: 600; line-height: 1.35; margin-bottom: 8px; }
+.summary-lead { display: grid; gap: 6px; }
+.kid-month { display: grid; gap: 4px; padding-top: 12px; border-top: 1px solid var(--rule-soft); }
+.kid-month:first-of-type { border-top: 0; padding-top: 0; }
+.camel-note { display: flex; gap: 10px; align-items: flex-start; }
+.camel-note svg { flex: none; }
+.camel-hero { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: end; }
+.camel-hero-art { padding-bottom: 4px; }
+.camel-bubble { font: 600 1.0625rem/1.45 var(--font-kid), sans-serif; border-radius: 20px 20px 20px 6px; }
+.young .camel-bubble { font-size: 1.25rem; }
+.saver-sticker { display: flex; align-items: center; gap: 14px; background: var(--kid-sun) !important; color: #1a2340; }
+.saver-sticker .card-title { color: #1a2340; }
+.month-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.month-tile { display: grid; justify-items: center; gap: 4px; text-align: center; }
+.tile-big { font: 700 2.25rem/1 var(--font-kid), sans-serif; color: var(--ink); }
+.tile-label { font: 700 1.125rem/1.1 var(--font-kid), sans-serif; color: var(--ink); }
+.day-dots { display: flex; flex-wrap: wrap; gap: 6px; }
+.day-dots span { width: 18px; height: 18px; border-radius: 99px; border: 2px solid var(--kid-line); background: transparent; }
+.day-dots span.on { background: var(--kid-a); }
+.kid-progress { height: 22px; border-radius: 99px; border: 2px solid var(--kid-line); background: var(--kid-card); overflow: hidden; }
+.kid-progress span { display: block; height: 100%; background: var(--kid-mint, var(--kid-a)); border-right: 2px solid var(--kid-line); }
+.month-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); background: var(--kid-a-wash) !important; }
+
 /* Long-term savings calculator: the learning-only note, the form, one tile per year mark */
 .learn-note { margin: 0; padding: 10px 14px; border-radius: var(--radius-field); font-size: 14px; background: color-mix(in srgb, var(--s1) 10%, var(--chit)); border: 1px solid color-mix(in srgb, var(--s1) 40%, var(--rule)); }
 .calc-form { display: grid; gap: var(--space-3); }

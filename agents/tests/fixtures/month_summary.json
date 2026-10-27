@@ -1,0 +1,645 @@
+{
+  "month": "2026-10",
+  "monthLabel": "October",
+  "periodLabel": "1 to 27 October",
+  "running": true,
+  "from": "2026-10-01",
+  "to": "2026-10-27",
+  "budgetSpent": {
+    "minor": 258750,
+    "currency": "AED",
+    "text": "AED 2,587.50"
+  },
+  "budgetLimit": {
+    "minor": 670000,
+    "currency": "AED",
+    "text": "AED 6,700"
+  },
+  "budgetsWithin": 3,
+  "budgets": [
+    {
+      "category": "GROCERIES",
+      "label": "Groceries",
+      "limit": {
+        "minor": 300000,
+        "currency": "AED",
+        "text": "AED 3,000"
+      },
+      "spent": {
+        "minor": 61250,
+        "currency": "AED",
+        "text": "AED 612.50"
+      },
+      "percent": 20,
+      "left": {
+        "minor": 238750,
+        "currency": "AED",
+        "text": "AED 2,387.50"
+      },
+      "over": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+      },
+      "usual": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+      },
+      "atThisPace": {
+        "minor": 70324,
+        "currency": "AED",
+        "text": "AED 703.24"
+      },
+      "state": "OK",
+      "alert": null,
+      "fillBp": 1531,
+      "pastBp": 0
+    },
+    {
+      "category": "EATING_OUT",
+      "label": "Eating out",
+      "limit": {
+        "minor": 150000,
+        "currency": "AED",
+        "text": "AED 1,500"
+      },
+      "spent": {
+        "minor": 23500,
+        "currency": "AED",
+        "text": "AED 235"
+      },
+      "percent": 16,
+      "left": {
+        "minor": 126500,
+        "currency": "AED",
+        "text": "AED 1,265"
+      },
+      "over": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+      },
+      "usual": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+      },
+      "atThisPace": {
+        "minor": 26981,
+        "currency": "AED",
+        "text": "AED 269.81"
+      },
+      "state": "OK",
+      "alert": null,
+      "fillBp": 1175,
+      "pastBp": 0
+    },
+    {
+      "category": "ENTERTAINMENT",
+      "label": "Entertainment",
+      "limit": {
+        "minor": 120000,
+        "currency": "AED",
+        "text": "AED 1,200"
+      },
+      "spent": {
+        "minor": 156000,
+        "currency": "AED",
+        "text": "AED 1,560"
+      },
+      "percent": 130,
+      "left": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+      },
+      "over": {
+        "minor": 36000,
+        "currency": "AED",
+        "text": "AED 360"
+      },
+      "usual": {
+        "minor": 152000,
+        "currency": "AED",
+        "text": "AED 1,520"
+      },
+      "atThisPace": {
+        "minor": 179111,
+        "currency": "AED",
+        "text": "AED 1,791.11"
+      },
+      "state": "OVER",
+      "alert": "Entertainment is at 130% of its AED 1,200 budget with 4 days to go: AED 360 over.",
+      "fillBp": 7500,
+      "pastBp": 2250
+    },
+    {
+      "category": "TRANSPORT",
+      "label": "Transport",
+      "limit": {
+        "minor": 100000,
+        "currency": "AED",
+        "text": "AED 1,000"
+      },
+      "spent": {
+        "minor": 18000,
+        "currency": "AED",
+        "text": "AED 180"
+      },
+      "percent": 18,
+      "left": {
+        "minor": 82000,
+        "currency": "AED",
+        "text": "AED 820"
+      },
+      "over": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+      },
+      "usual": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+      },
+      "atThisPace": {
+        "minor": 20667,
+        "currency": "AED",
+        "text": "AED 206.67"
+      },
+      "state": "OK",
+      "alert": null,
+      "fillBp": 1350,
+      "pastBp": 0
+    }
+  ],
+  "goals": [
+    {
+      "name": "Emergency buffer",
+      "tierLabel": "Survival",
+      "saved": {
+        "minor": 1000000,
+        "currency": "AED",
+        "text": "AED 10,000"
+      },
+      "target": {
+        "minor": 2500000,
+        "currency": "AED",
+        "text": "AED 25,000"
+      },
+      "percent": 40,
+      "monthly": {
+        "minor": 500000,
+        "currency": "AED",
+        "text": "AED 5,000"
+      },
+      "fullBy": "December 2026"
+    },
+    {
+      "name": "Summer trip",
+      "tierLabel": "Good Life",
+      "saved": {
+        "minor": 360000,
+        "currency": "AED",
+        "text": "AED 3,600"
+      },
+      "target": {
+        "minor": 1200000,
+        "currency": "AED",
+        "text": "AED 12,000"
+      },
+      "percent": 30,
+      "monthly": {
+        "minor": 150000,
+        "currency": "AED",
+        "text": "AED 1,500"
+      },
+      "fullBy": "March 2027"
+    },
+    {
+      "name": "Home deposit",
+      "tierLabel": "Dream",
+      "saved": {
+        "minor": 0,
+        "currency": "AED",
+        "text": "AED 0"
+      },
+      "target": {
+        "minor": 15000000,
+        "currency": "AED",
+        "text": "AED 150,000"
+      },
+      "percent": 0,
+      "monthly": null,
+      "fullBy": null
+    }
+  ],
+  "kids": [
+    {
+      "id": "00000000-0000-0000-0000-0000000000c2",
+      "name": "Adam",
+      "spent": {
+        "minor": 13400,
+        "currency": "AED",
+        "text": "AED 134"
+      },
+      "pocketMoney": {
+        "minor": 24000,
+        "currency": "AED",
+        "text": "AED 240"
+      },
+      "spentPercent": 56,
+      "daysLogged": 15,
+      "daysInPeriod": 27,
+      "topCategory": "toys and hobbies",
+      "goalName": "Building set",
+      "goalSaved": {
+        "minor": 7200,
+        "currency": "AED",
+        "text": "AED 72"
+      },
+      "goalTarget": {
+        "minor": 16000,
+        "currency": "AED",
+        "text": "AED 160"
+      },
+      "goalPercent": 45,
+      "starsThisMonth": 25,
+      "requests": {
+        "asked": 0,
+        "approved": 0,
+        "declined": 0,
+        "blocked": 0,
+        "waiting": 0,
+        "blockedTitles": []
+      },
+      "againstRules": [
+        "Robux gift card",
+        "Cola"
+      ]
+    },
+    {
+      "id": "00000000-0000-0000-0000-0000000000c1",
+      "name": "Layla",
+      "spent": {
+        "minor": 25100,
+        "currency": "AED",
+        "text": "AED 251"
+      },
+      "pocketMoney": {
+        "minor": 40000,
+        "currency": "AED",
+        "text": "AED 400"
+      },
+      "spentPercent": 63,
+      "daysLogged": 20,
+      "daysInPeriod": 27,
+      "topCategory": "the school canteen",
+      "goalName": "Headphones",
+      "goalSaved": {
+        "minor": 12000,
+        "currency": "AED",
+        "text": "AED 120"
+      },
+      "goalTarget": {
+        "minor": 30000,
+        "currency": "AED",
+        "text": "AED 300"
+      },
+      "goalPercent": 40,
+      "starsThisMonth": 40,
+      "requests": {
+        "asked": 0,
+        "approved": 0,
+        "declined": 0,
+        "blocked": 0,
+        "waiting": 0,
+        "blockedTitles": []
+      },
+      "againstRules": []
+    }
+  ],
+  "saver": {
+    "winners": [
+      "Adam"
+    ],
+    "percent": 45,
+    "race": [
+      {
+        "id": "00000000-0000-0000-0000-0000000000c2",
+        "name": "Adam",
+        "percent": 45
+      },
+      {
+        "id": "00000000-0000-0000-0000-0000000000c1",
+        "name": "Layla",
+        "percent": 40
+      }
+    ]
+  },
+  "wentWell": [
+    {
+      "key": "budgets-within",
+      "text": "3 of 4 family budgets are within their limit: groceries, eating out and transport.",
+      "facts": [
+        "Groceries: AED 612.50 of AED 3,000 (20%)",
+        "Eating out: AED 235 of AED 1,500 (16%)",
+        "Transport: AED 180 of AED 1,000 (18%)",
+        "3 of 4 budgets within their limit"
+      ],
+      "why": [
+        {
+          "label": "Groceries",
+          "value": "AED 612.50 of AED 3,000"
+        },
+        {
+          "label": "Eating out",
+          "value": "AED 235 of AED 1,500"
+        },
+        {
+          "label": "Transport",
+          "value": "AED 180 of AED 1,000"
+        }
+      ]
+    },
+    {
+      "key": "goal",
+      "text": "The summer trip is 30% saved: AED 3,600 of AED 12,000, full by March 2027 on the plan.",
+      "facts": [
+        "Summer trip: AED 3,600 of AED 12,000 (30%), full by March 2027"
+      ],
+      "why": [
+        {
+          "label": "Saved",
+          "value": "AED 3,600"
+        },
+        {
+          "label": "Target",
+          "value": "AED 12,000"
+        },
+        {
+          "label": "Each month",
+          "value": "AED 1,500"
+        },
+        {
+          "label": "Full by",
+          "value": "March 2027"
+        }
+      ]
+    },
+    {
+      "key": "kept-track",
+      "text": "Adam logged spending on 15 of 27 days and Layla on 20.",
+      "facts": [
+        "Adam logged spending on 15 of 27 days",
+        "Layla logged spending on 20 of 27 days"
+      ],
+      "why": [
+        {
+          "label": "Adam",
+          "value": "15 of 27 days"
+        },
+        {
+          "label": "Layla",
+          "value": "20 of 27 days"
+        }
+      ]
+    }
+  ],
+  "toWatch": [
+    {
+      "key": "budget-entertainment",
+      "text": "Entertainment is AED 360 over its AED 1,200 budget (130%) with 4 days to go.",
+      "facts": [
+        "Entertainment: AED 1,560 of AED 1,200 (130%), AED 360 over, 4 days to go"
+      ],
+      "why": [
+        {
+          "label": "Budget",
+          "value": "AED 1,200"
+        },
+        {
+          "label": "Spent",
+          "value": "AED 1,560"
+        },
+        {
+          "label": "Over by",
+          "value": "AED 360"
+        }
+      ]
+    },
+    {
+      "key": "rules-adam",
+      "text": "Adam logged 2 things the family rules say no to: Robux gift card and cola. Worth a calm chat.",
+      "facts": [
+        "Adam logged 2 things against family rules: Robux gift card, Cola"
+      ],
+      "why": [
+        {
+          "label": "Robux gift card",
+          "value": "No in-game purchases"
+        },
+        {
+          "label": "Cola",
+          "value": "No fizzy drinks for Adam"
+        }
+      ]
+    }
+  ],
+  "headline": {
+    "key": "headline",
+    "about": "One line for the top of the parents' summary",
+    "text": "October so far: AED 2,587.50 of the AED 6,700 family budgets spent, 3 of 4 budgets within the limit, and the summer trip 30% saved.",
+    "writtenBy": "ENGINE",
+    "facts": [
+      "Period: 1 to 27 October",
+      "Family budgets: AED 2,587.50 spent of AED 6,700",
+      "3 of 4 budgets within their limit",
+      "Summer trip: 30% saved"
+    ]
+  },
+  "story": {
+    "key": "story",
+    "about": "Two or three sentences for the parents: what went well, what to watch",
+    "text": "3 of 4 family budgets are within their limit: groceries, eating out and transport. To watch: Entertainment is AED 360 over its AED 1,200 budget (130%) with 4 days to go.",
+    "writtenBy": "ENGINE",
+    "facts": [
+      "Period: 1 to 27 October",
+      "Family budgets: AED 2,587.50 spent of AED 6,700",
+      "3 of 4 budgets within their limit",
+      "Summer trip: 30% saved",
+      "Groceries: AED 612.50 of AED 3,000 (20%)",
+      "Eating out: AED 235 of AED 1,500 (16%)",
+      "Transport: AED 180 of AED 1,000 (18%)",
+      "3 of 4 budgets within their limit",
+      "Summer trip: AED 3,600 of AED 12,000 (30%), full by March 2027",
+      "Adam logged spending on 15 of 27 days",
+      "Layla logged spending on 20 of 27 days",
+      "Entertainment: AED 1,560 of AED 1,200 (130%), AED 360 over, 4 days to go",
+      "Adam logged 2 things against family rules: Robux gift card, Cola",
+      "Saver of the Month: Adam, 45% of the way to their own goal"
+    ]
+  },
+  "kidPages": [
+    {
+      "id": "00000000-0000-0000-0000-0000000000c2",
+      "name": "Adam",
+      "young": true,
+      "month": "2026-10",
+      "monthLabel": "October",
+      "periodLabel": "1 to 27 October",
+      "running": true,
+      "goalName": "Building set",
+      "goalSaved": {
+        "minor": 7200,
+        "currency": "AED",
+        "text": "AED 72"
+      },
+      "goalTarget": {
+        "minor": 16000,
+        "currency": "AED",
+        "text": "AED 160"
+      },
+      "goalPercent": 45,
+      "starsThisMonth": 25,
+      "starsTotal": 25,
+      "daysLogged": 15,
+      "daysInPeriod": 27,
+      "asked": 0,
+      "yes": 0,
+      "saver": {
+        "winners": [
+          "Adam"
+        ],
+        "percent": 45,
+        "race": [
+          {
+            "id": "00000000-0000-0000-0000-0000000000c2",
+            "name": "Adam",
+            "percent": 45
+          },
+          {
+            "id": "00000000-0000-0000-0000-0000000000c1",
+            "name": "Layla",
+            "percent": 40
+          }
+        ]
+      },
+      "saverOfTheMonth": true,
+      "familyGoal": {
+        "name": "Summer trip",
+        "percent": 30
+      },
+      "highlights": [
+        "You told me what you bought on 15 of 27 days. Thank you.",
+        "You earned 25 stars.",
+        "Your building set jar is 45% full.",
+        "Thanks for being honest about the Robux gift card and cola. They are on the family's no list, so let's skip them next month.",
+        "You are Saver of the Month.",
+        "The family is 30% of the way to the summer trip."
+      ],
+      "camel": {
+        "key": "kid:00000000-0000-0000-0000-0000000000c2",
+        "about": "The camel's note to Adam (a young child: very short, simple words)",
+        "text": "Adam, what a month. You are Saver of the Month, and your building set jar is 45% full.",
+        "writtenBy": "ENGINE",
+        "facts": [
+          "Month: October",
+          "Days logged: 15 of 27",
+          "Stars this month: 25, stars in all: 25",
+          "Own goal Building set: 45% full, AED 72 of AED 160",
+          "Things on the family's no list: Robux gift card, cola",
+          "Saver of the Month: Adam",
+          "Family goal Summer trip: 30%"
+        ]
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-0000000000c1",
+      "name": "Layla",
+      "young": false,
+      "month": "2026-10",
+      "monthLabel": "October",
+      "periodLabel": "1 to 27 October",
+      "running": true,
+      "goalName": "Headphones",
+      "goalSaved": {
+        "minor": 12000,
+        "currency": "AED",
+        "text": "AED 120"
+      },
+      "goalTarget": {
+        "minor": 30000,
+        "currency": "AED",
+        "text": "AED 300"
+      },
+      "goalPercent": 40,
+      "starsThisMonth": 40,
+      "starsTotal": 40,
+      "daysLogged": 20,
+      "daysInPeriod": 27,
+      "asked": 0,
+      "yes": 0,
+      "saver": {
+        "winners": [
+          "Adam"
+        ],
+        "percent": 45,
+        "race": [
+          {
+            "id": "00000000-0000-0000-0000-0000000000c2",
+            "name": "Adam",
+            "percent": 45
+          },
+          {
+            "id": "00000000-0000-0000-0000-0000000000c1",
+            "name": "Layla",
+            "percent": 40
+          }
+        ]
+      },
+      "saverOfTheMonth": false,
+      "familyGoal": {
+        "name": "Summer trip",
+        "percent": 30
+      },
+      "highlights": [
+        "You told me what you bought on 20 of 27 days. Thank you.",
+        "You earned 40 stars.",
+        "Your headphones jar is 40% full.",
+        "Adam is Saver of the Month this time. You can catch up next month.",
+        "The family is 30% of the way to the summer trip."
+      ],
+      "camel": {
+        "key": "kid:00000000-0000-0000-0000-0000000000c1",
+        "about": "The camel's note to Layla",
+        "text": "Layla, your headphones jar is 40% full. Every dirham you keep gets it closer. You earned 40 stars.",
+        "writtenBy": "ENGINE",
+        "facts": [
+          "Month: October",
+          "Days logged: 20 of 27",
+          "Stars this month: 40, stars in all: 40",
+          "Own goal Headphones: 40% full, AED 120 of AED 300",
+          "Saver of the Month: Adam",
+          "Family goal Summer trip: 30%"
+        ]
+      }
+    }
+  ],
+  "months": [
+    {
+      "month": "2026-10",
+      "label": "October so far"
+    },
+    {
+      "month": "2026-09",
+      "label": "September"
+    },
+    {
+      "month": "2026-08",
+      "label": "August"
+    }
+  ],
+  "needsWords": true
+}
