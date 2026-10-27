@@ -60,7 +60,7 @@ def test_without_claude_the_parser_drafts_the_rule_in_an_agent_run():
     assert core.rule_drafts == [{"kind": "BLOCK_ALLERGEN", "forChild": ADAM, "allergen": "PEANUT", "weekly": False,
                                  "said": "No peanuts for Adam", "draftedBy": "RULES"}]
     assert core.rule_headers[0].startswith("11111111-")       # recorded under the agent run
-    assert "No peanuts for Adam" in reply and "Turn on" in reply
+    assert "No peanuts for Adam" in reply and "turn it on here" in reply
     assert core.runs[0]["agent"] == "GATEKEEPER" and core.runs[0]["finished"]["llmUsed"] is False
 
 
