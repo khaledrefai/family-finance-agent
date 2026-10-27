@@ -145,3 +145,20 @@ def test_a_child_cannot_make_the_family_plan(fake_core):
     r = TestClient(app).post("/setup/plan", headers={"Authorization": "Bearer t"})
     assert r.status_code == 403
     assert fake_core.bucket_drafts == []
+
+
+def test_a_month_short_after_goal_saving_says_short_not_minus_spare():
+    from app.core_client import Cashflow, PlanOption
+    from app.planner import _short, _template
+    data = json.loads(open("tests/fixtures/cashflow.json").read())
+    data["spare"] = {"minor": -442167, "currency": "AED", "text": "-AED 4,421.67"}
+    text = _template(Cashflow.model_validate(data), None, first_plan=True)
+    assert "goal saving needs AED 4,421.67 more than that, so the month comes up short" in text
+    assert "-AED" not in text
+
+    money = {"minor": 485000, "currency": "AED", "text": "AED 4,850"}
+    every = PlanOption(id="relaxed", name="Relaxed", monthly=money, readyMonth="August 2027", meetsDate=True, fits=False,
+                       tightestMonth="November", monthsShort=10, monthsChecked=10)
+    assert _short(every) == ", short every month"
+    one = every.model_copy(update={"monthsShort": 1})
+    assert _short(one) == ", does not fit in November"

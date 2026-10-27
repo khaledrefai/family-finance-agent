@@ -99,7 +99,8 @@ def _facts(cf, shares: list[Share], options, first_plan: bool = False) -> list[s
         f"Planned income in {cf.monthLabel}: {cf.income.total.text}.",
         f"Commitments and reserves this month: {cf.commitments.total.text}.",
         f"Everyday budgets: {cf.everyday.total.text}.",
-        f"Free cash this month: {cf.free.text}. After goal saving of {cf.saving.total.text}, spare: {cf.spare.text}.",
+        f"Free cash this month: {cf.free.text}. After goal saving of {cf.saving.total.text}, "
+        + (f"spare: {cf.spare.text}." if cf.spare.minor >= 0 else f"the month is short by {cf.spare.text.lstrip('-')}."),
     ]
     if u.nextIncomeOn and not first_plan:
         facts.append(f"Free until the next pay ({u.nextIncomeLabel}, {u.nextIncomeOn.day} {u.nextIncomeOn:%b}): {u.free.text}.")
@@ -114,8 +115,17 @@ def _facts(cf, shares: list[Share], options, first_plan: bool = False) -> list[s
     if options:
         for o in options.options:
             facts.append(f"{options.goalName}, {o.name}: {o.monthly.text} a month, ready by {o.readyMonth}"
-                         + ("" if o.fits else f", does not fit in {o.tightestMonth}") + ".")
+                         + ("" if o.fits else _short(o)) + ".")
     return facts
+
+
+def _short(o) -> str:
+    """Where a pace does not fit, in the same words as the app."""
+    if o.monthsShort > 1 and o.monthsShort >= o.monthsChecked:
+        return ", short every month"
+    if o.monthsShort > 1:
+        return f", short in {o.monthsShort} months, most in {o.tightestMonth}"
+    return f", does not fit in {o.tightestMonth}"
 
 
 def _prompt(message: str, facts: list[str]) -> str:
@@ -126,7 +136,12 @@ def _prompt(message: str, facts: list[str]) -> str:
 def _template(cf, options, first_plan: bool = False) -> str:
     """The rule-based answer: always right, a little plain."""
     u = cf.untilNextIncome
-    parts = [f"This month {cf.free.text} is free after commitments and everyday budgets, and {cf.spare.text} is spare after goal saving."]
+    if cf.spare.minor < 0:
+        # "-AED 4,421.67 is spare" reads wrong: say the month is short, by how much
+        parts = [f"This month {cf.free.text} is free after commitments and everyday budgets, but goal saving needs "
+                 f"{cf.spare.text.lstrip('-')} more than that, so the month comes up short."]
+    else:
+        parts = [f"This month {cf.free.text} is free after commitments and everyday budgets, and {cf.spare.text} is spare after goal saving."]
     if u.nextIncomeOn and not first_plan:
         parts.append(f"Until {u.nextIncomeLabel} arrives on {u.nextIncomeOn.day} {u.nextIncomeOn:%b}, {u.free.text} is free.")
     tight = [_month_name(m.month) for m in cf.months if m.tight]

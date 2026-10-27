@@ -29,7 +29,8 @@ public final class PlanOptionsEngine {
     static final int DEFAULT_MONTHS = 8;
 
     public record Option(String id, String name, MoneyView monthly, int months, LocalDate readyBy, String readyMonth,
-                         boolean meetsDate, boolean fits, String tightestMonth, MoneyView spareInTightest) {
+                         boolean meetsDate, boolean fits, String tightestMonth, MoneyView spareInTightest,
+                         int monthsShort, int monthsChecked) {
     }
 
     public record PlanOptions(UUID goalId, String goalName, Tier tier, MoneyView target, MoneyView saved,
@@ -98,10 +99,12 @@ public final class PlanOptionsEngine {
         YearMonth ready = engine.month(needed - 1);
         LocalDate readyBy = ready.atEndOfMonth();
         boolean fits = true;
+        int monthsShort = 0;
+        int checked = Math.min(needed, CashflowEngine.MONTHS);
         int tightest = 0;
         Money tightestSpare = null;
         Money left = remaining;
-        for (int m = 0; m < Math.min(needed, CashflowEngine.MONTHS); m++) {
+        for (int m = 0; m < checked; m++) {
             Money put = monthly.min(left);
             left = left.minus(put);
             Money after = spare[m].minus(put);
@@ -111,6 +114,7 @@ public final class PlanOptionsEngine {
             }
             if (after.isNegative()) {
                 fits = false;
+                monthsShort++;
             }
         }
         String name = Character.toUpperCase(id.charAt(0)) + id.substring(1);
@@ -118,6 +122,6 @@ public final class PlanOptionsEngine {
                 ready.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH) + " " + ready.getYear(),
                 date == null || !readyBy.isAfter(date.withDayOfMonth(date.lengthOfMonth())), fits,
                 engine.month(tightest).getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH),
-                MoneyView.of(tightestSpare == null ? Money.zero(currency) : tightestSpare));
+                MoneyView.of(tightestSpare == null ? Money.zero(currency) : tightestSpare), monthsShort, checked);
     }
 }

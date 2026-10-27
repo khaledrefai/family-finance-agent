@@ -130,7 +130,7 @@ export interface PlanOptions {
   goalId: string;
   goalName: string;
   target: MoneyView;
-  options: { id: string; name: string; monthly: MoneyView; readyMonth: string; meetsDate: boolean; fits: boolean; tightestMonth: string; spareInTightest: MoneyView }[];
+  options: { id: string; name: string; monthly: MoneyView; readyMonth: string; meetsDate: boolean; fits: boolean; tightestMonth: string; spareInTightest: MoneyView; monthsShort: number; monthsChecked: number }[];
   recommended: string | null;
   recommendedReason: string | null;
 }
@@ -621,3 +621,15 @@ export const sampleGold: Gold = {
   priceIsSample: true,
   makingNote: sample.gold.makingNote,
 };
+
+/** Where a saving pace does not fit: one month, several, or every month on the way. */
+export function shortText(o: { tightestMonth: string; monthsShort: number; monthsChecked: number }) {
+  if (o.monthsShort > 1 && o.monthsShort >= o.monthsChecked) return "Short every month.";
+  if (o.monthsShort > 1) return `Short in ${o.monthsShort} months, most in ${o.tightestMonth}.`;
+  return `Tight in ${o.tightestMonth}.`;
+}
+
+/** A goal's name in "Your … jar": "A scooter" -> "scooter", never "Your a scooter jar". */
+export function jarLabel(name: string) {
+  return name.replace(/^(a|an|the|my)\s+(?=\S)/i, "").toLowerCase();
+}

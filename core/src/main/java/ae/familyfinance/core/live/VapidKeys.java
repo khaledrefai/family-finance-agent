@@ -3,6 +3,8 @@ package ae.familyfinance.core.live;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +40,19 @@ public class VapidKeys {
         this.db = db;
         this.envPublic = envPublic;
         this.envPrivate = envPrivate;
+    }
+
+    /**
+     * Make or load the pair once at start, outside any request. The first caller used to be GET /api/push/settings,
+     * which runs read-only, so on a database without keys the insert failed and the Family notifications card broke.
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    void warmUp() {
+        try {
+            pair();
+        } catch (RuntimeException e) {
+            log.warn("Web push keys not ready: {}", e.getMessage());
+        }
     }
 
     /** base64url, as the browser's pushManager.subscribe wants it. */

@@ -48,9 +48,11 @@ public final class WeeklyPlanEngine {
         int daysToPay = pay == null ? WEEK : (int) Math.max(1, ChronoUnit.DAYS.between(today, pay));
         int weekDays = Math.min(WEEK, daysToPay);
         Money free = untilPay == null ? Money.zero(currency) : new Money(untilPay.free().minor(), currency);
-        Money week = free.isPositive()
-                ? free.scaled(weekDays, daysToPay).roundedDownTo(ROUND_TO_MINOR)
-                : Money.zero(currency);
+        // Pay day within the week: the whole "free until pay day", to the dirham, so it matches Today's big number.
+        // Otherwise a week's share, rounded down to AED 10.
+        Money week = !free.isPositive() ? Money.zero(currency)
+                : weekDays == daysToPay ? free.roundedDownTo(100)
+                : free.scaled(weekDays, daysToPay).roundedDownTo(ROUND_TO_MINOR);
 
         String headline;
         if (!free.isPositive()) {

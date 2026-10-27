@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { aed, api, ApiError, getToken, Me, MemberView } from "@/lib/api";
-import { Buckets, core, day, fromBuckets, Goal, MoneyView, PlanOptions } from "@/lib/live";
+import { Buckets, core, day, fromBuckets, Goal, MoneyView, PlanOptions, shortText } from "@/lib/live";
 import { CommitmentView, IncomeView, setupApi, SetupStatus, typed } from "@/lib/setup";
 import { MemberForm } from "../member-form";
 import { BillAddForm, BudgetsForm, HOW_OFTEN, IncomeAddForm, today } from "../plan-forms";
@@ -385,7 +385,7 @@ function PlanStep({ status, onBack, onDone, refresh }: {
                 {o.id === options.recommended && <span className="confirmed" style={{ marginLeft: 8 }}>Suggested</span>}
                 <br />
                 <span className="muted" style={{ fontSize: 14 }}>
-                  Ready by {o.readyMonth}. {o.fits ? "Fits every month." : `Tight in ${o.tightestMonth}.`}
+                  Ready by {o.readyMonth}. {o.fits ? "Fits every month." : shortText(o)}
                 </span>
               </span>
               <button type="button" className={o.id === options.recommended ? undefined : "quiet"} disabled={!!busy}

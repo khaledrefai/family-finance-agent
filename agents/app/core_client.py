@@ -310,6 +310,8 @@ class PlanOption(BaseModel):
     fits: bool
     tightestMonth: str | None = None
     spareInTightest: MoneyView | None = None
+    monthsShort: int = 0
+    monthsChecked: int = 0
 
 
 class PlanOptions(BaseModel):
