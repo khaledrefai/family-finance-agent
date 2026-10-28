@@ -73,6 +73,10 @@ export default function BucketsPage() {
             )}
           </>
         )}
+        {/* The engine's checks: a bucket that holds less than it needs, before or after confirming */}
+        {(buckets.warnings ?? []).map((w) => (
+          <p key={w} className="warn-line" role="note">{w}</p>
+        ))}
         {error && <p className="error" role="alert">{error}</p>}
       </section>
 

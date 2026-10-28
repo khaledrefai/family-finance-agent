@@ -101,8 +101,10 @@ class PricingIntegrationTest extends PostgresIntegrationTest {
         assertThat(c.get("offers").findValues("link")).allMatch(JsonNode::isNull);
         assertThat(c.get("assessment").get("freeUntilPay").isNull()).isTrue();
         assertThat(c.get("assessment").get("needsParent").asBoolean()).isTrue();
+        // The seeded wallet depends on today's date (pocket money in, canteen spending out), so read it back
+        String wallet = c.get("assessment").get("kid").get("wallet").get("text").asText();
         assertThat(c.get("facts").toString()).contains("Best re-checked total: AED 289 at Amazon.ae (AED 289 + free delivery)",
-                "A different model, not the same item", "less than half the usual price", "Your headphones jar has AED 120 and the wallet AED 305");
+                "A different model, not the same item", "less than half the usual price", "Your headphones jar has AED 120 and the wallet " + wallet);
         assertThat(replay.searches).hasSize(4);                     // the search and three re-checks
     }
 
