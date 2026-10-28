@@ -1,9 +1,10 @@
 """The Bookkeeper reading receipts and statements, against a fake core and a fake Claude."""
 
 from app.doc_parser import parse
-from app.documents import NEEDS_AI, answer_findings, read_document
+from app.documents import NEEDS_AI, NOT_READ, WRONG_TYPE, answer_findings, read_document
 from app.graph import Agent, orchestrator
 from app.llm import Llm
+from app.settings import settings
 from tests.conftest import FakeCore
 from tests.test_planner import FakeAnthropic, llm_on, me
 
@@ -93,6 +94,25 @@ def test_a_photo_with_the_ai_off_is_marked_failed_with_a_way_forward(monkeypatch
     assert reply == NEEDS_AI
     assert core.failures == [NEEDS_AI]
     assert core.runs[0]["finished"]["status"] == "FAILED"
+
+
+def test_a_photo_claude_could_not_read_in_time_says_try_again_not_ai_off(monkeypatch):
+    llm_on(monkeypatch)
+    core = FakeCore("Sara")
+    core.file = (b"\xff\xd8 a phone photo", "image/jpeg")
+    fake = FakeAnthropic(error=TimeoutError("took too long"))
+    doc, reply = read_document(core.client(), me(core), DOC, Llm(fake))
+    assert doc.status == "FAILED"
+    assert reply == NOT_READ
+    assert fake.calls[0]["timeout"] == settings.llm_read_timeout_s     # a photo gets the long timeout
+
+
+def test_a_photo_type_claude_cannot_take_says_which_files_work(monkeypatch):
+    llm_on(monkeypatch)
+    core = FakeCore("Sara")
+    core.file = (b"heic bytes", "image/heic")
+    doc, reply = read_document(core.client(), me(core), DOC, Llm(FakeAnthropic(error=RuntimeError("not called"))))
+    assert reply == WRONG_TYPE
 
 
 def test_claude_reads_a_photo_into_the_schema(monkeypatch):

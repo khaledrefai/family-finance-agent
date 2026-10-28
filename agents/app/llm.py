@@ -74,8 +74,10 @@ class Llm:
                                                max_retries=0)
         return self._client
 
-    def ask(self, system: str, user: str | list, schema: dict, max_tokens: int = 1200) -> LlmResult:
-        """`user` is the text, or a list of content blocks (a receipt photo or PDF plus the question)."""
+    def ask(self, system: str, user: str | list, schema: dict, max_tokens: int = 1200,
+            timeout_s: float | None = None) -> LlmResult:
+        """`user` is the text, or a list of content blocks (a receipt photo or PDF plus the question).
+        `timeout_s` replaces the usual short timeout for one slow call, such as reading a photo."""
         if not enabled():
             return LlmResult(None, used=False, fallback_reason="LLM off")
         started = time.monotonic()
@@ -89,6 +91,7 @@ class Llm:
                 # If the model declines, the API retries on Anthropic's recommended fallback model in the same call
                 betas=["server-side-fallback-2026-07-01"],
                 fallbacks="default",
+                **({"timeout": timeout_s} if timeout_s else {}),
             )
         except Exception as e:  # timeout, network, bad key, rate limit: the template answers instead
             return LlmResult(None, used=False, fallback_reason=f"LLM error: {type(e).__name__}"[:120],
