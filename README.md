@@ -74,7 +74,8 @@ and `~/ffa/shared/.env` holds the settings (the JWT secret is generated there on
 **HTTPS.** DNS (Namecheap): `A @` and `A www`, both pointing at the VPS IP. This VPS also hosts other sites,
 so the web server already running there (on ports 80 and 443) forwards `family-finance-coach.com` and `www.` to
 `http://127.0.0.1:3000`, with a Let's Encrypt certificate from certbot. For live updates it must not buffer
-(nginx: `proxy_buffering off;`). The repo also has a Caddy option (`ops/caddy/Caddyfile`, GitHub variable
+(nginx: `proxy_buffering off;`). Uploads go up to 5 MB, so the nginx site also needs `client_max_body_size 6m;`:
+nginx's default is 1 MB, which refuses most phone photos of receipts. The repo also has a Caddy option (`ops/caddy/Caddyfile`, GitHub variable
 `CADDY=on`) for a server where nothing else uses 80/443; it is off by default. `http://VPS_HOST:3000` keeps working.
 
 To reset the demo family on the server: `ssh` in, then `cd ~/ffa/current && COMPOSE_PROJECT_NAME=ffa ./deploy.sh reseed`.
