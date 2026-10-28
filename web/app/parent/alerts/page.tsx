@@ -38,7 +38,7 @@ export default function AlertsPage() {
           <div className="rows">
             {bell.items.map((n) => (
               <Link key={n.id} href={n.link} className="row" style={{ display: "block", padding: "12px 0", color: "inherit", textDecoration: "none" }}>
-                <b>{n.title}</b>
+                <b style={{ whiteSpace: "normal" }}>{n.title}</b>
                 <br />
                 <span style={{ fontSize: 14 }}>{n.body}</span>
                 <br />

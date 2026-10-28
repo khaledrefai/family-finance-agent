@@ -43,6 +43,12 @@ function CalculatorScreen() {
   // First visit: the goal's or the bucket's own numbers
   useEffect(() => {
     if (!me) return;
+    if (!goalId && !fromInvest) {
+      // Opened on its own: nothing to start from, so the parent types the numbers
+      setMonthly("1000");
+      filled.current = true;
+      return;
+    }
     (async () => {
       try {
         const c = await calculatorApi.project({ goalId, from: !goalId && fromInvest ? "INVEST_ASIDE" : undefined, rate, years });

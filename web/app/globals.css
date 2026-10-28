@@ -325,8 +325,10 @@ main.with-tabs { padding-bottom: 112px; }
 .tab svg { box-sizing: content-box; padding: 4px 18px; border-radius: 99px; transition: background-color 160ms; }
 .tab[aria-current="page"] { color: var(--ink); font-weight: 600; }
 .tab[aria-current="page"] svg { background: var(--wash); }
+/* Small phones (320 wide): five tabs still fit */
+@media (max-width: 340px) { .tab { min-width: 56px; } .tab svg { padding: 4px 12px; } }
 
-.stack { display: grid; gap: var(--space-4); }
+.stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
 .card { background: var(--chit); border: 1px solid var(--card-line); border-radius: var(--radius-card); padding: var(--space-4); }
 .card.strong { border-color: var(--ink); box-shadow: inset 0 0 0 0.5px var(--ink); }
 a.card { color: inherit; text-decoration: none; transition: border-color 120ms; }
@@ -545,9 +547,9 @@ body:has(.kid-app .young) { --kid-a: #b54d08; --kid-a-wash: #ffe6d1; }
   display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; padding: 3px 12px 3px 8px; border-radius: 99px;
   background: var(--kid-card); border: 2px solid var(--kid-line); color: var(--ink); text-decoration: none; font-weight: 600; font-size: 14px;
 }
-.goal-card { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; align-items: center; }
+.goal-card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 16px; align-items: center; }
 .goal-info { display: grid; gap: 4px; }
-.goal-name { display: flex; align-items: center; gap: 8px; font: 700 1.25rem/1.15 var(--font-kid), sans-serif; text-transform: capitalize; }
+.goal-name { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font: 700 1.25rem/1.15 var(--font-kid), sans-serif; text-transform: capitalize; }
 .goal-pct { font-size: 2.75rem; font-weight: 700; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
 .goal-plan { grid-column: 1 / -1; padding: 10px 14px; border-radius: 14px; background: var(--kid-a-wash); font-size: 15px; }
 .wallet { display: flex; align-items: center; gap: 14px; }

@@ -443,6 +443,7 @@ export type AccountRow = (typeof sample.accounts)[number];
 export type BucketsView = Omit<typeof sample.buckets, "list"> & {
   list: { id: string; name: string; color: string; amountMinor: number; percent: number; from: number; to: number; about: string; optional?: boolean; items: { label: string; amountMinor: number; share: number; tier?: sample.Tier; note?: string }[] }[];
   proposedBy?: string;
+  warnings?: string[];
 };
 
 const DAY = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
@@ -531,6 +532,7 @@ export function fromBuckets(b: Buckets): BucketsView {
     incomeMinor: b.income.minor,
     confirmed: b.status === "ACTIVE",
     proposedBy: b.proposedBy,
+    warnings: b.warnings,
     tiers: sample.buckets.tiers,
     list: b.buckets.map((x) => ({
       ...BUCKET_STYLE[x.kind],
