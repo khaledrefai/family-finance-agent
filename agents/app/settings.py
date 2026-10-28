@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     llm: str = "auto"
     llm_model: str = "claude-opus-5-5"
     llm_timeout_s: float = 6.0
+    # Reading a receipt photo or a PDF takes Claude far longer than a chat reply
+    llm_read_timeout_s: float = 40.0
     anthropic_api_key: str | None = Field(default=None, validation_alias="ANTHROPIC_API_KEY")
 
 

@@ -7,6 +7,8 @@ const agentsUrl = process.env.AGENTS_URL ?? "http://localhost:8000";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Reading a receipt photo can take the AI up to 40 seconds; the forwarding would give up at 30 by default
+  experimental: { proxyTimeout: 60_000 },
   async rewrites() {
     return [
       { source: "/api/:path*", destination: `${coreUrl}/api/:path*` },

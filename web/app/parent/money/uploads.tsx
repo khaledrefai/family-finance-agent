@@ -22,6 +22,29 @@ const ACTIONS: Record<Finding["kind"], { yes: "DUPLICATE" | "ADD"; yesLabel: str
 
 /** The core takes up to 5 MB (DocumentService.MAX_BYTES). */
 const MAX_BYTES = 5 * 1024 * 1024;
+/** A phone photo is made at most this many pixels on its long side: plenty to read a receipt. */
+const MAX_SIDE = 2000;
+
+/**
+ * A phone photo is often 3 to 5 MB, slow to send and slow for the AI to read. It is redrawn here as a JPEG of at
+ * most MAX_SIDE pixels first. Anything the browser can't draw (a PDF, a CSV) is sent as it is.
+ */
+async function shrink(file: File): Promise<File> {
+  if (!file.type.startsWith("image/") || file.type === "image/gif") return file;
+  try {
+    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+    const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1 && file.type === "image/jpeg" && file.size <= 1.5 * 1024 * 1024) return file;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((done) => canvas.toBlob(done, "image/jpeg", 0.85));
+    return blob ? new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" }) : file;
+  } catch {
+    return file; // the core and the AI still get the original
+  }
+}
 
 export function Uploads({ enabled, demo }: { enabled: boolean; demo: boolean }) {
   const router = useRouter();
@@ -36,8 +59,9 @@ export function Uploads({ enabled, demo }: { enabled: boolean; demo: boolean }) 
   const found = useLive(docs.findings, [] as Finding[], enabled);
   const live = list.live;
 
-  async function send(file: File, as: "RECEIPT" | "STATEMENT") {
+  async function send(picked: File, as: "RECEIPT" | "STATEMENT") {
     setError(null);
+    const file = await shrink(picked);
     // Checked here first: a too-big upload can be cut off mid-send, which reads as "can't connect"
     if (file.size > MAX_BYTES) {
       setError("That file is over 5 MB. Try a smaller photo.");

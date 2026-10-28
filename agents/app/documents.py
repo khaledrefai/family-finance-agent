@@ -19,6 +19,7 @@ import base64
 from .core_client import CoreClient, CoreError, Document, DocLine, Extraction, Me, Role
 from .doc_parser import parse
 from .llm import Llm, LlmResult, llm as default_llm, numbers_in
+from .settings import settings
 
 CATEGORIES = ["GROCERIES", "EATING_OUT", "ENTERTAINMENT", "TRANSPORT", "SHOPPING", "HOTEL", "HEALTH", "HOME", "OTHER"]
 
@@ -60,6 +61,20 @@ SCHEMA = {
 
 NEEDS_AI = ("I can't read photos and PDFs while the AI is switched off. Upload the bank's CSV export instead, "
             "or type the payment in with Add spending.")
+WRONG_TYPE = "I can't read this kind of file. Upload a JPEG or PNG photo, a PDF or the bank's CSV export."
+NOT_READ = "I couldn't read it this time. Press Read it again, or type the payment in with Add spending."
+NOTHING_FOUND = "I couldn't find a total or any payment lines in this file. Check it's a receipt or a statement."
+
+
+def _why_not(content_type: str, result: LlmResult) -> str:
+    """What the parent sees when no draft came back: only "AI switched off" when it really is off."""
+    if result.used or content_type.startswith("text/"):
+        return NOTHING_FOUND
+    if result.fallback_reason == "LLM off":
+        return NEEDS_AI
+    if result.fallback_reason == "unsupported file type":
+        return WRONG_TYPE
+    return NOT_READ  # a timeout, a network error, a refusal or an answer cut off
 
 
 def read_document(core: CoreClient, me: Me, doc_id, model: Llm | None = None) -> tuple[Document | None, str]:
@@ -75,8 +90,7 @@ def read_document(core: CoreClient, me: Me, doc_id, model: Llm | None = None) ->
         data, content_type = run.document_file(doc_id)
         draft, result = _read(data, content_type, doc.fileName, doc.kind, model)
         if draft is None:
-            reason = NEEDS_AI if not content_type.startswith("text/") and not result.used else (
-                "I couldn't find a total or any payment lines in this file. Check it's a receipt or a statement.")
+            reason = _why_not(content_type, result)
             doc = run.mark_failed(doc_id, reason)
             reply = reason
             ok = False
@@ -106,7 +120,8 @@ def _read(data: bytes, content_type: str, file_name: str, uploaded_kind: str, mo
         draft = parse(text, content_type, file_name)
         if draft is not None:
             return draft, LlmResult(None, used=False, fallback_reason="rules read a text file")
-        result = model.ask(SYSTEM, _question(uploaded_kind) + "\n\nDOCUMENT:\n" + text[:20000], SCHEMA, max_tokens=4000)
+        result = model.ask(SYSTEM, _question(uploaded_kind) + "\n\nDOCUMENT:\n" + text[:20000], SCHEMA, max_tokens=4000,
+                           timeout_s=settings.llm_read_timeout_s)
         draft = _draft(result)
         # Everything Claude copied must be printed in the text: if a number isn't, it was made up
         if draft is not None and not _copied(draft, text):
@@ -115,7 +130,8 @@ def _read(data: bytes, content_type: str, file_name: str, uploaded_kind: str, mo
     block = _block(data, content_type)
     if block is None:
         return None, LlmResult(None, used=False, fallback_reason="unsupported file type")
-    result = model.ask(SYSTEM, [block, {"type": "text", "text": _question(uploaded_kind)}], SCHEMA, max_tokens=4000)
+    result = model.ask(SYSTEM, [block, {"type": "text", "text": _question(uploaded_kind)}], SCHEMA, max_tokens=4000,
+                       timeout_s=settings.llm_read_timeout_s)
     return _draft(result), result
 
 
