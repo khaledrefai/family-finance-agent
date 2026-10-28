@@ -199,6 +199,33 @@ export interface BudgetMonth {
   alerts: BudgetLine[];
 }
 
+// Every payment in one budget's bar for a month (GET /api/budgets/{category}/spending): the core adds them up
+export interface BudgetSpend {
+  id: string;
+  on: string;
+  shop: string | null;
+  description: string;
+  amount: MoneyView;
+  who: string | null;
+  source: string; // "Receipt", "Statement", "Typed in", "Demo sample", "…, receipt added"
+  paidFrom: string | null;
+  items: { description: string; amount: MoneyView; credit: boolean }[];
+}
+
+export interface BudgetSpending {
+  category: string;
+  label: string;
+  month: string;
+  monthLabel: string;
+  running: boolean;
+  limit: MoneyView;
+  spent: MoneyView;
+  left: MoneyView;
+  over: MoneyView;
+  count: number;
+  spends: BudgetSpend[];
+}
+
 export interface WaysToSave {
   month: string;
   monthLabel: string;
@@ -216,6 +243,8 @@ export const rulesApi = {
 
 export const advice = {
   budgets: () => call<BudgetMonth>("/api/budgets"),
+  spending: (category: string, month?: string | null) =>
+    call<BudgetSpending>(`/api/budgets/${encodeURIComponent(category)}/spending${month ? `?month=${month}` : ""}`),
   // The agent writes this month's words once (Claude, checked against the engine's numbers); if the agent
   // service can't answer, the core's own card is shown.
   waysToSave: () => call<WaysToSave>("/agent/ways-to-save", { method: "POST" }).catch(() => call<WaysToSave>("/api/ways-to-save")),

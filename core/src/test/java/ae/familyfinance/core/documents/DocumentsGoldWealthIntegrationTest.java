@@ -201,6 +201,54 @@ class DocumentsGoldWealthIntegrationTest extends PostgresIntegrationTest {
     }
 
     @Test
+    void a_budget_lists_every_payment_its_bar_adds_up_with_the_receipt_lines() throws Exception {
+        String sara = login("sara");
+        String receiptText = sample(sara, "receipt");
+        String rid = upload(sara, "carrefour-receipt.txt", "text/plain", receiptText, "RECEIPT").get("id").asText();
+        String date = receiptText.lines().filter(l -> l.startsWith("Date:")).findFirst().orElseThrow().substring(6, 16);
+        JsonNode draft = read(postJson("/api/documents/" + rid + "/extraction", sara, """
+                {"kind":"RECEIPT","merchant":"Carrefour Mirdif City Centre","date":"%s","total":"641.50","cardLast4":"7710",
+                 "readBy":"RULES","lines":[{"description":"Whole chicken x2","amount":"44.00"},{"description":"Rest","amount":"597.50"}]}
+                """.formatted(date), openRun(sara)).andExpect(status().isOk()));
+        postJson("/api/documents/" + rid + "/confirm", sara, "{}", null).andExpect(status().isOk());
+
+        String month = draft.get("date").asText().substring(0, 7);
+        JsonNode list = read(mvc.perform(get("/api/budgets/groceries/spending").param("month", month)
+                .header("Authorization", sara)).andExpect(status().isOk()));
+        assertThat(list.get("label").asText()).isEqualTo("Groceries");
+        JsonNode receipt = null;
+        long sum = 0;
+        for (JsonNode s : list.get("spends")) {
+            sum += s.get("amount").get("minor").asLong();
+            if (s.get("source").asText().equals("Receipt")) {
+                receipt = s;
+            }
+        }
+        assertThat(list.get("count").asInt()).isEqualTo(list.get("spends").size());
+        assertThat(list.get("spent").get("minor").asLong()).isEqualTo(sum);
+        assertThat(receipt.get("shop").asText()).isEqualTo("Carrefour Mirdif City Centre");
+        assertThat(receipt.get("amount").get("text").asText()).isEqualTo("AED 641.50");
+        assertThat(receipt.get("who").asText()).isEqualTo("Omar");
+        assertThat(receipt.get("paidFrom").asText()).isEqualTo("Omar's Visa ···7710");
+        assertThat(receipt.get("items").findValuesAsText("description")).containsExactly("Whole chicken x2", "Rest");
+
+        // this month's list is exactly the Groceries bar
+        JsonNode now = read(mvc.perform(get("/api/budgets/GROCERIES/spending").header("Authorization", sara))
+                .andExpect(status().isOk()));
+        JsonNode bars = read(mvc.perform(get("/api/budgets").header("Authorization", sara)).andExpect(status().isOk()));
+        for (JsonNode l : bars.get("lines")) {
+            if (l.get("category").asText().equals("GROCERIES")) {
+                assertThat(now.get("spent")).isEqualTo(l.get("spent"));
+            }
+        }
+
+        mvc.perform(get("/api/budgets/GROCERIES/spending").header("Authorization", login("layla"))).andExpect(status().isForbidden());
+        mvc.perform(get("/api/budgets/NOPE/spending").header("Authorization", sara)).andExpect(status().isNotFound());
+        mvc.perform(get("/api/budgets/GROCERIES/spending").param("month", "2001-01").header("Authorization", sara))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void a_document_the_agent_could_not_read_says_so_and_can_be_thrown_away() throws Exception {
         String sara = login("sara");
         JsonNode doc = upload(sara, "photo.png", "image/png", "not really a png", "RECEIPT");

@@ -11,7 +11,7 @@ import { useSession } from "../../../use-session";
 import { MoneyHeader } from "../money-tabs";
 
 // Budgets: spent so far against each limit, and six months of everyday spending against the budget.
-// The bars and the overspend alerts are live from the budget engine, and this week's food from the saved dinner plan;
+// The bars and the overspend alerts are live (tap one for its payments) from the budget engine, and this week's food from the saved dinner plan;
 // the history is a sample.
 export default function BudgetsPage() {
   const { me } = useSession("PARENT");
@@ -24,7 +24,7 @@ export default function BudgetsPage() {
   const h = budgets.history;
   const bars = live && month
     ? month.lines.map((l) => ({ name: l.label, spentMinor: l.spent.minor, limitMinor: l.limit.minor, fill: l.fillBp / 100,
-        past: l.pastBp / 100, overMinor: l.over.minor || undefined }))
+        past: l.pastBp / 100, overMinor: l.over.minor || undefined, href: `/parent/money/budgets/spending?c=${l.category}` }))
     : budgets.items;
 
   return (
@@ -36,7 +36,7 @@ export default function BudgetsPage() {
           <p className="card-title">Spent so far against each budget</p>
           {live && <Link href="/parent/money/budgets/change" className="link">Change budgets ›</Link>}
         </div>
-        <p className="muted" style={{ margin: "2px 0 6px" }}>The dark line is the limit. Red is over it.</p>
+        <p className="muted" style={{ margin: "2px 0 6px" }}>The dark line is the limit. Red is over it.{live && " Tap a budget to see every payment in it."}</p>
         {bars.map((b) => (
           <BudgetBar key={b.name} {...b} />
         ))}

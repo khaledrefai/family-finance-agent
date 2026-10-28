@@ -87,7 +87,8 @@ function Summary() {
           </p>
           {page.budgets.map((l) => (
             <BudgetBar key={l.category} name={l.label} spentMinor={l.spent.minor} limitMinor={l.limit.minor}
-                       fill={l.fillBp / 100} past={l.pastBp / 100} overMinor={l.over.minor || undefined} />
+                       fill={l.fillBp / 100} past={l.pastBp / 100} overMinor={l.over.minor || undefined}
+                       href={`/parent/money/budgets/spending?c=${l.category}&month=${page.month}`} />
           ))}
         </section>
       )}

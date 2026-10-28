@@ -314,14 +314,16 @@ export function MonthColumns({
 }
 
 // One bar per budget: spent against the limit (the dark tick at 75% of the track), overspend in red.
-export function BudgetBar({ name, spentMinor, limitMinor, fill, past, overMinor }: { name: string; spentMinor: number; limitMinor: number; fill: number; past: number; overMinor?: number }) {
+// With href, the whole bar is a link to the budget's list of payments (a chevron after the amounts says so).
+export function BudgetBar({ name, spentMinor, limitMinor, fill, past, overMinor, href }: { name: string; spentMinor: number; limitMinor: number; fill: number; past: number; overMinor?: number; href?: string }) {
   const over = past > 0;
-  return (
-    <div className="bud" title={`${name}: ${aed(spentMinor)} of ${aed(limitMinor)}`}>
+  const bar = (
+    <>
       <div className="row" style={{ padding: 0 }}>
         <span>{name}</span>
         <b className={over ? "over" : undefined}>
           {plain(spentMinor)} of {plain(limitMinor)}
+          {href && <span aria-hidden="true" style={{ marginLeft: 6, color: "var(--ink-soft)" }}>›</span>}
         </b>
       </div>
       <div className="bud-track" role="img" aria-label={`${name}: ${aed(spentMinor)} of ${aed(limitMinor)}${over && overMinor ? `, over by ${aed(overMinor)}` : ""}`}>
@@ -335,7 +337,13 @@ export function BudgetBar({ name, spentMinor, limitMinor, fill, past, overMinor 
           Over by {aed(overMinor)}
         </p>
       )}
-    </div>
+    </>
+  );
+  const title = `${name}: ${aed(spentMinor)} of ${aed(limitMinor)}`;
+  return href ? (
+    <Link href={href} className="bud bud-link" title={`${title}. See every payment`}>{bar}</Link>
+  ) : (
+    <div className="bud" title={title}>{bar}</div>
   );
 }
 

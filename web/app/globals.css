@@ -342,6 +342,8 @@ a.card:hover { border-color: var(--field); }
 .row.sub { padding-left: var(--space-3); color: var(--ink-soft); font-size: var(--step--1); }
 .row.total { border-top: 1.5px solid var(--ink); margin-top: 6px; padding-top: 10px; font-size: var(--step-0); font-weight: 600; }
 .rows > .row + .row { border-top: 1px solid var(--rule-soft); }
+.spend { display: grid; gap: 2px; padding: 8px 0; }
+.rows > .spend + .spend { border-top: 1px solid var(--rule-soft); }
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-top: var(--space-3); }
 .back { display: inline-flex; align-items: center; gap: 2px; min-height: 40px; margin: -8px 0 -8px -4px; color: var(--ink-soft); text-decoration: none; font-size: 15px; font-weight: 500; }
 .back:hover { color: var(--ink); }
@@ -471,6 +473,8 @@ button.close:hover { background: var(--wash-strong); }
 .wf-track { position: relative; height: 14px; }
 .wf-track > span { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
 .bud { display: grid; gap: 4px; padding: 8px 0; }
+.bud-link { color: inherit; text-decoration: none; }
+.bud-link:hover .bud-track { outline: 2px solid var(--rule-soft); outline-offset: 2px; }
 .bud-track { position: relative; height: 12px; border-radius: 99px; background: var(--track); }
 .bud-track .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); border-radius: 99px; }
 .bud-track .fill.capped { border-radius: 99px 0 0 99px; }
