@@ -4,7 +4,10 @@ import ae.familyfinance.core.auth.CurrentMember;
 import ae.familyfinance.core.budgets.BudgetEngine.Month;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import ae.familyfinance.core.budgets.BudgetService.Spending;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,5 +25,12 @@ public class BudgetController {
     @GetMapping
     public Month month(@AuthenticationPrincipal Jwt jwt) {
         return budgets.month(CurrentMember.from(jwt));
+    }
+
+    /** Every payment in one budget this month (or one of the 3 before): what the bar adds up, with receipt lines. */
+    @GetMapping("/{category}/spending")
+    public Spending spending(@AuthenticationPrincipal Jwt jwt, @PathVariable String category,
+                             @RequestParam(required = false) String month) {
+        return budgets.spending(CurrentMember.from(jwt), category, budgets.month(month));
     }
 }
