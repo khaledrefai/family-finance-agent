@@ -20,6 +20,9 @@ const ACTIONS: Record<Finding["kind"], { yes: "DUPLICATE" | "ADD"; yesLabel: str
   SUBSCRIPTION: { yes: "ADD", yesLabel: "Add it", no: "IGNORE", noLabel: "Ignore", done: "Added to your commitments. The plan counts it from now on." },
 };
 
+/** The core takes up to 5 MB (DocumentService.MAX_BYTES). */
+const MAX_BYTES = 5 * 1024 * 1024;
+
 export function Uploads({ enabled, demo }: { enabled: boolean; demo: boolean }) {
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
@@ -35,6 +38,11 @@ export function Uploads({ enabled, demo }: { enabled: boolean; demo: boolean }) 
 
   async function send(file: File, as: "RECEIPT" | "STATEMENT") {
     setError(null);
+    // Checked here first: a too-big upload can be cut off mid-send, which reads as "can't connect"
+    if (file.size > MAX_BYTES) {
+      setError("That file is over 5 MB. Try a smaller photo.");
+      return;
+    }
     setBusy(`Uploading ${file.name}…`);
     try {
       const doc = await docs.upload(file, as, accountId || undefined);
