@@ -283,7 +283,12 @@ habits AS (
     FROM days WHERE dow = 7
 ),
 one_offs AS (
-    SELECT v.member, v.ago, t.d - v.ago AS d, v.descr, v.merchant, v.cat, v.amt
+    -- Adam's cola and Robux card stay in this month even in its first days, so the month's summary always has them
+    -- (on the 1st that means today)
+    SELECT v.member, v.ago,
+           CASE WHEN v.cat IN ('SUGARY_DRINKS', 'IN_GAME_PURCHASES') THEN greatest(date_trunc('month', t.d)::date, t.d - v.ago)
+                ELSE t.d - v.ago END AS d,
+           v.descr, v.merchant, v.cat, v.amt
     FROM today t, (VALUES
      -- Layla
      ('00000000-0000-0000-0000-0000000000c1'::uuid,  2, 'Shawarma with friends',   'Shawarma place', 'EATING_OUT',              1200),
