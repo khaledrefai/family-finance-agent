@@ -212,7 +212,7 @@ html, body { margin: 0; background: #000; }
 
   <!-- 5. three years -->
   <section class="scene" id="sc-years">
-    <div class="abs kicker" id="yr-k" style="left:150px;top:70px">Small choices, every day, for three years</div>
+    <div class="abs kicker" id="yr-k" style="left:150px;top:70px">Three years of small choices</div>
     <svg id="chart" class="abs" style="left:110px;top:130px" width="1700" height="800" viewBox="0 0 1700 800"></svg>
     <div class="abs habit bad" id="yr-coffee" style="left:300px;top:720px;width:600px">
       <div class="emoji">☕</div><div><div class="t">1,095 coffees</div><div class="d">One every morning, for three years</div></div>
@@ -306,9 +306,9 @@ html, body { margin: 0; background: #000; }
 
   <!-- 10-17. the app, one column of words per scene; the phone is its own layer -->
   <section class="scene" id="sc-today"><div class="appcol">
-    <div class="kicker">Today</div><div class="h2">What's really free this month</div>
-    <div class="bul"><i></i><span>After rent, school fees and bills are set aside</span></div>
-    <div class="bul"><i></i><span>And what's left until pay day</span></div>
+    <div class="kicker">Today</div><div class="h2">What's truly free until pay day</div>
+    <div class="bul"><i></i><span>After bills and savings are set aside</span></div>
+    <div class="bul"><i></i><span>What needs him, like Adam's request</span></div>
   </div></section>
   <section class="scene" id="sc-plan"><div class="appcol">
     <div class="kicker">The plan</div><div class="h2">A plan, every month</div>
@@ -316,39 +316,50 @@ html, body { margin: 0; background: #000; }
     <div class="bul"><i></i><span>The credit card paid in full: no interest</span></div>
     <div class="bul"><i></i><span>A safety buffer</span></div>
     <div class="bul"><i></i><span>Every dirham gets a job, investing included</span></div>
+    <div class="bul"><i></i><span>What it could grow to in 10 years</span></div>
+  </div></section>
+  <section class="scene" id="sc-dinners"><div class="appcol">
+    <div class="kicker">Weekly dinners</div><div class="h2">Dinners planned for the whole family</div>
+    <div class="bul"><i></i><span>Suits everyone: halal, no peanuts for Adam</span></div>
+    <div class="bul"><i></i><span>The shopping list stays inside the grocery budget</span></div>
+    <div class="bul"><i></i><span>Busy nights can still be delivery nights</span></div>
+  </div></section>
+  <section class="scene" id="sc-outings"><div class="appcol">
+    <div class="kicker">Family outings</div><div class="h2">Days out that fit the fun budget</div>
+    <div class="bul"><i></i><span>Say what the family likes, or tap a chip</span></div>
+    <div class="bul"><i></i><span>3 outings in December for AED 170</span></div>
+    <div class="note">🛈 Prices from the app's saved list: check each venue before booking.</div>
   </div></section>
   <section class="scene" id="sc-budgets"><div class="appcol">
     <div class="kicker">Budgets</div><div class="h2">Warned the same month, not three years later</div>
-    <div class="bul"><i></i><span>Overspending shows up early</span></div>
-    <div class="bul"><i></i><span>A way to save, suggested</span></div>
+    <div class="bul"><i></i><span>Overspending shows up early, with a way to save</span></div>
   </div></section>
   <section class="scene" id="sc-add"><div class="appcol">
     <div class="kicker">Every dirham</div><div class="h2">Every coffee counts</div>
-    <div class="bul"><i></i><span>Typed in</span></div>
-    <div class="bul"><i></i><span>Said in his own words</span></div>
-    <div class="bul"><i></i><span>Read from a receipt</span></div>
+    <div class="bul"><i></i><span>Typed in, said in his own words, or read from a receipt</span></div>
   </div></section>
   <section class="scene" id="sc-compare"><div class="appcol">
     <div class="kicker">Before a big buy</div><div class="h2">Compare the shops. Check the card.</div>
     <div class="bul"><i></i><span>The best total across UAE shops</span></div>
-    <div class="bul"><i></i><span>Will the card bill be covered on its due date?</span></div>
+    <div class="bul"><i></i><span>Will the card bill be covered?</span></div>
   </div></section>
   <section class="scene" id="sc-wealth"><div class="appcol">
     <div class="kicker">Gold and wealth</div><div class="h2">The whole picture</div>
-    <div class="bul"><i></i><span>Gold logged in grams, valued at today's price</span></div>
+    <div class="bul"><i></i><span>Gold logged in grams</span></div>
     <div class="bul"><i></i><span>What they own, minus the cards and the old loan</span></div>
     <div class="note">🛈 The app records gold. It never tells you to buy it.</div>
   </div></section>
   <section class="scene" id="sc-kids"><div class="appcol" style="left:1130px;width:720px">
     <div class="kicker">The kids</div><div class="h2">Kids learn the value of money</div>
     <div class="bul"><i></i><span>Layla saves for her headphones</span></div>
+    <div class="bul"><i></i><span>The family's dinners and outings on her screen</span></div>
     <div class="bul"><i></i><span>The best price is found, a parent decides</span></div>
-    <div class="bul"><i></i><span>Family rules are checked on every request</span></div>
+    <div class="bul"><i></i><span>Her month, told by her camel</span></div>
   </div></section>
   <section class="scene" id="sc-summary"><div class="appcol">
     <div class="kicker">Every month</div><div class="h2">A short family summary</div>
     <div class="bul"><i></i><span>What went well</span></div>
-    <div class="bul"><i></i><span>What to change next</span></div>
+    <div class="bul"><i></i><span>What to watch</span></div>
   </div></section>
 
   <div id="phones" class="layer"></div>
@@ -684,36 +695,47 @@ window.setup = function (timing, meta) {
   // Omar's phone
   BEATS1 = [
     { at: at("bridge", 0), shot: "today", scroll: 0 },
-    { at: at("today", L("today", 0, "really")), shot: "today", scroll: 0, spot: "hero" },
-    { at: at("today", L("today", 1)), shot: "today", scroll: 0, spot: "payday" },
-    { at: at("plan", 0.2), shot: "plan", scroll: 0 },
-    { at: at("plan", L("plan", 0, "plan")), shot: "plan", scroll: 0, spot: "steps" },
-    { at: at("plan", L("plan", 1, "Pay")), shot: "plan", scroll: 0, spot: { x: 20, y: 196, w: 350, h: 76 } },
-    { at: at("plan", L("plan", 1, "Build")), shot: "plan", scroll: 0, spot: { x: 20, y: 280, w: 350, h: 72 } },
-    { at: at("plan", L("plan", 2)), shot: "buckets", scroll: shotTop("buckets", "flow", 30), spot: "flow" },
+    { at: at("today", L("today", 0, "truly free")), shot: "today", scroll: 0, spot: "hero" },
+    { at: at("today", L("today", 1)), shot: "today", scroll: 330, spot: { x: 16, y: 460, w: 358, h: 312 } },
+    { at: at("plan", 0.2), shot: "plan", scroll: 0, spot: "steps" },
+    { at: at("plan", L("plan", 0, "the credit card")), shot: "plan", scroll: 0, spot: { x: 20, y: 196, w: 350, h: 76 } },
+    { at: at("plan", L("plan", 0, "a safety")), shot: "plan", scroll: 0, spot: { x: 20, y: 280, w: 350, h: 72 } },
+    { at: at("plan", L("plan", 1)), shot: "buckets", scroll: shotTop("buckets", "flow", 30), spot: "flow" },
+    { at: at("plan", L("plan", 1, "calculator")), shot: "calc", scroll: 600, spot: { x: 16, y: 668, w: 358, h: 535 } },
+    { at: at("dinners", 0.2), shot: "meals", scroll: 0 },
+    { at: at("dinners", L("dinners", 0, "plans the")), shot: "meals", scroll: 1000, spot: { x: 16, y: 1205, w: 358, h: 400 } },
+    { at: at("dinners", L("dinners", 0, "food rules")), shot: "meals", scroll: 0, spot: { x: 16, y: 145, w: 358, h: 202 } },
+    { at: at("dinners", L("dinners", 1)), shot: "meals", scroll: 560, spot: { x: 16, y: 800, w: 330, h: 342 } },
+    { at: at("dinners", L("dinners", 1, "busy nights")), shot: "meals", scroll: 230, spot: { x: 16, y: 365, w: 358, h: 420 } },
+    { at: at("outings", 0.2), shot: "outings", scroll: 0 },
+    { at: at("outings", L("outings", 0, "fit the fun")), shot: "outings", scroll: 0, spot: { x: 16, y: 145, w: 358, h: 160 } },
+    { at: at("outings", L("outings", 1)), shot: "outings", scroll: 120, spot: { x: 16, y: 323, w: 358, h: 322 } },
+    { at: at("outings", L("outings", 1, "A safari")), shot: "outings", scroll: 560, spot: { x: 16, y: 661, w: 330, h: 268 } },
+    { at: at("outings", L("outings", 1, "three outings")), shot: "outings", scroll: 960, spot: { x: 16, y: 995, w: 358, h: 590 } },
     { at: at("budgets", 0.2), shot: "budgets", scroll: 0 },
-    { at: at("budgets", L("budgets", 0, "run over")), shot: "budgets", scroll: 0, spot: { x: 20, y: 344, w: 350, h: 180 } },
-    { at: at("budgets", L("budgets", 1)), shot: "budgets", scroll: 640, spot: "advice" },
+    { at: at("budgets", L("budgets", 0, "runs over")), shot: "budgets", scroll: 0, spot: { x: 20, y: 344, w: 350, h: 180 } },
+    { at: at("budgets", L("budgets", 0, "suggests")), shot: "budgets", scroll: 640, spot: "advice" },
     { at: at("add", 0.2), shot: "add", scroll: 300, spot: { x: 16, y: 352, w: 358, h: 310 } },
     { at: at("add", L("add", 0, "said")), shot: "add", scroll: 520, spot: "addit", tap: { x: 195, y: 1233 }, tapDelay: 0.9 },
-    { at: at("compare", 0.2), shot: "compare", scroll: 0, spot: { x: 16, y: 150, w: 358, h: 52 } },
-    { at: at("compare", L("compare", 0, "compares")), shot: "compare", scroll: 900, spot: { x: 16, y: 975, w: 358, h: 590 } },
-    { at: at("compare", L("compare", 1)), shot: "compare", scroll: 560, spot: { x: 16, y: 692, w: 358, h: 246 } },
+    { at: at("compare", 0.2), shot: "compare", scroll: 900, spot: { x: 16, y: 975, w: 358, h: 590 } },
+    { at: at("compare", L("compare", 0, "checks")), shot: "compare", scroll: 560, spot: { x: 16, y: 692, w: 358, h: 246 } },
     { at: at("wealth", 0.2), shot: "gold", scroll: 0, spot: "worth" },
-    { at: at("wealth", L("wealth", 1)), shot: "wealth", scroll: 120, spot: "adds" },
-    { at: at("wealth", L("wealth", 1, "minus")), shot: "wealth", scroll: 120, spot: { x: 22, y: 522, w: 346, h: 136 } },
-    { at: at("kids", 0.1), shot: "waiting", scroll: 0 },
-    { at: at("kids", L("kids", 2, "her parents")), shot: "waiting", scroll: 240, spot: { x: 16, y: 408, w: 358, h: 362 } },
-    { at: at("kids", L("kids", 2, "her parents") + 1.6), shot: "approved", scroll: 240, spot: { x: 16, y: 408, w: 358, h: 216 } },
-    { at: at("kids", L("kids", 3)), shot: "family", scroll: 380, spot: "peanut" },
-    { at: at("summary", 0.2), shot: "summary", scroll: 300, spot: "went" },
-    { at: at("summary", L("summary", 0, "what to change")), shot: "summary", scroll: 300, spot: "change" },
+    { at: at("wealth", L("wealth", 0, "family wealth")), shot: "wealth", scroll: 120, spot: "adds" },
+    { at: at("wealth", L("wealth", 0, "minus")), shot: "wealth", scroll: 120, spot: { x: 22, y: 522, w: 346, h: 136 } },
+    { at: at("kids", 0.1), shot: "today", scroll: 0 },
+    { at: at("kids", L("kids", 2, "her parents") - 0.6), shot: "waiting", scroll: 300, spot: { x: 16, y: 462, w: 358, h: 240 } },
+    { at: at("kids", L("kids", 2, "her parents") + 1.2), shot: "approved", scroll: 300, spot: { x: 16, y: 462, w: 358, h: 160 } },
+    { at: at("summary", 0.2), shot: "summary", scroll: 140, spot: { x: 16, y: 241, w: 358, h: 330 } },
+    { at: at("summary", L("summary", 0, "what went")), shot: "summary", scroll: 140, spot: "went" },
   ];
   // Layla's phone, in the kids' scene only
   BEATS2 = [
     { at: at("kids", 0), shot: "kid", scroll: 0 },
-    { at: at("kids", L("kids", 1, "saves")), shot: "kid", scroll: 0, spot: "goal" },
-    { at: at("kids", L("kids", 2)), shot: "kidfind", scroll: 560, spot: { x: 16, y: 800, w: 358, h: 322 } },
+    { at: at("kids", L("kids", 1)), shot: "kid", scroll: 0, spot: "goal" },
+    { at: at("kids", L("kids", 1, "sees the")), shot: "kid", scroll: 600, spot: { x: 16, y: 643, w: 358, h: 700 } },
+    { at: at("kids", L("kids", 2)), shot: "kidfind", scroll: 440, spot: { x: 16, y: 606, w: 358, h: 372 } },
+    { at: at("kids", L("kids", 3)), shot: "kidmonth", scroll: 0, spot: { x: 16, y: 95, w: 358, h: 425 } },
+    { at: at("kids", L("kids", 3) + 1.8), shot: "kidmonth", scroll: 560, spot: { x: 16, y: 1035, w: 358, h: 249 } },
   ];
 };
 
@@ -743,18 +765,19 @@ window.render = function (t) {
   // 2. meet
   if (t >= S.meet.start - 0.5 && t < S.omar.start) {
     const x = lt("meet");
-    rise($("#mt-o"), x, L("meet", 0, "Omar") - 0.2, 0.7, 50);
+    rise($("#mt-o"), x, L("meet", 0) - 0.2, 0.7, 50);
     rise($("#mt-y"), x, L("meet", 0, "Yousef") - 0.1, 0.7, 50);
-    pop($("#mt-eq"), x, L("meet", 1));
-    rise($("#mt-s1"), x, L("meet", 1, "twenty")); rise($("#mt-s2"), x, L("meet", 1, "twenty") + 0.15);
-    rise($("#mt-f1"), x, L("meet", 2, "wife")); rise($("#mt-f2"), x, L("meet", 2, "wife") + 0.15);
+    pop($("#mt-eq"), x, L("meet", 0, "both earn"));
+    rise($("#mt-s1"), x, L("meet", 0, "twenty")); rise($("#mt-s2"), x, L("meet", 0, "twenty") + 0.15);
+    rise($("#mt-f1"), x, L("meet", 0, "wife")); rise($("#mt-f2"), x, L("meet", 0, "wife") + 0.15);
   }
   // 3. Omar's months
   if (t >= S.omar.start - 0.5 && t < S.yousef.start) {
     const x = lt("omar");
     let total = 0;
+    const when = [L("omar", 1), L("omar", 1, "A restaurant"), L("omar", 1, "Delivery"), L("omar", 2), L("omar", 2, "hotel"), L("omar", 3, "credit card")];
     document.querySelectorAll("#om-habits .habit").forEach((el, i) => {
-      const t0 = L("omar", i + 1) - 0.1;
+      const t0 = when[i] - 0.1;
       rise(el, x, t0, 0.55, 40);
       total += OMAR_HABITS[i][5] * easeOut(prog(x, t0 + 0.2, 0.8));
     });
@@ -763,8 +786,8 @@ window.render = function (t) {
   // 4. Yousef's months: line 1 brings save and invest together
   if (t >= S.yousef.start - 0.5 && t < S.years.start) {
     const x = lt("yousef");
-    const when = [L("yousef", 0, "plan"), L("yousef", 1, "save"), L("yousef", 1, "invest"), L("yousef", 2), L("yousef", 3),
-      L("yousef", 4), L("yousef", 5), L("yousef", 6)];
+    const when = [L("yousef", 0, "plan"), L("yousef", 1, "saves"), L("yousef", 1, "invests"), L("yousef", 1, "every time"), L("yousef", 2),
+      L("yousef", 3, "compares"), L("yousef", 3, "never misses"), L("yousef", 3, "his kids")];
     let total = 0;
     document.querySelectorAll("#yo-habits .habit").forEach((el, i) => {
       rise(el, x, when[i] - 0.1, 0.55, 40);
@@ -776,23 +799,23 @@ window.render = function (t) {
   if (t >= S.years.start - 0.5 && t < S.omarEnd.start) {
     const x = lt("years");
     rise($("#yr-k"), x, 0.2);
-    const m = 36 * easeInOut(prog(x, 0.9, 9.5));
+    const m = 36 * easeInOut(prog(x, 0.8, 8.4));
     drawChart(m);
-    const end = prog(x, 10.2, 0.6);
+    const end = prog(x, 9.1, 0.6);
     $("#ch-ylab").setAttribute("opacity", end); $("#ch-olab").setAttribute("opacity", end);
-    rise($("#yr-coffee"), x, L("years", 1, "coffee") - 0.3, 0.6, 30);
-    $("#yr-coffee").style.opacity = Math.min(Number($("#yr-coffee").style.opacity), 1 - prog(x, 10.0, 0.5));
+    rise($("#yr-coffee"), x, L("years", 0, "coffee") - 0.3, 0.6, 30);
+    $("#yr-coffee").style.opacity = Math.min(Number($("#yr-coffee").style.opacity), 1 - prog(x, 9.0, 0.5));
   }
   // 6. Omar, three years later
   if (t >= S.omarEnd.start - 0.5 && t < S.yousefEnd.start) {
     const x = lt("omarEnd");
     rise($("#oe-broke"), x, L("omarEnd", 0, "broke") - 0.1, 0.5, 20);
-    document.querySelectorAll("#oe-cards .ccard").forEach((c, i) => rise(c, x, L("omarEnd", 1) + i * 0.25, 0.5, 60));
-    rise($("#oe-debt"), x, L("omarEnd", 1, "sixty") - 0.3, 0.5, 20);
-    $("#oe-debt-n").textContent = `AED ${fmt(60000 * easeOut(prog(x, L("omarEnd", 1, "sixty") - 0.2, 1.4)))}`;
-    rise($("#oe-arrow"), x, L("omarEnd", 2), 0.4, 0);
-    rise($("#oe-loan"), x, L("omarEnd", 2, "bank loan"), 0.6, 40);
-    pop($("#oe-stamp"), x, L("omarEnd", 2, "with interest"));
+    document.querySelectorAll("#oe-cards .ccard").forEach((c, i) => rise(c, x, L("omarEnd", 0, "with sixty") - 0.6 + i * 0.25, 0.5, 60));
+    rise($("#oe-debt"), x, L("omarEnd", 0, "sixty") - 0.3, 0.5, 20);
+    $("#oe-debt-n").textContent = `AED ${fmt(60000 * easeOut(prog(x, L("omarEnd", 0, "sixty") - 0.2, 1.4)))}`;
+    rise($("#oe-arrow"), x, L("omarEnd", 1), 0.4, 0);
+    rise($("#oe-loan"), x, L("omarEnd", 1, "bank loan"), 0.6, 40);
+    pop($("#oe-stamp"), x, L("omarEnd", 1, "with interest"));
   }
   // 7. Yousef, three years later
   if (t >= S.yousefEnd.start - 0.5 && t < S.versus.start) {
@@ -803,7 +826,7 @@ window.render = function (t) {
     const gk = prog(x, L("yousefEnd", 0, "seventy"), 1.6);
     $("#ye-gold-n").textContent = `${Math.round(70 * easeOut(gk))} g`;
     document.querySelectorAll("#ye-bars .bar").forEach((b, i) => b.setAttribute("opacity", gk * 9 > i ? 1 : 0));
-    rise($("#ye-shop"), x, L("yousefEnd", 1, "small business") - 0.3, 0.7, 40);
+    rise($("#ye-shop"), x, L("yousefEnd", 0, "small business") - 0.3, 0.7, 40);
   }
   // 8. versus
   if (t >= S.versus.start - 0.5 && t < S.bridge.start) {
@@ -826,14 +849,16 @@ window.render = function (t) {
   }
   // 10-17. the app: bullets come in with the words
   const bullets = {
-    today: [L("today", 0, "after rent"), L("today", 1)],
-    plan: [L("plan", 1), L("plan", 1, "Pay"), L("plan", 1, "Build"), L("plan", 2)],
-    budgets: [L("budgets", 0, "says so"), L("budgets", 1)],
-    add: [L("add", 0, "typed"), L("add", 0, "said"), L("add", 0, "read from")],
-    compare: [L("compare", 0, "compares"), L("compare", 1)],
-    wealth: [L("wealth", 0, "logs"), L("wealth", 1)],
-    kids: [L("kids", 1), L("kids", 2), L("kids", 3)],
-    summary: [L("summary", 0, "what went"), L("summary", 0, "what to change")],
+    today: [L("today", 0, "after bills"), L("today", 1)],
+    plan: [L("plan", 0, "bills first"), L("plan", 0, "the credit card"), L("plan", 0, "a safety"), L("plan", 1), L("plan", 1, "calculator")],
+    dinners: [L("dinners", 0, "food rules"), L("dinners", 1), L("dinners", 1, "busy nights")],
+    outings: [L("outings", 1), L("outings", 1, "three outings")],
+    budgets: [L("budgets", 0, "warns")],
+    add: [L("add", 0, "typed")],
+    compare: [L("compare", 0, "compares"), L("compare", 0, "checks")],
+    wealth: [L("wealth", 0), L("wealth", 0, "family wealth")],
+    kids: [L("kids", 1), L("kids", 1, "sees the"), L("kids", 2), L("kids", 3)],
+    summary: [L("summary", 0, "what went"), L("summary", 0, "what to watch")],
   };
   for (const [id, times] of Object.entries(bullets)) {
     if (t < S[id].start - 0.5 || t > S[id].end + 0.5) continue;
@@ -842,7 +867,7 @@ window.render = function (t) {
     rise($(".h2", col), x, 0.2, 0.6, 24);
     col.querySelectorAll(".bul").forEach((b, i) => rise(b, x, times[i] - 0.15, 0.5, 18));
     const note = $(".note", col);
-    if (note) rise(note, x, L(id, 1, "minus"), 0.6, 10);
+    if (note) rise(note, x, id === "wealth" ? L(id, 0, "minus") : L(id, 1, "safari"), 0.6, 10);
   }
 
   // phones: Omar's from the bridge to the summary; Layla's beside it for the kids
