@@ -72,21 +72,37 @@ const meta = {};
   // ---- Omar, the first man
   await login('omar');
   await go('/parent');
-  await snap('today', { hero: ['Free this month', 'card'], payday: ['free until pay day', 'text'], alert: ['Entertainment is at', 'card'], coming: ['Coming up', 'card'], save: ['Ways to save', 'card'] });
+  await snap('today', { hero: ['Free to spend until pay day', 'card'], needs: ['Needs you', 'text'], alert: ['Entertainment is at', 'card'], save: ['Ways to save', 'card'] });
   await go('/parent/plan');
-  await snap('plan', { steps: ['Protect the commitments', 'card'], card: ['Clear the card', 'text'], buffer: ['Build a buffer', 'text'], buckets: ['Money buckets', 'card'] });
+  await snap('plan', { steps: ['Protect the commitments', 'card'], card: ['Clear the card', 'text'], buffer: ['Build a buffer', 'text'],
+    buckets: ['Money buckets', 'card'], dinners: ['Weekly dinners', 'card'], outings: ['Family outings', 'card'], calc: ['Savings calculator', 'card'] });
   await go('/parent/plan/buckets');
   await snap('buckets', { flow: ['How the money flows', 'card'] });
+  await go('/parent/plan/calculator?from=invest');
+  await snap('calc', { learn: ['Learning only', 'card'], years: ['In 10 years', 'card'], chart: ['Over 10 years', 'card'] });
+
+  // Weekly dinners: the kids want pasta
+  await go('/parent/plan/meals');
+  await p.getByRole('button', { name: 'Pasta', exact: true }).click(); await wait(6000);
+  await snap('meals', { groceries: ['Groceries this week', 'card'], words: ["This week's dinners", 'card'], first: ['Tuna pasta bake', 'card'] });
+  await p.getByRole('button', { name: /Shopping list/ }).first().click().catch(() => {}); await wait(800);
+  await snap('mealslist', { list: ['Shopping list', 'card'] });
+  await p.getByRole('button', { name: 'Save this week' }).click().catch(() => {}); await wait(2000);
+
+  // Family outings for December: the kids love animals
+  await go('/parent/plan/outings');
+  await p.getByRole('button', { name: 'Animals', exact: true }).click(); await wait(6000);
+  await snap('outings', { board: ['Entertainment in', 'card'], words: ['For December', 'card'], first: ['Dubai Safari Park', 'card'], total: ['This plan', 'card'] });
+  await p.getByRole('button', { name: 'Save this plan' }).click().catch(() => {}); await wait(2000);
+
   await go('/parent/money/budgets');
   await snap('budgets', { budgets: ['Spent so far against each budget', 'card'], alert: ['Entertainment is at', 'text'], advice: ['cut entertainment to', 'card'] });
-  await go('/parent/money/accounts');
-  await snap('accounts', { visa: ["Omar's Visa", 'card'] });
   await go('/parent/money/gold');
   await snap('gold', { worth: ['Worth today', 'card'], never: ['never tells you to buy', 'text'] });
   await go('/parent/money/wealth');
   await snap('wealth', { total: ['An estimate from the balances', 'card'], adds: ['How it adds up', 'card'], loan: ['Loan for the old card debt', 'text'] });
   await go('/parent/summary');
-  await snap('summary', { went: ['Went well', 'card'], change: ['To change in', 'card'] });
+  await snap('summary', { top: ['so far:', 'card'], went: ['Went well', 'card'], watch: ['To watch', 'card'] });
   await go('/parent/family');
   await snap('family', { rules: ['Family rules', 'text'], peanut: ['No peanuts for Adam', 'card'] });
 
@@ -98,22 +114,26 @@ const meta = {};
   await p.getByRole('button', { name: /Omar's Visa/ }).click();
   await p.getByRole('button', { name: 'Omar', exact: true }).click();
   await wait(400);
-  await snap('add', { form: ['Amount in AED', 'card'], addit: ['Add it', 'text'], where: ['Where', 'text'] });
+  await snap('add', { form: ['Amount in AED', 'card'], addit: ['Add it', 'text'] });
 
   // Compare before a big buy, paying with the Visa
   await go('/parent/money/compare');
   await p.fill('input[placeholder^="An air fryer"]', 'Sony WH-CH720N headphones');
   await p.getByRole('button', { name: /Omar's Visa/ }).click();
-  await p.getByRole('button', { name: 'Compare prices' }).click(); await wait(5000);
+  await p.getByRole('button', { name: 'Compare prices' }).click(); await wait(6000);
   await snap('compare', { best: ['Best price', 'card'], verdict: ['Best total', 'card'], cardcheck: ['Card check', 'card'] });
 
   // ---- Layla, 13
   await login('layla');
   await go('/child');
-  await snap('kid', { goal: ['My goal', 'card'], wallet: ['My wallet', 'card'] });
-  await   await go('/child/ask');
+  await p.getByRole('button', { name: 'Got it' }).click().catch(() => {}); await wait(800);
+  await snap('kid', { goal: ['My goal', 'card'], wallet: ['My wallet', 'card'], fun: ['Family fun', 'card'], dinners: ['Dinners this week', 'card'] });
+  await go('/child/month');
+  await snap('kidmonth', { lines: ['My month in a few lines', 'card'], jar: ['headphones jar', 'card'] });
+  await go('/child/ask');
+  await p.getByRole('button', { name: 'I want something' }).click().catch(() => {}); await wait(500);
   await p.fill('input[aria-label="What do you want?"]', 'Sony WH-CH720N headphones');
-  await p.getByRole('button', { name: 'Find it' }).click(); await wait(5000);
+  await p.getByRole('button', { name: 'Find it' }).click(); await wait(6000);
   await snap('kidfind', { found: ['The best price I found', 'card'], best: ['Best price', 'card'] });
   await p.getByRole('button', { name: 'Ask for this one' }).first().click(); await wait(2500);
 
@@ -121,7 +141,8 @@ const meta = {};
   await login('omar');
   await go('/parent');
   await snap('waiting', { chit: ['Layla asks', 'card'], approve: ['Approve', 'text'] });
-  await p.getByRole('button', { name: 'Approve', exact: true }).first().click(); await wait(3000);
+  const chit = p.locator('article, section, div').filter({ hasText: 'Layla asks' }).last();
+  await chit.getByRole('button', { name: 'Approve', exact: true }).first().click(); await wait(3000);
   await snap('approved', { chit: ['Layla asked', 'card'] });
 
   fs.writeFileSync(`${OUT}/meta.json`, JSON.stringify(meta, null, 1));

@@ -5,7 +5,7 @@ from datetime import date
 import pytest
 from fastapi.testclient import TestClient
 
-from app.bookkeeper import children_asked, month_asked
+from app.bookkeeper import children_asked, month_asked, today_in_uae
 from app.core_client import LoggingStatus, Member, SpendCategory, SpendSummary
 from app.main import app
 from app.spend_parser import parse_spend
@@ -124,7 +124,8 @@ def test_parent_asks_about_both_kids(fake_core: FakeCore):
     fake_core.who = MEMBERS[0]  # Sara
     resp = TestClient(app).post("/chat", json={"message": "where did the money go last month?"}, headers=TOKEN)
     assert [c["memberId"] for c in fake_core.summary_calls] == [LAYLA, ADAM]
-    assert all(c["month"] == month_asked("last month", date.today()) for c in fake_core.summary_calls)
+    # the app asks in UAE time; the server clock is UTC, a day behind from 20:00 on the last of a month
+    assert all(c["month"] == month_asked("last month", today_in_uae()) for c in fake_core.summary_calls)
 
 
 def test_nudge_endpoint(fake_core: FakeCore):
