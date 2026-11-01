@@ -2,84 +2,197 @@
   "voice": "af_heart",
   "speed": 0.96,
   "gap": 0.3,
-  "pronounce": { "Yousef": "Yusef" },
+  "pronounce": {
+    "Yousef": "Yusef"
+  },
   "scenes": [
-    { "id": "intro", "lead": 1.0, "tail": 0.7, "lines": [
-      "This is a true story from the UAE.",
-      "Two men. Same salary. Same family size. Two very different futures."
-    ]},
-    { "id": "meet", "lead": 0.3, "tail": 0.7, "lines": [
-      "Omar and Yousef both earn twenty-eight thousand dirhams a month, and both have a wife and two children."
-    ]},
-    { "id": "omar", "lead": 0.3, "tail": 0.8, "lines": [
-      "Omar spends without a plan.",
-      "Starbucks every morning. A restaurant every week. Delivery when nobody cooks.",
-      "Mall trips with the kids, and hotel weekends now and then.",
-      "And when the salary runs out, the credit card pays the rest."
-    ]},
-    { "id": "yousef", "lead": 0.3, "tail": 0.8, "lines": [
-      "Yousef lives the same life, with a plan.",
-      "He saves first, invests a little, and every time his invest money reaches three thousand dirhams, he buys gold.",
-      "The family eats out every two or three weeks, when the budget allows.",
-      "He compares prices, never misses a card payment, and his kids learn the value of money."
-    ]},
-    { "id": "years", "lead": 0.6, "tail": 4.4, "lines": [
-      "Three years pass. Omar's morning coffee alone costs more than twenty-seven thousand dirhams."
-    ]},
-    { "id": "omarEnd", "lead": 0.3, "tail": 0.9, "lines": [
-      "Omar ends up broke, with sixty thousand dirhams of card debt.",
-      "He turns it into a bank loan, and pays more every month, with interest, for years."
-    ]},
-    { "id": "yousefEnd", "lead": 0.3, "tail": 1.0, "lines": [
-      "Yousef has forty thousand dirhams saved and seventy grams of gold: enough to start a small business for his wife."
-    ]},
-    { "id": "versus", "lead": 0.3, "tail": 1.2, "lines": [
-      "Same salary. Same family. The difference was how they managed their money."
-    ]},
-    { "id": "bridge", "lead": 0.5, "tail": 0.8, "lines": [
-      "Inspired by this true story, we built Family Finance Coach.",
-      "An AI accountant and money coach for the whole family, made to help the first man."
-    ]},
-    { "id": "today", "lead": 0.3, "tail": 0.7, "lines": [
-      "Each morning, Omar sees what is truly free until pay day, after bills and savings are set aside.",
-      "And what needs him, like a request from his son, Adam."
-    ]},
-    { "id": "plan", "lead": 0.3, "tail": 0.7, "lines": [
-      "The coach builds the family plan: bills first, the credit card paid in full, and a safety buffer.",
-      "Every dirham gets a job, including money to invest. And a calculator shows what it could grow to in ten years."
-    ]},
-    { "id": "dinners", "lead": 0.3, "tail": 0.7, "lines": [
-      "Delivery every night is expensive. So the coach plans the week's dinners, with the food rules everyone needs.",
-      "The shopping list stays inside the grocery budget, and busy nights can still be delivery nights."
-    ]},
-    { "id": "outings", "lead": 0.3, "tail": 0.7, "lines": [
-      "Instead of the mall every weekend, the coach plans family outings that fit the fun budget.",
-      "The kids love animals? A safari park, the beach, and the fountain show: three outings for one hundred and seventy dirhams."
-    ]},
-    { "id": "budgets", "lead": 0.3, "tail": 0.6, "lines": [
-      "When spending runs over budget, the coach warns him the same month, and suggests a way to save."
-    ]},
-    { "id": "add", "lead": 0.3, "tail": 0.6, "lines": [
-      "Every coffee gets logged: typed in, said in his own words, or read from a receipt."
-    ]},
-    { "id": "compare", "lead": 0.3, "tail": 0.6, "lines": [
-      "Before a big purchase, it compares prices across UAE shops, and checks if the card bill will be covered."
-    ]},
-    { "id": "wealth", "lead": 0.3, "tail": 0.6, "lines": [
-      "Gold is logged in grams, and family wealth shows the whole picture, minus the cards and the old loan."
-    ]},
-    { "id": "kids", "lead": 0.3, "tail": 0.7, "lines": [
-      "And the kids learn too.",
-      "Layla saves for headphones, and sees the family's dinners and outings on her own screen.",
-      "When she asks, the coach finds the best price, and her parents decide.",
-      "Each month, her camel shows her how the month went."
-    ]},
-    { "id": "summary", "lead": 0.3, "tail": 0.6, "lines": [
-      "And every month, a family summary: what went well, and what to watch."
-    ]},
-    { "id": "outro", "lead": 0.5, "tail": 4.6, "lines": [
-      "Same salary. Same family. A different ending.",
-      "Family Finance Coach. So every family can write the second ending."
-    ]}
+    {
+      "id": "intro",
+      "lead": 1.0,
+      "tail": 0.7,
+      "lines": [
+        "This is a true story from the UAE.",
+        "Two men. Same salary. Same family size. Two very different futures."
+      ]
+    },
+    {
+      "id": "meet",
+      "lead": 0.3,
+      "tail": 0.7,
+      "lines": [
+        "Omar and Yousef both earn twenty-eight thousand dirhams a month, and both have a wife and two children."
+      ]
+    },
+    {
+      "id": "omar",
+      "lead": 0.3,
+      "tail": 0.8,
+      "lines": [
+        "Omar spends without a plan.",
+        "Starbucks every morning. A restaurant every week. Delivery when nobody cooks.",
+        "Mall trips with the kids, and hotel weekends now and then.",
+        "And when the salary runs out, the credit card pays the rest."
+      ]
+    },
+    {
+      "id": "yousef",
+      "lead": 0.3,
+      "tail": 0.8,
+      "lines": [
+        "Yousef lives the same life, with a plan.",
+        "He saves first, invests a little, and every time his invest money reaches three thousand dirhams, he buys gold.",
+        "The family eats out every two or three weeks, when the budget allows.",
+        "He compares prices, never misses a card payment, and his kids learn the value of money."
+      ]
+    },
+    {
+      "id": "years",
+      "lead": 0.6,
+      "tail": 4.4,
+      "lines": [
+        "Three years pass. Omar's morning coffee alone costs more than twenty-seven thousand dirhams."
+      ]
+    },
+    {
+      "id": "omarEnd",
+      "lead": 0.3,
+      "tail": 0.9,
+      "lines": [
+        "Omar ends up broke, with sixty thousand dirhams of card debt.",
+        "He turns it into a bank loan, and pays more every month, with interest, for years."
+      ]
+    },
+    {
+      "id": "yousefEnd",
+      "lead": 0.3,
+      "tail": 1.0,
+      "lines": [
+        "Yousef has forty thousand dirhams saved and seventy grams of gold: enough to start a small business for his wife."
+      ]
+    },
+    {
+      "id": "versus",
+      "lead": 0.3,
+      "tail": 1.2,
+      "lines": [
+        "Same salary. Same family. The difference was how they managed their money."
+      ]
+    },
+    {
+      "id": "bridge",
+      "lead": 0.5,
+      "tail": 0.8,
+      "lines": [
+        "Inspired by this true story, we built Family Finance Coach.",
+        "An AI accountant and money coach for the whole family, made to help the first man."
+      ]
+    },
+    {
+      "id": "today",
+      "lead": 0.3,
+      "tail": 0.7,
+      "lines": [
+        "Each morning, Omar sees what is truly free until pay day, after bills and savings are set aside.",
+        "And what needs him, like a request from his son, Adam."
+      ]
+    },
+    {
+      "id": "ask",
+      "lead": 0.3,
+      "tail": 0.7,
+      "lines": [
+        "Omar can ask the coach anything about the family's money, in his own words.",
+        "Where did Adam's money go? Can we afford a weekend away? Each answer comes from the family's real numbers.",
+        "He can even make a family rule, just by saying it."
+      ]
+    },
+    {
+      "id": "plan",
+      "lead": 0.3,
+      "tail": 0.7,
+      "lines": [
+        "The coach builds the family plan: bills first, the credit card paid in full, and a safety buffer.",
+        "Every dirham gets a job, including money to invest. And a calculator shows what it could grow to in ten years."
+      ]
+    },
+    {
+      "id": "dinners",
+      "lead": 0.3,
+      "tail": 0.7,
+      "lines": [
+        "Delivery every night is expensive. So the coach plans the week's dinners, with the food rules everyone needs.",
+        "The shopping list stays inside the grocery budget, and busy nights can still be delivery nights."
+      ]
+    },
+    {
+      "id": "outings",
+      "lead": 0.3,
+      "tail": 0.7,
+      "lines": [
+        "Instead of the mall every weekend, the coach plans family outings that fit the fun budget.",
+        "The kids love animals? A safari park, the beach, and the fountain show: three outings for one hundred and seventy dirhams."
+      ]
+    },
+    {
+      "id": "budgets",
+      "lead": 0.3,
+      "tail": 0.6,
+      "lines": [
+        "When spending runs over budget, the coach warns him the same month, and suggests a way to save."
+      ]
+    },
+    {
+      "id": "receipt",
+      "lead": 0.3,
+      "tail": 0.7,
+      "lines": [
+        "Every purchase gets logged. Omar uploads a receipt, and the coach reads it line by line.",
+        "It matches his card and the budget, and nothing counts until he confirms."
+      ]
+    },
+    {
+      "id": "compare",
+      "lead": 0.3,
+      "tail": 0.6,
+      "lines": [
+        "Before a big purchase, it compares prices across UAE shops, and checks if the card bill will be covered."
+      ]
+    },
+    {
+      "id": "wealth",
+      "lead": 0.3,
+      "tail": 0.6,
+      "lines": [
+        "Gold is logged in grams, and family wealth shows the whole picture, minus the cards and the old loan."
+      ]
+    },
+    {
+      "id": "kids",
+      "lead": 0.3,
+      "tail": 0.7,
+      "lines": [
+        "And the kids learn too.",
+        "Layla saves for headphones, and sees the family's dinners and outings on her own screen.",
+        "When she asks, the coach finds the best price, and her parents decide.",
+        "Each month, her camel shows her how the month went."
+      ]
+    },
+    {
+      "id": "summary",
+      "lead": 0.3,
+      "tail": 0.6,
+      "lines": [
+        "And every month, a family summary: what went well, and what to watch."
+      ]
+    },
+    {
+      "id": "outro",
+      "lead": 0.5,
+      "tail": 4.6,
+      "lines": [
+        "Same salary. Same family. A different ending.",
+        "Family Finance Coach. So every family can write the second ending."
+      ]
+    }
   ]
 }

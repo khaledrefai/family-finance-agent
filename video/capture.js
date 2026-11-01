@@ -145,6 +145,22 @@ const meta = {};
   await chit.getByRole('button', { name: 'Approve', exact: true }).first().click(); await wait(3000);
   await snap('approved', { chit: ['Layla asked', 'card'] });
 
+  // Ask the accountant: questions in his own words, answered from the family's numbers
+  await go('/parent/ask');
+  for (const q of ["Where did Adam's money go this month?", 'Can we afford a AED 1,200 weekend away?',
+    'AED 1,000 a month at 5% for 10 years', 'Anything over AED 100 needs me']) {
+    await p.fill('input[aria-label="Ask anything"]', q);
+    await p.getByRole('button', { name: 'Send' }).click(); await wait(3500);
+  }
+  await snap('ask', { first: ['Where did Adam', 'text'] });
+
+  // Upload a receipt: the demo Carrefour receipt, read line by line, waiting for Confirm
+  await go('/parent/money');
+  await snap('uploads', { uploads: ['Try the demo receipt', 'card'] });
+  await p.getByRole('button', { name: 'Try the demo receipt' }).click();
+  await p.waitForURL(/\/parent\/money\/document/, { timeout: 20000 }); await wait(2500);
+  await snap('receipt', { top: ['Carrefour', 'card'], items: ['Items (', 'card'], confirm: ['Paid from', 'card'] });
+
   fs.writeFileSync(`${OUT}/meta.json`, JSON.stringify(meta, null, 1));
   await browser.close();
 })();
