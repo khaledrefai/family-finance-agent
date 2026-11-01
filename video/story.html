@@ -310,6 +310,13 @@ html, body { margin: 0; background: #000; }
     <div class="bul"><i></i><span>After bills and savings are set aside</span></div>
     <div class="bul"><i></i><span>What needs him, like Adam's request</span></div>
   </div></section>
+  <section class="scene" id="sc-ask"><div class="appcol">
+    <div class="kicker">Ask the accountant</div><div class="h2">Ask anything, in his own words</div>
+    <div class="bul"><i></i><span>"Where did Adam's money go?"</span></div>
+    <div class="bul"><i></i><span>"Can we afford a weekend away?"</span></div>
+    <div class="bul"><i></i><span>Say a family rule, and it is written down</span></div>
+    <div class="note">🛈 Totals are worked out by the app, not guessed by the AI.</div>
+  </div></section>
   <section class="scene" id="sc-plan"><div class="appcol">
     <div class="kicker">The plan</div><div class="h2">A plan, every month</div>
     <div class="bul"><i></i><span>Bills first</span></div>
@@ -334,9 +341,11 @@ html, body { margin: 0; background: #000; }
     <div class="kicker">Budgets</div><div class="h2">Warned the same month, not three years later</div>
     <div class="bul"><i></i><span>Overspending shows up early, with a way to save</span></div>
   </div></section>
-  <section class="scene" id="sc-add"><div class="appcol">
-    <div class="kicker">Every dirham</div><div class="h2">Every coffee counts</div>
-    <div class="bul"><i></i><span>Typed in, said in his own words, or read from a receipt</span></div>
+  <section class="scene" id="sc-receipt"><div class="appcol">
+    <div class="kicker">Receipts</div><div class="h2">Upload a receipt, the coach reads it</div>
+    <div class="bul"><i></i><span>19 lines read: AED 641.50 at Carrefour</span></div>
+    <div class="bul"><i></i><span>Matched to Omar's Visa, under Groceries</span></div>
+    <div class="bul"><i></i><span>Nothing counts until he confirms</span></div>
   </div></section>
   <section class="scene" id="sc-compare"><div class="appcol">
     <div class="kicker">Before a big buy</div><div class="h2">Compare the shops. Check the card.</div>
@@ -697,6 +706,10 @@ window.setup = function (timing, meta) {
     { at: at("bridge", 0), shot: "today", scroll: 0 },
     { at: at("today", L("today", 0, "truly free")), shot: "today", scroll: 0, spot: "hero" },
     { at: at("today", L("today", 1)), shot: "today", scroll: 330, spot: { x: 16, y: 460, w: 358, h: 312 } },
+    { at: at("ask", 0.2), shot: "ask", scroll: 0 },
+    { at: at("ask", L("ask", 0, "anything")), shot: "ask", scroll: 100, spot: { x: 33, y: 168, w: 326, h: 626 } },
+    { at: at("ask", L("ask", 1, "Can we")), shot: "ask", scroll: 760, spot: { x: 33, y: 840, w: 326, h: 256 } },
+    { at: at("ask", L("ask", 2)), shot: "ask", scroll: 1660, spot: { x: 33, y: 1738, w: 342, h: 292 } },
     { at: at("plan", 0.2), shot: "plan", scroll: 0, spot: "steps" },
     { at: at("plan", L("plan", 0, "the credit card")), shot: "plan", scroll: 0, spot: { x: 20, y: 196, w: 350, h: 76 } },
     { at: at("plan", L("plan", 0, "a safety")), shot: "plan", scroll: 0, spot: { x: 20, y: 280, w: 350, h: 72 } },
@@ -715,8 +728,10 @@ window.setup = function (timing, meta) {
     { at: at("budgets", 0.2), shot: "budgets", scroll: 0 },
     { at: at("budgets", L("budgets", 0, "runs over")), shot: "budgets", scroll: 0, spot: { x: 20, y: 344, w: 350, h: 180 } },
     { at: at("budgets", L("budgets", 0, "suggests")), shot: "budgets", scroll: 640, spot: "advice" },
-    { at: at("add", 0.2), shot: "add", scroll: 300, spot: { x: 16, y: 352, w: 358, h: 310 } },
-    { at: at("add", L("add", 0, "said")), shot: "add", scroll: 520, spot: "addit", tap: { x: 195, y: 1233 }, tapDelay: 0.9 },
+    { at: at("receipt", 0.2), shot: "uploads", scroll: 1970, spot: { x: 16, y: 2031, w: 358, h: 598 }, tap: { x: 120, y: 2563 }, tapDelay: 1.6 },
+    { at: at("receipt", L("receipt", 0, "reads it")), shot: "receipt", scroll: 0, spot: { x: 16, y: 165, w: 358, h: 228 } },
+    { at: at("receipt", L("receipt", 0, "line by line")), shot: "receipt", scroll: 300, spot: { x: 16, y: 409, w: 358, h: 572 } },
+    { at: at("receipt", L("receipt", 1)), shot: "receipt", scroll: 860, spot: { x: 16, y: 997, w: 358, h: 580 }, tap: { x: 100, y: 1547 }, tapDelay: 2.6 },
     { at: at("compare", 0.2), shot: "compare", scroll: 900, spot: { x: 16, y: 975, w: 358, h: 590 } },
     { at: at("compare", L("compare", 0, "checks")), shot: "compare", scroll: 560, spot: { x: 16, y: 692, w: 358, h: 246 } },
     { at: at("wealth", 0.2), shot: "gold", scroll: 0, spot: "worth" },
@@ -854,7 +869,8 @@ window.render = function (t) {
     dinners: [L("dinners", 0, "food rules"), L("dinners", 1), L("dinners", 1, "busy nights")],
     outings: [L("outings", 1), L("outings", 1, "three outings")],
     budgets: [L("budgets", 0, "warns")],
-    add: [L("add", 0, "typed")],
+    ask: [L("ask", 1), L("ask", 1, "Can we"), L("ask", 2)],
+    receipt: [L("receipt", 0, "line by line"), L("receipt", 1), L("receipt", 1, "nothing counts")],
     compare: [L("compare", 0, "compares"), L("compare", 0, "checks")],
     wealth: [L("wealth", 0), L("wealth", 0, "family wealth")],
     kids: [L("kids", 1), L("kids", 1, "sees the"), L("kids", 2), L("kids", 3)],
@@ -867,7 +883,8 @@ window.render = function (t) {
     rise($(".h2", col), x, 0.2, 0.6, 24);
     col.querySelectorAll(".bul").forEach((b, i) => rise(b, x, times[i] - 0.15, 0.5, 18));
     const note = $(".note", col);
-    if (note) rise(note, x, id === "wealth" ? L(id, 0, "minus") : L(id, 1, "safari"), 0.6, 10);
+    const noteAt = { wealth: () => L(id, 0, "minus"), outings: () => L(id, 1, "safari"), ask: () => L(id, 1, "real numbers") };
+    if (note) rise(note, x, noteAt[id](), 0.6, 10);
   }
 
   // phones: Omar's from the bridge to the summary; Layla's beside it for the kids

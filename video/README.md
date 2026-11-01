@@ -1,6 +1,6 @@
 # The story video: two men, one salary
 
-`family-finance-coach-story.mp4`: 1920x1080, about 3 min 27 s, narrated, with subtitles.
+`family-finance-coach-story.mp4`: 1920x1080, about 3 min 47 s, narrated, with subtitles.
 
 Inspired by a true story. Two men in the UAE earn the same salary (AED 28,000 a month) and both have a wife and two
 children. Omar spends without a plan: Starbucks every morning, a restaurant every week, delivery, the mall with the
@@ -17,11 +17,12 @@ Then the full demo of the app, built to help the first man. Every app screen in 
 | Scene | Screen | What it shows |
 |---|---|---|
 | Today | `/parent` | What is free until pay day, and Adam's request waiting |
+| Ask the accountant | `/parent/ask` | Questions in his own words: where Adam's money went, a weekend away, a what-if; a family rule just by saying it |
 | The plan | `/parent/plan`, `/parent/plan/buckets`, `/parent/plan/calculator` | Bills first, the card paid in full, a buffer; every dirham gets a job; the investing bucket in 1, 5 and 10 years |
 | Weekly dinners | `/parent/plan/meals` | "The kids want pasta": a week of dinners that suits everyone, the shopping list inside the grocery budget, busy nights |
 | Family outings | `/parent/plan/outings` | "The kids love animals": 3 outings in December for AED 170, inside the fun budget |
 | Budgets | `/parent/money/budgets` | Entertainment over budget the same month, and the advice |
-| Every dirham | `/parent/money/add` | A morning coffee typed in |
+| Receipts | `/parent/money` (Uploads), `/parent/money/document` | The demo Carrefour receipt read line by line (19 items, AED 641.50), matched to Omar's Visa, waiting for Confirm |
 | Before a big buy | `/parent/money/compare` | The best total across shops, and the card check |
 | Gold and wealth | `/parent/money/gold`, `/parent/money/wealth` | Gold in grams; wealth minus the cards and the old card-debt loan |
 | The kids | `/child`, `/child/ask`, `/child/month`, `/parent` | Layla's goal, the family's dinners and outings on her screen, the best price, Omar approves, her month with the camel |
@@ -38,7 +39,7 @@ the app is a prototype with demo money only, and that it is information, not fin
 | `script.json` | The narration, scene by scene, and how the voice should say a name ("Yousef" is spelled "Yusef" for the voice; "UAE" and "AI" are left plain so each is said as one word) |
 | `audio.py` | Speaks each line with Kokoro (offline), lays out the timing, adds a generated music bed: `build/timing.json`, `build/audio_24k.wav` |
 | `story-overlay.sql` | One change to the demo family for the story: the car loan becomes "Loan for the old card debt" |
-| `capture.sh`, `capture.js` | Reset the demo family, apply the overlay, and screenshot the real app at phone size: `build/shots/`. It also plans the week's dinners (pasta) and December's outings (animals) and saves both, so Layla's home shows them |
+| `capture.sh`, `capture.js` | Reset the demo family, apply the overlay, and screenshot the real app at phone size: `build/shots/`. It also plans the week's dinners (pasta) and December's outings (animals) and saves both, so Layla's home shows them; asks the accountant four questions; and uploads the demo receipt |
 | `story.html` | Every scene. `render(t)` draws any moment, so each frame is exact |
 | `render.js` | Draws each frame with Playwright and pipes it to ffmpeg with the audio |
 
@@ -56,6 +57,6 @@ the app is a prototype with demo money only, and that it is information, not fin
    `KOKORO_DIR=<that folder> python audio.py script.json build`. Lines are cached in `build/lines/`, so editing one line
    only respeaks that line.
 5. Check a few moments: `node render.js --stills 12,95.5,150` writes PNGs to `build/stills/`.
-6. The video: `npm run render` (about 9 minutes for 6,200 frames). It renders 30-second parts into
+6. The video: `npm run render` (about 10 minutes for 6,800 frames). It renders 30-second parts into
    `build/parts/` and keeps the ones already done, so a stopped render picks up where it was; delete that folder after
    changing the scenes, the screens or the narration.
