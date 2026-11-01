@@ -19,6 +19,8 @@ Week 7: the Planner plans cheaper family outings (outings.py): it reads the mont
 from the core's list, and the core prices them for the family and checks them against the entertainment budget.
 Dinners (2026-10-26): the Planner plans the week's dinners (meals.py): it reads the busy nights and wishes, may pick
 from the core's saved recipes that suit everyone, and the core prices the shopping list and checks the grocery money.
+Quick money questions: the Planner answers "how much is free until pay day?", "I got a AED 5,000 bonus" and
+"how much gold do we have?" from the core's cash flow, goals, one-off effect, gold and wealth (money_questions.py).
 Savings calculator: the Planner reads a what-if ("AED 1,000 a month at 6% for 15 years") into the core's calculator
 ask (calculator.py) and repeats the core's 1, 5 and 10 year figures. Learning only, no product is ever named.
 Later weeks replace route_message() with an LLM classifier and fill in each agent with tools
@@ -32,7 +34,7 @@ from typing import TypedDict
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 
-from . import bookkeeper, calculator, documents, gatekeeper, meals, outings, planner, rules, shopper
+from . import bookkeeper, calculator, documents, gatekeeper, meals, money_questions, outings, planner, rules, shopper
 from .spend_parser import PARENT_SAID, looks_like_spend
 
 
@@ -95,15 +97,20 @@ def route_message(state: ChatState) -> ChatState:
     text = state.get("message", "").lower()
     if bookkeeper.is_spend_question(text) or is_spend_log(state):
         return {"agent": Agent.BOOKKEEPER}
-    if state.get("role") == "PARENT" and rules.is_rule_text(text):
+    parent = state.get("role") == "PARENT"
+    if parent and rules.is_rule_text(text):
         return {"agent": Agent.GATEKEEPER}
+    if parent and money_questions.is_extra_income(text):
+        return {"agent": Agent.PLANNER}  # "I got a AED 5,000 bonus" is money in, not a price to check
     if gatekeeper.amount_in(text) and _ASKING.search(text) or "afford" in text:
         return {"agent": Agent.GATEKEEPER}
     if meals.is_meals_question(text) or outings.is_outings_question(text) or calculator.is_calculator_question(text):
         return {"agent": Agent.PLANNER}
+    if parent and money_questions.is_money_question(text) or money_questions.is_gold_question(text):
+        return {"agent": Agent.PLANNER}  # before the Shopper: "how much is free until pay day" is not a price
     if shopper.is_price_question(text):
         return {"agent": Agent.SHOPPER}
-    if state.get("role") == "PARENT" and planner.is_plan_question(text):
+    if parent and planner.is_plan_question(text):
         return {"agent": Agent.PLANNER}
     for agent, words in _KEYWORDS:
         if any(w in text for w in words):
@@ -154,8 +161,12 @@ def planner_node(state: ChatState, config: RunnableConfig) -> ChatState:
         return {"reply": meals.handle(core, me, message, ctx.get("llm"))}
     if core is not None and me is not None and outings.is_outings_question(message):
         return {"reply": outings.handle(core, me, message, ctx.get("llm"))}
+    if core is not None and me is not None and money_questions.is_extra_income(message):
+        return {"reply": money_questions.handle(core, me, message)}
     if core is not None and me is not None and calculator.is_calculator_question(message):
         return {"reply": calculator.handle(core, me, message)}
+    if core is not None and me is not None and money_questions.is_money_question(message):
+        return {"reply": money_questions.handle(core, me, message)}
     if core is not None and me is not None and planner.is_plan_question(message):
         return {"reply": planner.handle(core, me, message, ctx.get("llm"))}
     return {"reply": _PLACEHOLDER[Agent.PLANNER]}

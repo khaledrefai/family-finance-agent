@@ -582,6 +582,18 @@ class CoreClient:
         _raise_for_core(resp)
         return resp.json()
 
+    def one_off_effect(self, amount: str) -> dict:
+        """A bonus or gift: each funded goal's full month now, and if all of the amount went there. Saves nothing."""
+        return self._get("/api/plan/one-off-effect", {"amount": amount})
+
+    def gold(self) -> dict:
+        """The family's gold: grams by purity, value at today's price, what was paid, the price used. Parents only."""
+        return self._get("/api/gold")
+
+    def wealth(self) -> dict:
+        """Bank + cash + gold at today's price − cards − loans, with each part. Parents only."""
+        return self._get("/api/wealth")
+
     def bucket_suggestion(self) -> list[Share]:
         return [Share.model_validate(s) for s in self._get("/api/plan/buckets/suggestion")]
 

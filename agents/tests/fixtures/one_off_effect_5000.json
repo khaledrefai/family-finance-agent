@@ -1,0 +1,24 @@
+{
+    "amount": {
+        "minor": 500000,
+        "currency": "AED",
+        "text": "AED 5,000"
+    },
+    "goals": [
+        {
+            "goalId": "00000000-0000-0000-0000-0000000003f1",
+            "goal": "Emergency buffer",
+            "fullBefore": "January 2027",
+            "fullAfter": "December 2026",
+            "monthsSooner": 1
+        },
+        {
+            "goalId": "00000000-0000-0000-0000-0000000003f2",
+            "goal": "Summer trip",
+            "fullBefore": "April 2027",
+            "fullAfter": "January 2027",
+            "monthsSooner": 3
+        }
+    ],
+    "note": "One-off money is never planned in advance. These show each goal if all of it went there."
+}

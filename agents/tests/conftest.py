@@ -59,9 +59,12 @@ class FakeCore:
         self.meal_plans: list[dict] = []
         self.meal_headers: list[str] = []
         self.calculator_bodies: list[dict] = []
+        self.one_off_amounts: list[str] = []
+        self.paths: list[str] = []          # every core path called, in order
 
     def handler(self, request: httpx.Request) -> httpx.Response:
         path = request.url.path
+        self.paths.append(path)
         if path == "/api/me":
             return httpx.Response(200, json={"memberId": self.who["id"], "displayName": self.who["displayName"],
                                              "role": self.who["role"], "ageBand": self.who["ageBand"],
@@ -104,6 +107,13 @@ class FakeCore:
         if path == "/api/plan/calculator":
             self.calculator_bodies.append(json.loads(request.content))
             return httpx.Response(200, json=load("calculator_1000_6pc.json"))
+        if path == "/api/plan/one-off-effect":
+            self.one_off_amounts.append(request.url.params["amount"])
+            return httpx.Response(200, json=load("one_off_effect_5000.json"))
+        if path in ("/api/gold", "/api/wealth"):
+            if self.who["role"] != "PARENT":
+                return httpx.Response(403, json={"detail": "Only a parent can see the family's gold"})
+            return httpx.Response(200, json=load(path.removeprefix("/api/") + ".json"))
         if path == "/api/plan/options":
             return httpx.Response(200, json=load("options_trip.json"))
         if path == "/api/plan/buckets/draft":

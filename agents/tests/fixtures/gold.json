@@ -1,0 +1,184 @@
+{
+    "value": {
+        "minor": 1576500,
+        "currency": "AED",
+        "text": "AED 15,765"
+    },
+    "paid": {
+        "minor": 1540000,
+        "currency": "AED",
+        "text": "AED 15,400"
+    },
+    "grams": [
+        {
+            "purity": "24K",
+            "grams": "40",
+            "gramsMg": 40000,
+            "value": {
+                "minor": 1280000,
+                "currency": "AED",
+                "text": "AED 12,800"
+            }
+        },
+        {
+            "purity": "22K",
+            "grams": "10",
+            "gramsMg": 10000,
+            "value": {
+                "minor": 296500,
+                "currency": "AED",
+                "text": "AED 2,965"
+            }
+        }
+    ],
+    "byGoal": [
+        {
+            "goalId": "00000000-0000-0000-0000-0000000003f3",
+            "name": "Home deposit",
+            "grams": "40",
+            "value": {
+                "minor": 1280000,
+                "currency": "AED",
+                "text": "AED 12,800"
+            }
+        },
+        {
+            "goalId": "00000000-0000-0000-0000-0000000003f1",
+            "name": "Emergency buffer",
+            "grams": "10",
+            "value": {
+                "minor": 296500,
+                "currency": "AED",
+                "text": "AED 2,965"
+            }
+        }
+    ],
+    "holdings": [
+        {
+            "id": "f9dfc7fb-7f29-4723-bf21-5efb9f0f8801",
+            "description": "Gold bar",
+            "grams": "20",
+            "gramsMg": 20000,
+            "purity": "24K",
+            "paid": {
+                "minor": 580000,
+                "currency": "AED",
+                "text": "AED 5,800"
+            },
+            "boughtOn": "2026-03-18",
+            "seller": "Gold Souk, Deira",
+            "bucket": "GOALS",
+            "goalId": "00000000-0000-0000-0000-0000000003f3",
+            "goalName": "Home deposit",
+            "jewellery": false,
+            "value": {
+                "minor": 640000,
+                "currency": "AED",
+                "text": "AED 6,400"
+            },
+            "belowPaid": false
+        },
+        {
+            "id": "22280e66-3442-423c-a502-d37006cb5a95",
+            "description": "Gold coins, 4 x 5 g",
+            "grams": "20",
+            "gramsMg": 20000,
+            "purity": "24K",
+            "paid": {
+                "minor": 620000,
+                "currency": "AED",
+                "text": "AED 6,200"
+            },
+            "boughtOn": "2026-07-10",
+            "seller": "Mall of the Emirates",
+            "bucket": "GOALS",
+            "goalId": "00000000-0000-0000-0000-0000000003f3",
+            "goalName": "Home deposit",
+            "jewellery": false,
+            "value": {
+                "minor": 640000,
+                "currency": "AED",
+                "text": "AED 6,400"
+            },
+            "belowPaid": false
+        },
+        {
+            "id": "98856e4a-43a1-45e2-a345-25f71319e155",
+            "description": "Bangle",
+            "grams": "10",
+            "gramsMg": 10000,
+            "purity": "22K",
+            "paid": {
+                "minor": 340000,
+                "currency": "AED",
+                "text": "AED 3,400"
+            },
+            "boughtOn": "2026-09-23",
+            "seller": "Gold Souk, Deira",
+            "bucket": "GOALS",
+            "goalId": "00000000-0000-0000-0000-0000000003f1",
+            "goalName": "Emergency buffer",
+            "jewellery": true,
+            "value": {
+                "minor": 296500,
+                "currency": "AED",
+                "text": "AED 2,965"
+            },
+            "belowPaid": true
+        }
+    ],
+    "prices": [
+        {
+            "purity": "24K",
+            "perGram": {
+                "minor": 32000,
+                "currency": "AED",
+                "text": "AED 320"
+            },
+            "asOf": "2026-11-01T20:30:42.57974Z",
+            "source": "Sample Dubai retail rate (demo)",
+            "seeded": true,
+            "typedByFamily": true
+        },
+        {
+            "purity": "22K",
+            "perGram": {
+                "minor": 29650,
+                "currency": "AED",
+                "text": "AED 296.50"
+            },
+            "asOf": "2026-11-01T20:30:42.57974Z",
+            "source": "Sample Dubai retail rate (demo)",
+            "seeded": true,
+            "typedByFamily": true
+        },
+        {
+            "purity": "21K",
+            "perGram": {
+                "minor": 28300,
+                "currency": "AED",
+                "text": "AED 283"
+            },
+            "asOf": "2026-11-01T20:30:42.57974Z",
+            "source": "Sample Dubai retail rate (demo)",
+            "seeded": true,
+            "typedByFamily": true
+        },
+        {
+            "purity": "18K",
+            "perGram": {
+                "minor": 24250,
+                "currency": "AED",
+                "text": "AED 242.50"
+            },
+            "asOf": "2026-11-01T20:30:42.57974Z",
+            "source": "Sample Dubai retail rate (demo)",
+            "seeded": true,
+            "typedByFamily": true
+        }
+    ],
+    "priceAsOf": "2026-11-01T20:30:42.57974Z",
+    "priceSource": "Sample Dubai retail rate (demo)",
+    "priceIsSample": true,
+    "makingNote": "Jewellery prices include making charges, so it is worth less than you paid if you sell it by weight."
+}

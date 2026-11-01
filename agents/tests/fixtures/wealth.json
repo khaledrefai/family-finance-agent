@@ -1,0 +1,112 @@
+{
+    "total": {
+        "minor": 1496500,
+        "currency": "AED",
+        "text": "AED 14,965"
+    },
+    "owned": {
+        "minor": 6066500,
+        "currency": "AED",
+        "text": "AED 60,665"
+    },
+    "owed": {
+        "minor": 4570000,
+        "currency": "AED",
+        "text": "AED 45,700"
+    },
+    "asOf": "2026-11-02",
+    "steps": [
+        {
+            "label": "Bank accounts",
+            "amount": {
+                "minor": 4425000,
+                "currency": "AED",
+                "text": "AED 44,250"
+            },
+            "fromBp": 0,
+            "toBp": 7294,
+            "kind": "s1",
+            "asOf": "2026-11-02",
+            "asOfLatest": "2026-11-02"
+        },
+        {
+            "label": "Cash",
+            "amount": {
+                "minor": 65000,
+                "currency": "AED",
+                "text": "AED 650"
+            },
+            "fromBp": 7294,
+            "toBp": 7401,
+            "kind": "s1",
+            "asOf": "2026-11-02",
+            "asOfLatest": "2026-11-02"
+        },
+        {
+            "label": "Gold, at today's price",
+            "amount": {
+                "minor": 1576500,
+                "currency": "AED",
+                "text": "AED 15,765"
+            },
+            "fromBp": 7401,
+            "toBp": 10000,
+            "kind": "s4",
+            "asOf": "2026-11-02",
+            "asOfLatest": "2026-11-02"
+        },
+        {
+            "label": "Everything you own",
+            "amount": {
+                "minor": 6066500,
+                "currency": "AED",
+                "text": "AED 60,665"
+            },
+            "fromBp": 0,
+            "toBp": 10000,
+            "kind": "total",
+            "asOf": null,
+            "asOfLatest": null
+        },
+        {
+            "label": "Credit cards",
+            "amount": {
+                "minor": -730000,
+                "currency": "AED",
+                "text": "-AED 7,300"
+            },
+            "fromBp": 8797,
+            "toBp": 10000,
+            "kind": "s2",
+            "asOf": "2026-11-01",
+            "asOfLatest": "2026-11-01"
+        },
+        {
+            "label": "Car loan left",
+            "amount": {
+                "minor": -3840000,
+                "currency": "AED",
+                "text": "-AED 38,400"
+            },
+            "fromBp": 2467,
+            "toBp": 8797,
+            "kind": "s2",
+            "asOf": "2026-11-02",
+            "asOfLatest": "2026-11-02"
+        },
+        {
+            "label": "Family wealth",
+            "amount": {
+                "minor": 1496500,
+                "currency": "AED",
+                "text": "AED 14,965"
+            },
+            "fromBp": 0,
+            "toBp": 2467,
+            "kind": "total",
+            "asOf": null,
+            "asOfLatest": null
+        }
+    ],
+    "note": "An estimate from the balances you typed in. No bank is connected."
+}
