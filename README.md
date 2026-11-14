@@ -288,7 +288,7 @@ saves a draft bucket split with the engine's own shares, and asks Claude only fo
 (structured outputs), with server-side refusal fallbacks on. If any number in Claude's text is not in the core's
 facts, or Claude is off, slow (6 s) or fails, the rule-based template answers instead. Set `ANTHROPIC_API_KEY` to
 turn it on; `AGENTS_LLM=off` forces the template (use it for a recording if the network is unsure). The model is
-`AGENTS_LLM_MODEL` (default `claude-opus-5-5`). Every run is in "What the agent did" (`GET /api/agent-runs`),
+`AGENTS_LLM_MODEL` (default `claude-haiku-5-5`). Every run is in "What the agent did" (`GET /api/agent-runs`),
 including whether Claude or the fallback answered and why.
 
 ## Spend logging (spike)
