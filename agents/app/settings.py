@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     # The LLM step. "off" = always the rule-based fallback (demo-safe, no key needed),
     # "on" = always try Claude, "auto" = try Claude only when an API key is set.
     llm: str = "auto"
-    llm_model: str = "claude-opus-5-5"
+    llm_model: str = "claude-haiku-5-5"
     llm_timeout_s: float = 6.0
     # Reading a receipt photo or a PDF takes Claude far longer than a chat reply
     llm_read_timeout_s: float = 40.0
