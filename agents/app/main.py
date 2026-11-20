@@ -11,7 +11,7 @@ from .graph import orchestrator
 from .spend_story import nudge
 from .core_client import CoreError, WaysToSave
 from .ways_to_save import write as write_ways_to_save
-from . import meals, outings, planner, shopper, summary
+from . import agent_loop, meals, money_check, outings, planner, shopper, summary
 
 app = FastAPI(title="Family Finance Coach - agent service", version="0.1.0")
 
@@ -20,9 +20,21 @@ class ChatIn(BaseModel):
     message: str
 
 
+class StepOut(BaseModel):
+    agent: str      # Bookkeeper, Gatekeeper, Shopper, Planner, Core, or Router
+    tool: str
+    said: str
+    result: str
+    ok: bool = True
+    changes: bool = False
+
+
 class ChatOut(BaseModel):
     agent: str
     reply: str
+    # "How I worked this out": every step the agent took, in order. With the AI off, one step: the keyword router.
+    steps: list[StepOut] = []
+    planned: bool = False   # True when Claude chose the steps; False when the keyword router picked one agent
 
 
 class PricesIn(BaseModel):
@@ -58,9 +70,20 @@ def chat(body: ChatIn, core: CoreClient = Depends(core_for_caller)) -> ChatOut:
     # The member's token is passed straight through to the core API, so an agent can never do more
     # than the member themselves is allowed to.
     me = core.me()
-    result = orchestrator.invoke({"message": body.message, "role": me.role.value},
+    message = body.message[:1000]
+    try:
+        looped = agent_loop.run(core, me, message)
+    except CoreError:
+        looped = None  # the audit trail couldn't open: answer the fixed way
+    if looped is not None:
+        return ChatOut(agent=looped.agent, reply=looped.reply, planned=True,
+                       steps=[StepOut(**vars(s)) for s in looped.steps])
+    result = orchestrator.invoke({"message": message, "role": me.role.value},
                                  config={"configurable": {"core": core, "me": me}})
-    return ChatOut(agent=result["agent"].value, reply=result["reply"])
+    agent = result["agent"].value
+    return ChatOut(agent=agent, reply=result["reply"], steps=[StepOut(
+        agent="Router", tool="keyword router", said=message[:300],
+        result=f"Sent to the {agent.capitalize()} by keywords (the AI planner is off or unavailable).")])
 
 
 class ReadOut(BaseModel):
@@ -165,3 +188,18 @@ def setup_plan(core: CoreClient = Depends(core_for_caller)) -> SetupPlanOut:
     if me.role.value != "PARENT":
         raise HTTPException(status_code=403, detail="Only a parent can set up the family's plan")
     return SetupPlanOut(reply=planner.handle(core, me, FIRST_PLAN, first_plan=True))
+
+
+class CheckIn(BaseModel):
+    trigger: str = "MESSAGE"   # SCHEDULE when the core's Sunday job calls; MESSAGE for "Run the check now"
+
+
+@app.post("/check")
+def money_check_now(body: CheckIn | None = None, core: CoreClient = Depends(core_for_caller)) -> dict:
+    """The weekly money check: the Planner looks at the family's facts and proposes up to two actions for a parent
+    to approve. The core calls this every Sunday morning; a parent can also run it from the app."""
+    trigger = body.trigger if body and body.trigger in ("SCHEDULE", "MESSAGE", "EVENT") else "MESSAGE"
+    try:
+        return money_check.check(core, core.me(), trigger)
+    except CoreError as e:
+        raise HTTPException(status_code=e.status, detail=e.detail)

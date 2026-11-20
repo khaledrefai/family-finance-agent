@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { agent } from "@/lib/api";
+import { agent, AgentStep } from "@/lib/api";
 import { rulesApi } from "@/lib/live";
 
 interface Turn {
@@ -9,6 +9,8 @@ interface Turn {
   text: string;
   // A rule the agent just drafted: the parent can turn it on right here (the core only takes that from a parent's tap)
   rule?: { id: string; state: "draft" | "on" | "busy"; note?: string };
+  steps?: AgentStep[];
+  planned?: boolean;
 }
 
 // The Gatekeeper's answer after drafting a rule: I've written this down as a rule: "No energy drinks for Layla" (...)
@@ -42,9 +44,12 @@ export function AgentChat({
     setText("");
     try {
       const res = await agent.chat(message);
-      const label = res.reply.match(DRAFTED)?.[1];
+      // A rule the Gatekeeper drafted, from the answer or from the step that drafted it
+      const label = [res.reply, ...(res.steps ?? []).map((s) => s.result)].map((t) => t.match(DRAFTED)?.[1]).find(Boolean);
       const draft = label ? (await rulesApi.list().catch(() => [])).find((r) => r.status === "DRAFT" && r.label === label) : undefined;
-      setTurns((t) => [...t, { from: "agent", text: res.reply, rule: draft && { id: draft.id, state: "draft" } }]);
+      setTurns((t) => [...t, {
+        from: "agent", text: res.reply, rule: draft && { id: draft.id, state: "draft" }, steps: res.steps, planned: res.planned,
+      }]);
       onReply?.();
     } catch (err) {
       setTurns((t) => [...t, { from: "agent", text: `That didn't send. ${(err as Error).message}` }]);
@@ -82,6 +87,7 @@ export function AgentChat({
                 </button>
               )}
               {t.rule?.note && <p className="muted" role="status">{t.rule.note}</p>}
+              {t.steps && t.steps.length > 0 && <Steps steps={t.steps} planned={!!t.planned} />}
               {source && <p className="turn-source">{source}</p>}
             </div>
           ),
@@ -107,5 +113,44 @@ export function AgentChat({
         <button type="submit" disabled={busy}>Send</button>
       </form>
     </section>
+  );
+}
+
+// What each tool is, in words a parent understands
+const TOOL_WORDS: Record<string, string> = {
+  spending_story: "looked at the spending",
+  log_what_i_bought: "logged what was bought",
+  can_we_afford: "checked the money and the family rules",
+  find_best_price: "searched the shops",
+  draft_family_rule: "wrote a rule draft",
+  plan_this_month: "made this month's plan",
+  plan_dinners: "planned the dinners",
+  plan_outings: "planned outings",
+  savings_what_if: "ran the savings calculator",
+  money_this_month: "read this month's money",
+  budgets_this_month: "read the budgets",
+  family_goals: "read the goals",
+  family_rules: "read the family rules",
+  odd_charges: "looked for odd charges",
+};
+
+// "How I worked this out": every step the agent took for this answer, in order
+function Steps({ steps, planned }: { steps: AgentStep[]; planned: boolean }) {
+  return (
+    <details className="agent-steps">
+      <summary>
+        How I worked this out · {planned ? `${steps.length} step${steps.length === 1 ? "" : "s"}, chosen by the AI` : "AI off, fixed path"}
+      </summary>
+      <ol>
+        {steps.map((s, i) => (
+          <li key={i} className={s.ok ? undefined : "failed"}>
+            <b>{s.agent === "Core" ? "Money engine" : s.agent}</b> {TOOL_WORDS[s.tool] ?? s.tool}
+            {s.said && <span className="muted"> · asked: &ldquo;{s.said}&rdquo;</span>}
+            {s.changes && <span className="step-tag">{s.tool === "log_what_i_bought" ? "logged" : "draft, needs a parent's tap"}</span>}
+            <span className="step-result">{s.result.length > 240 ? `${s.result.slice(0, 240)}…` : s.result}</span>
+          </li>
+        ))}
+      </ol>
+    </details>
   );
 }

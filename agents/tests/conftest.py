@@ -59,6 +59,9 @@ class FakeCore:
         self.meal_plans: list[dict] = []
         self.meal_headers: list[str] = []
         self.calculator_bodies: list[dict] = []
+        self.proposals: list[dict] = []
+        self.proposal_headers: list[str] = []
+        self.budgets = load("budgets.json")
 
     def handler(self, request: httpx.Request) -> httpx.Response:
         path = request.url.path
@@ -97,6 +100,16 @@ class FakeCore:
             return httpx.Response(200, json=self.found)
         if path == "/api/plan/cashflow":
             return httpx.Response(200, json=load("cashflow.json"))
+        if path == "/api/budgets":
+            return httpx.Response(200, json=self.budgets)
+        if path == "/api/agent-proposals" and request.method == "POST":
+            body = json.loads(request.content)
+            self.proposal_headers.append(request.headers.get("X-Agent-Run-Id", ""))
+            if any(p["title"] == body["title"] for p in self.proposals):
+                return httpx.Response(409, json={"detail": "The same suggestion is already waiting for a parent"})
+            self.proposals.append(body)
+            return httpx.Response(201, json={**body, "id": "22222222-2222-2222-2222-%012d" % len(self.proposals),
+                                             "status": "PROPOSED"})
         if path == "/api/plan/goals":
             return httpx.Response(200, json=load("goals.json"))
         if path == "/api/plan/buckets/suggestion":

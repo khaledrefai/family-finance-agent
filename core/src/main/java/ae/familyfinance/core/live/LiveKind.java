@@ -24,6 +24,10 @@ public enum LiveKind {
     MONTH_SUMMARY,
     /** A parent saved the week's dinners. Everyone hears what's for dinner; the kids never see prices. */
     MEALS_PLANNED,
+    /** The weekly money check proposed something for a parent to approve or dismiss. */
+    AGENT_PROPOSAL,
+    /** A parent approved the money check's short message to one child. */
+    AGENT_NUDGE,
     /** "Send me a test" from the notifications card. */
     TEST
 }

@@ -119,10 +119,80 @@ export const api = {
     call<SpendingRequest>(`/api/requests/${id}/${decision}`, { method: "POST" }),
 };
 
+// One step an agent took to answer: which agent or tool, what it was asked, and what it found.
+export interface AgentStep {
+  agent: string; // Bookkeeper, Gatekeeper, Shopper, Planner, Core (a money engine lookup) or Router (AI off)
+  tool: string;
+  said: string;
+  result: string;
+  ok: boolean;
+  changes: boolean; // saved a draft or logged something; a draft still needs a parent's tap
+}
+
+export interface ChatReply {
+  agent: string;
+  reply: string;
+  steps: AgentStep[];
+  planned: boolean; // true: the AI chose the steps; false: the keyword router picked one agent
+}
+
+// The weekly money check: what it proposes, for a parent's tap
+export interface Proposal {
+  id: string;
+  kind: "NOTE" | "BUDGET" | "NUDGE";
+  title: string;
+  body: string;
+  why: string[];
+  link: string | null;
+  childId: string | null;
+  childName: string | null;
+  childMessage: string | null;
+  status: "PROPOSED" | "APPROVED" | "DISMISSED";
+  createdAt: string;
+  decidedBy: string | null;
+  decidedAt: string | null;
+  triggeredBy: "SCHEDULE" | "MESSAGE" | "EVENT" | null;
+}
+
+export interface CheckResult {
+  summary: string;
+  proposals: Proposal[];
+  factsChecked: number;
+  aiChose: boolean;
+}
+
+// "What the agents did": one run, with every call it made to the core
+export interface AgentRun {
+  id: string;
+  agent: string;
+  triggeredBy: string | null;
+  status: "RUNNING" | "SUCCEEDED" | "FAILED";
+  inputSummary: string | null;
+  outputSummary: string | null;
+  model: string | null;
+  llmUsed: boolean | null;
+  fallbackReason: string | null;
+  latencyMs: number | null;
+  inputTokens: number | null;
+  outputTokens: number | null;
+  startedAt: string;
+  finishedAt: string | null;
+  calls: { tool: string; changesState: boolean; status: string; httpStatus: number | null; at: string }[];
+}
+
+export const agentsApi = {
+  runs: (limit = 30) => call<AgentRun[]>(`/api/agent-runs?limit=${limit}`),
+  proposals: (all = false) => call<Proposal[]>(`/api/agent-proposals${all ? "?all=true" : ""}`),
+  approve: (id: string) => call<Proposal>(`/api/agent-proposals/${id}/approve`, { method: "POST" }),
+  dismiss: (id: string) => call<Proposal>(`/api/agent-proposals/${id}/dismiss`, { method: "POST" }),
+};
+
 // The agent service (Python). It calls the core with the same token, so it can't do more than the member can.
 export const agent = {
   chat: (message: string) =>
-    call<{ agent: string; reply: string }>("/agent/chat", { method: "POST", body: JSON.stringify({ message }) }),
+    call<ChatReply>("/agent/chat", { method: "POST", body: JSON.stringify({ message }) }),
+  // Run the weekly money check now (it also runs by itself every Sunday morning)
+  check: () => call<CheckResult>("/agent/check", { method: "POST", body: JSON.stringify({ trigger: "MESSAGE" }) }),
   nudge: () => call<{ nudge: string | null }>("/agent/nudge"),
 };
 

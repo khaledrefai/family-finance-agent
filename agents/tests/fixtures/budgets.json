@@ -1,0 +1,111 @@
+{
+ "monthLabel": "October 2026",
+ "daysLeft": 8,
+ "limit": {
+  "minor": 380000,
+  "currency": "AED",
+  "text": "AED 3,800"
+ },
+ "spent": {
+  "minor": 284000,
+  "currency": "AED",
+  "text": "AED 2,840"
+ },
+ "lines": [
+  {
+   "category": "GROCERIES",
+   "label": "Groceries",
+   "limit": {
+    "minor": 300000,
+    "currency": "AED",
+    "text": "AED 3,000"
+   },
+   "spent": {
+    "minor": 180000,
+    "currency": "AED",
+    "text": "AED 1,800"
+   },
+   "percent": 60,
+   "left": {
+    "minor": 120000,
+    "currency": "AED",
+    "text": "AED 1,200"
+   },
+   "over": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "usual": null,
+   "atThisPace": null,
+   "state": "OK",
+   "alert": null,
+   "fillBp": 0,
+   "pastBp": 0
+  },
+  {
+   "category": "ENTERTAINMENT",
+   "label": "Entertainment",
+   "limit": {
+    "minor": 80000,
+    "currency": "AED",
+    "text": "AED 800"
+   },
+   "spent": {
+    "minor": 104000,
+    "currency": "AED",
+    "text": "AED 1,040"
+   },
+   "percent": 130,
+   "left": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "over": {
+    "minor": 24000,
+    "currency": "AED",
+    "text": "AED 240"
+   },
+   "usual": null,
+   "atThisPace": null,
+   "state": "OVER",
+   "alert": "Entertainment is AED 240 over with 8 days left.",
+   "fillBp": 0,
+   "pastBp": 0
+  }
+ ],
+ "alerts": [
+  {
+   "category": "ENTERTAINMENT",
+   "label": "Entertainment",
+   "limit": {
+    "minor": 80000,
+    "currency": "AED",
+    "text": "AED 800"
+   },
+   "spent": {
+    "minor": 104000,
+    "currency": "AED",
+    "text": "AED 1,040"
+   },
+   "percent": 130,
+   "left": {
+    "minor": 0,
+    "currency": "AED",
+    "text": "AED 0"
+   },
+   "over": {
+    "minor": 24000,
+    "currency": "AED",
+    "text": "AED 240"
+   },
+   "usual": null,
+   "atThisPace": null,
+   "state": "OVER",
+   "alert": "Entertainment is AED 240 over with 8 days left.",
+   "fillBp": 0,
+   "pastBp": 0
+  }
+ ]
+}
