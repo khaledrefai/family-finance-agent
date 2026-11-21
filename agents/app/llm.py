@@ -117,6 +117,21 @@ class Llm:
         return result
 
 
+    def converse(self, system: str, messages: list, tools: list, max_tokens: int = 2000,
+                 timeout_s: float | None = None):
+        """One turn of a tool-use conversation (the orchestrator's loop). Returns the SDK's message; raises on any
+        API error, so the caller can fall back. Claude only picks tools and writes words here: the tools do the work."""
+        return self._get_client().messages.create(
+            model=settings.llm_model,
+            max_tokens=max_tokens,
+            system=system,
+            tools=tools,
+            messages=messages,
+            output_config={"effort": "low"},
+            **({"timeout": timeout_s} if timeout_s else {}),
+        )
+
+
 def _ms(started: float) -> int:
     return int((time.monotonic() - started) * 1000)
 

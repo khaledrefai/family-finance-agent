@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     llm: str = "auto"
     llm_model: str = "claude-haiku-5-5"
     llm_timeout_s: float = 6.0
+    # The orchestrator's tool loop (Ask): each Claude turn, and the whole loop with every tool it calls
+    llm_loop_turn_timeout_s: float = 15.0
+    llm_loop_budget_s: float = 45.0
+    llm_loop_max_steps: int = 6
     # Reading a receipt photo or a PDF takes Claude far longer than a chat reply
     llm_read_timeout_s: float = 40.0
     anthropic_api_key: str | None = Field(default=None, validation_alias="ANTHROPIC_API_KEY")

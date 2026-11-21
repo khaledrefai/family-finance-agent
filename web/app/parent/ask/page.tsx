@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api, MemberView } from "@/lib/api";
+import Link from "next/link";
 import { AgentChat } from "../../agent-chat";
 import { Loading, Masthead } from "../../ui";
 import { useSession } from "../../use-session";
@@ -31,6 +32,7 @@ export default function AskPage() {
         suggestions={[
           ...members.filter((m) => m.role === "CHILD").map((m) => `Where did ${m.displayName}'s money go this month?`),
           "Anything over AED 100 needs me",
+          "How are we doing this month, and is anything over budget?",
           "I got a AED 5,000 bonus",
         ]}
       />
@@ -43,6 +45,10 @@ export default function AskPage() {
           <li><b>Make a family rule:</b> &quot;{kids[0] ? `${kids[0].displayName}: snacks up to AED 50 a month` : "anything over AED 100 needs me"}&quot;</li>
         </ul>
         <p className="muted" style={{ fontSize: 13, margin: 0 }}>Anything that changes money comes back as a draft. Nothing counts until you confirm it.</p>
+        <p className="muted" style={{ fontSize: 13, margin: 0 }}>
+          The coach picks which agents and tools to use for each question. Open &quot;How I worked this out&quot; under an
+          answer, or see <Link href="/parent/agents" className="link">what the agents did</Link>.
+        </p>
       </section>
     </div>
   );

@@ -6,6 +6,7 @@ import { aed, api, MemberView, plain } from "@/lib/api";
 import { advice as adviceApi, BudgetMonth, CardCheck, core, dayLongMonth, Goal, useAccounts, useLive, useMoney, WaysToSave } from "@/lib/live";
 import { advice, familyGoal, waysToSave } from "@/lib/sample";
 import { Chit } from "../chit";
+import { MoneyCheck } from "../money-check";
 import { BellLink } from "../live-ui";
 import { notifyApi, WeekPlan } from "@/lib/push";
 import { useLiveEvents } from "@/lib/live-stream";
@@ -226,6 +227,8 @@ export default function TodayPage() {
           </div>
         )}
       </section>
+
+      <MoneyCheck compact />
 
       <section className="card" style={{ display: "grid", gap: 6 }}>
         <div className="row" style={{ padding: 0 }}>

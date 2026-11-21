@@ -145,6 +145,20 @@ public final class LivePolicy {
                     }
                 }
             }
+            case AGENT_PROPOSAL -> {
+                for (Member p : parents) {
+                    live.add(p.id());
+                    notes.add(new Note(p.id(), "Money check: " + title, e.get("body"), "/parent#money-check", false));
+                }
+            }
+            case AGENT_NUDGE -> {
+                parents.forEach(p -> live.add(p.id()));
+                if (subjectIsChild) {
+                    live.add(subject.id());
+                    notes.add(new Note(subject.id(), orDefault(title, "A note from your parents"), e.get("body"),
+                            "/child", false));
+                }
+            }
             case TEST -> {
                 if (subject != null) {
                     live.add(subject.id());

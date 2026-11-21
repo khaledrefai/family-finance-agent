@@ -37,6 +37,8 @@ services:
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       PUSH_CONTACT: ${PUSH_CONTACT:-}
+      # The weekly money check: every Sunday 8:00 UAE time the core wakes the Planner agent for each family
+      APP_AGENTS_URL: http://agents:8000
     depends_on:
       db:
         condition: service_healthy

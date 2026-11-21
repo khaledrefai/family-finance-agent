@@ -516,6 +516,41 @@ class Finding(BaseModel):
     amount: MoneyView
 
 
+class BudgetLine(BaseModel):
+    category: str
+    label: str
+    limit: MoneyView
+    spent: MoneyView
+    percent: int
+    left: MoneyView | None = None
+    over: MoneyView | None = None
+    usual: MoneyView | None = None
+    atThisPace: MoneyView | None = None
+    state: str   # OK, ABOVE_USUAL, HEADING_OVER or OVER (the core's engine decides)
+    alert: str | None = None
+
+
+class BudgetMonth(BaseModel):
+    monthLabel: str
+    daysLeft: int
+    limit: MoneyView
+    spent: MoneyView
+    lines: list[BudgetLine]
+    alerts: list[BudgetLine] = []
+
+
+class NewProposal(BaseModel):
+    """One suggestion from the weekly money check. NOTE: something to know. BUDGET: a budget to slow down or change
+    (the parent changes it in Budgets). NUDGE: a short message to a child, sent only when a parent approves it."""
+    kind: str
+    title: str
+    body: str
+    why: list[str] = []        # the core's facts it is based on, word for word
+    childId: UUID | None = None
+    childMessage: str | None = None
+    link: str | None = None
+
+
 class CoreError(Exception):
     """The core said no (bad amount, not allowed...). `detail` is a message safe to show the member."""
 
@@ -543,8 +578,8 @@ class CoreClient:
 
     # ------------------------------------------------------------ agent runs (the core keeps the audit trail)
 
-    def open_run(self, agent: str, input_summary: str) -> UUID:
-        resp = self._http.post("/api/agent-runs", json={"agent": agent, "triggerKind": "MESSAGE",
+    def open_run(self, agent: str, input_summary: str, trigger_kind: str = "MESSAGE") -> UUID:
+        resp = self._http.post("/api/agent-runs", json={"agent": agent, "triggerKind": trigger_kind,
                                                         "inputSummary": input_summary[:2000]})
         _raise_for_core(resp)
         return UUID(resp.json()["id"])
@@ -563,7 +598,22 @@ class CoreClient:
         _raise_for_core(self._http.post(f"/api/agent-runs/{run_id}/finish",
                                         json={k: v for k, v in body.items() if v is not None}))
 
+    # ------------------------------------------------------------ the weekly money check's suggestions
+
+    def propose(self, proposal: "NewProposal") -> dict:
+        """A suggestion for a parent to approve or dismiss. Only an agent run may make one; nothing happens until a
+        parent approves it in the app."""
+        resp = self._http.post("/api/agent-proposals", json=proposal.model_dump(exclude_none=True, mode="json"))
+        _raise_for_core(resp)
+        return resp.json()
+
+    def proposals(self) -> list[dict]:
+        return self._get("/api/agent-proposals")
+
     # ------------------------------------------------------------ the money plan
+
+    def budgets(self) -> "BudgetMonth":
+        return BudgetMonth.model_validate(self._get("/api/budgets"))
 
     def cashflow(self) -> Cashflow:
         return Cashflow.model_validate(self._get("/api/plan/cashflow"))
